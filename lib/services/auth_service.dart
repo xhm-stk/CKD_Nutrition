@@ -62,4 +62,46 @@ class AuthService {
       return 'ไม่สามารถเข้าสู่ระบบได้: กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ ($e)';
     }
   }
+
+  // ส่งลิงก์เพื่อรีเซ็ตรหัสผ่านไปยังอีเมลของผู้ใช้งาน
+  Future<String?> resetPassword(String email) async {
+    try {
+      await _sb.auth.resetPasswordForEmail(email);
+      return null; // ทำการส่งอีเมลสำเร็จ
+    } on AuthException catch (e) {
+      return e.message; // ส่งข้อความแจ้งข้อผิดพลาดจาก Supabase กลับไป
+    } catch (e) {
+      return 'ไม่สามารถส่งลิงก์รีเซ็ตรหัสผ่านได้: $e';
+    }
+  }
+
+  // เข้าสู่ระบบผ่าน Google OAuth
+  Future<String?> signInWithGoogle() async {
+    try {
+      await _sb.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'io.supabase.ckdnutrition://login-callback/',
+      );
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return 'เกิดข้อผิดพลาดในการเชื่อมต่อ Google: $e';
+    }
+  }
+
+  // เข้าสู่ระบบผ่าน Apple OAuth
+  Future<String?> signInWithApple() async {
+    try {
+      await _sb.auth.signInWithOAuth(
+        OAuthProvider.apple,
+        redirectTo: 'io.supabase.ckdnutrition://login-callback/',
+      );
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return 'เกิดข้อผิดพลาดในการเชื่อมต่อ Apple: $e';
+    }
+  }
 }
