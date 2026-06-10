@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../services/auth_service.dart';
 import '../dashboard/dashboard_page.dart'; // import ให้ตรง
 import 'login_page.dart'; // ดึงหน้าเข้าสู่ระบบเพื่อใช้ย้อนกลับ
+import 'package:provider/provider.dart';
 
 class HealthSetupPage extends StatefulWidget {
   final Isar isar;
@@ -33,7 +34,7 @@ class _HealthSetupPageState extends State<HealthSetupPage> {
 
     try {
       // เซฟโปรไฟล์ขึ้น Cloud
-      await AuthService(widget.isar).saveHealthProfile(
+      await context.read<AuthService>().saveHealthProfile(
         weightKg: double.parse(_weightCtrl.text.trim()),
         heightCm: double.parse(_heightCtrl.text.trim()),
         gender: _selectedGender,
@@ -60,6 +61,13 @@ class _HealthSetupPageState extends State<HealthSetupPage> {
         ),
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _weightCtrl.dispose();
+    _heightCtrl.dispose();
+    super.dispose();
   }
 
   @override
