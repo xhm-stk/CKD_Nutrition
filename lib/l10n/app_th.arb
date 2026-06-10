@@ -1,0 +1,14 @@
+{
+  "appName": "CKD Nutrition",
+  "welcomeTitle": "ยินดีต้อนรับสู่ CKD Nutrition",
+  "welcomeSubtitle": "ติดตามอาหารเพื่อดูแลสุขภาพไตของคุณ",
+  "login": "เข้าสู่ระบบ",
+  "register": "สมัครสมาชิกใหม่",
+  "email": "อีเมลของคุณ",
+  "password": "รหัสผ่าน",
+  "confirmPassword": "ยืนยันรหัสผ่านอีกครั้ง",
+  "forgotPassword": "ลืมรหัสผ่าน?",
+  "dontHaveAccount": "ยังไม่มีบัญชีผู้ใช้งาน? ",
+  "alreadyHaveAccount": "มีบัญชีผู้ใช้งานอยู่แล้ว? ",
+  "orLoginWith": "หรือล็อกอินด้วย"
+}

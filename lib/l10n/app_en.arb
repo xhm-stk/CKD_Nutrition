@@ -1,0 +1,14 @@
+{
+  "appName": "CKD Nutrition",
+  "welcomeTitle": "Welcome to CKD Nutrition",
+  "welcomeSubtitle": "Track your nutrition to care for your kidney health",
+  "login": "Sign In",
+  "register": "Sign Up",
+  "email": "Your Email",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "forgotPassword": "Forgot Password?",
+  "dontHaveAccount": "Don't have an account? ",
+  "alreadyHaveAccount": "Already have an account? ",
+  "orLoginWith": "Or sign in with"
+}

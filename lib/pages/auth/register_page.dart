@@ -3,6 +3,8 @@ import 'package:isar/isar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../services/auth_service.dart';
 import 'health_setup_page.dart'; // ดึงหน้าตั้งค่าสุขภาพเพื่อไปต่อหลังจากสมัครสำเร็จ
+import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RegisterPage extends StatefulWidget {
   final Isar isar;
@@ -23,9 +25,69 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscurePass = true;
   bool _obscureConfirmPass = true;
   bool _isLoading = false;
+  bool _acceptPrivacyPolicy = false;
+
+  // ฟังก์ชันสำหรับเปิด Dialog แสดงนโยบายความเป็นส่วนตัว
+  void _showPrivacyPolicyDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.privacy_tip_outlined, color: Colors.teal.shade700, size: 28),
+              const SizedBox(width: 8),
+              const Text('นโยบายความเป็นส่วนตัว'),
+            ],
+          ),
+          content: const SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'ข้อตกลงและนโยบายความเป็นส่วนตัว (Privacy Policy)',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  '1. การรวบรวมข้อมูลสุขภาพ\n'
+                  'แอปพลิเคชัน CKD Nutrition จำเป็นต้องรวบรวมข้อมูลสุขภาพส่วนบุคคลของคุณ เช่น น้ำหนัก ส่วนสูง เพศ และระยะโรคไต (CKD Stage) เพื่อใช้ในการคำนวณโควต้าโปรตีน โซเดียม โพแทสเซียม และปริมาณน้ำที่เหมาะสมสำหรับสุขภาพไตของคุณ\n\n'
+                  '2. การรักษาความปลอดภัยของข้อมูล\n'
+                  'ข้อมูลทั้งหมดของคุณจะถูกจัดเก็บอย่างปลอดภัยบนระบบฐานข้อมูล Supabase ภายใต้เกราะป้องกัน Row Level Security (RLS) ซึ่งจะจำกัดสิทธิ์ให้เข้าถึงได้เฉพาะเจ้าของบัญชีเท่านั้น\n\n'
+                  '3. การแบ่งปันข้อมูล\n'
+                  'เราไม่มีนโยบายการเปิดเผยข้อมูลส่วนบุคคลหรือข้อมูลสุขภาพของคุณให้กับบริษัทภายนอกเพื่อประโยชน์ทางการค้าใดๆ ทั้งสิ้น ข้อมูลทั้งหมดจะใช้เพื่อวัตถุประสงค์ในการคำนวณอาหารภายในแอปพลิเคชันนี้เท่านั้น',
+                  style: TextStyle(fontSize: 14, height: 1.4),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('รับทราบ'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // ฟังก์ชันสมัครสมาชิก
   void _register() async {
+    // ตรวจสอบว่าผู้ใช้กดยอมรับนโยบายความเป็นส่วนตัวหรือยัง
+    if (!_acceptPrivacyPolicy) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('กรุณากดยอมรับนโยบายความเป็นส่วนตัวก่อนสมัครสมาชิก'),
+          backgroundColor: Colors.amber,
+        ),
+      );
+      return;
+    }
+
     // 1. ตรวจสอบความถูกต้องของข้อมูลทั้งหมดในฟอร์มก่อน
     if (!_formKey.currentState!.validate()) return;
 
@@ -33,7 +95,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     try {
       // 2. เรียกใช้ AuthService เพื่อส่งข้อมูลอีเมลและรหัสผ่านไปยัง Supabase
-      final err = await AuthService(widget.isar).register(
+      final err = await context.read<AuthService>().register(
         _emailCtrl.text.trim(),
         _passCtrl.text.trim(),
       );
@@ -94,8 +156,17 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passCtrl.dispose();
+    _confirmPassCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Scaffold(
       body: Container(
@@ -137,7 +208,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'เริ่มดูแลสุขภาพไตของคุณ',
+                      l10n.welcomeTitle,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
@@ -146,7 +217,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'สร้างแผนโภชนาการสำหรับโรคไตเพื่อดูแลตัวเองในระยะยาว',
+                      l10n.welcomeSubtitle,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.teal.shade600,
@@ -171,7 +242,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               controller: _emailCtrl,
                               keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(
-                                labelText: 'อีเมลของคุณ',
+                                labelText: l10n.email,
                                 hintText: 'example@gmail.com',
                                 prefixIcon: Icon(Icons.mail_outline_rounded, color: Colors.teal.shade600),
                                 border: OutlineInputBorder(
@@ -202,8 +273,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               controller: _passCtrl,
                               obscureText: _obscurePass,
                               decoration: InputDecoration(
-                                labelText: 'รหัสผ่าน',
-                                hintText: 'อย่างน้อย 6 ตัวอักษร',
+                                labelText: l10n.password,
+                                hintText: 'อย่างน้อย 8 ตัวอักษร (A-Z, a-z, 0-9, อักขระพิเศษ)',
                                 prefixIcon: Icon(Icons.lock_outline_rounded, color: Colors.teal.shade600),
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -226,7 +297,13 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               validator: (val) {
                                 if (val == null || val.isEmpty) return 'กรุณากรอกรหัสผ่าน';
-                                if (val.length < 6) return 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร';
+                                if (val.length < 8) return 'รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร';
+                                if (!RegExp(r'[A-Z]').hasMatch(val)) return 'ต้องมีตัวพิมพ์ใหญ่ (A-Z) อย่างน้อย 1 ตัว';
+                                if (!RegExp(r'[a-z]').hasMatch(val)) return 'ต้องมีตัวพิมพ์เล็ก (a-z) อย่างน้อย 1 ตัว';
+                                if (!RegExp(r'[0-9]').hasMatch(val)) return 'ต้องมีตัวเลข (0-9) อย่างน้อย 1 ตัว';
+                                if (!RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(val)) {
+                                  return 'ต้องมีอักขระพิเศษ (เช่น !@#\$%^&*) อย่างน้อย 1 ตัว';
+                                }
                                 return null;
                               },
                             ),
@@ -237,7 +314,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               controller: _confirmPassCtrl,
                               obscureText: _obscureConfirmPass,
                               decoration: InputDecoration(
-                                labelText: 'ยืนยันรหัสผ่านอีกครั้ง',
+                                labelText: l10n.confirmPassword,
                                 prefixIcon: Icon(Icons.lock_clock_outlined, color: Colors.teal.shade600),
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -264,7 +341,48 @@ class _RegisterPageState extends State<RegisterPage> {
                                 return null;
                               },
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 16),
+
+                            // แถวเช็คบ็อกซ์ยอมรับนโยบายความเป็นส่วนตัว
+                            Row(
+                              children: [
+                                Checkbox(
+                                  activeColor: Colors.teal.shade700,
+                                  value: _acceptPrivacyPolicy,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _acceptPrivacyPolicy = val ?? false;
+                                    });
+                                  },
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: _showPrivacyPolicyDialog,
+                                    child: RichText(
+                                      text: TextSpan(
+                                        style: TextStyle(
+                                          color: Colors.teal.shade800,
+                                          fontSize: 13,
+                                          fontFamily: theme.textTheme.bodyMedium?.fontFamily,
+                                        ),
+                                        children: [
+                                          const TextSpan(text: 'ฉันยอมรับ '),
+                                          TextSpan(
+                                            text: 'นโยบายความเป็นส่วนตัว และ ข้อตกลงการใช้งาน',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              decoration: TextDecoration.underline,
+                                              color: Colors.teal.shade900,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
 
                             // ปุ่มดำเนินการสมัครสมาชิกไล่เฉดสีเขียวสวยงาม
                             _isLoading
@@ -289,18 +407,73 @@ class _RegisterPageState extends State<RegisterPage> {
                                           borderRadius: BorderRadius.circular(16),
                                         ),
                                       ),
-                                      child: const Center(
-                                        child: Text(
-                                          'สมัครสมาชิกใหม่',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
+                                      child: Center(
+                                        child: Text(l10n.register),
                                       ),
                                     ),
                                   ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: Text(
+                                    l10n.orLoginWith,
+                                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                                  ),
+                                ),
+                                Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () async {
+                                      final messenger = ScaffoldMessenger.of(context);
+                                      final err = await context.read<AuthService>().signInWithGoogle();
+                                      if (err != null && mounted) {
+                                        messenger.showSnackBar(
+                                          SnackBar(content: Text(err), backgroundColor: Colors.redAccent),
+                                        );
+                                      }
+                                    },
+                                    icon: const Icon(Icons.g_mobiledata, color: Colors.red, size: 24),
+                                    label: const Text('Google', style: TextStyle(color: Colors.black)),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () async {
+                                      final messenger = ScaffoldMessenger.of(context);
+                                      final err = await context.read<AuthService>().signInWithApple();
+                                      if (err != null && mounted) {
+                                        messenger.showSnackBar(
+                                          SnackBar(content: Text(err), backgroundColor: Colors.redAccent),
+                                        );
+                                      }
+                                    },
+                                    icon: const Icon(Icons.apple, color: Colors.black, size: 20),
+                                    label: const Text('Apple', style: TextStyle(color: Colors.black)),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -312,13 +485,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'มีบัญชีผู้ใช้งานอยู่แล้ว? ',
+                          l10n.alreadyHaveAccount,
                           style: TextStyle(color: Colors.teal.shade800),
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(context), // ปิดหน้านี้เพื่อย้อนกลับไปหน้าเดิม (Login)
                           child: Text(
-                            'เข้าสู่ระบบ',
+                            l10n.login,
                             style: TextStyle(
                               color: Colors.teal.shade700,
                               fontWeight: FontWeight.bold,
