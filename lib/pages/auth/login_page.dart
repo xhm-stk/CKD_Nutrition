@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
-import '../../../services/auth_service.dart';
-import 'register_page.dart'; // โหลดหน้าจอสมัครสมาชิกเพื่อเปลี่ยนหน้าเมื่อกดลิงก์
-import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../repositories/auth_repository.dart';
+import '../../../core/result.dart';
+import '../../l10n/app_localizations.dart';
 
-class LoginPage extends StatefulWidget {
-  final Isar isar;
-  const LoginPage({super.key, required this.isar});
+class LoginPage extends ConsumerStatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   // GlobalKey สำหรับใช้เช็คสถานะและตรวจสอบข้อมูลใน Form ของล็อกอิน
   final _formKey = GlobalKey<FormState>();
   
@@ -55,8 +54,8 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _isLoading = true);
     
-    // 2. เรียกใช้งาน AuthService เพื่อล็อกอินเข้า Supabase
-    final err = await context.read<AuthService>().login(
+    // 2. เรียกใช้งาน AuthRepository เพื่อล็อกอินเข้า Supabase
+    final result = await ref.read(authRepositoryProvider).login(
       _emailCtrl.text.trim(),
       _passCtrl.text.trim(),
     );
@@ -64,35 +63,36 @@ class _LoginPageState extends State<LoginPage> {
     if (!mounted) return;
     setState(() => _isLoading = false);
     
-    // 3. หากเข้าสู่ระบบไม่สำเร็จ ให้แสดงป้ายสีแดงเตือนความผิดพลาด
-    if (err != null) {
-      setState(() {
-        _loginAttempts++;
-        // หากกรอกผิดครบ 5 ครั้ง จะทำการระงับการล็อกอินชั่วคราวเป็นเวลา 1 นาที
+    // 3. จัดการผลลัพธ์ด้วย Result
+    switch (result) {
+      case Failure(:final userMessage):
+        setState(() {
+          _loginAttempts++;
+          if (_loginAttempts >= 5) {
+            _lockoutUntil = DateTime.now().add(const Duration(minutes: 1));
+          }
+        });
+
+        String errorMsg = userMessage;
         if (_loginAttempts >= 5) {
-          _lockoutUntil = DateTime.now().add(const Duration(minutes: 1));
+          errorMsg = 'กรอกรหัสผ่านผิดครบ 5 ครั้ง! โดนระงับการเข้าใช้งานชั่วคราว 1 นาที';
+        } else {
+          errorMsg = '$userMessage (เหลือสิทธิ์ให้ลองอีก ${5 - _loginAttempts} ครั้ง)';
         }
-      });
 
-      String errorMsg = err;
-      if (_loginAttempts >= 5) {
-        errorMsg = 'กรอกรหัสผ่านผิดครบ 5 ครั้ง! โดนระงับการเข้าใช้งานชั่วคราว 1 นาที';
-      } else {
-        errorMsg = '$err (เหลือสิทธิ์ให้ลองอีก ${5 - _loginAttempts} ครั้ง)';
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    } else {
-      // ล็อกอินสำเร็จ รีเซ็ตข้อมูลจำนวนครั้งที่ล็อกอินผิดพลาด
-      setState(() {
-        _loginAttempts = 0;
-        _lockoutUntil = null;
-      });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      case Success():
+        // ล็อกอินสำเร็จ รีเซ็ตข้อมูลจำนวนครั้งที่ล็อกอินผิดพลาด
+        setState(() {
+          _loginAttempts = 0;
+          _lockoutUntil = null;
+        });
+        // GoRouter จะเด้งไปหน้าถัดไปอัตโนมัติ
     }
   }
 
@@ -179,8 +179,8 @@ class _LoginPageState extends State<LoginPage> {
                           
                           setDialogState(() => isDialogLoading = true);
                           
-                          // เรียกใช้งานฟังก์ชันรีเซ็ตรหัสผ่านใน AuthService
-                          final err = await context.read<AuthService>().resetPassword(
+                          // เรียกใช้งานฟังก์ชันรีเซ็ตรหัสผ่านใน AuthRepository
+                          await ref.read(authRepositoryProvider).resetPassword(
                             emailCtrl.text.trim(),
                           );
                           
@@ -189,22 +189,14 @@ class _LoginPageState extends State<LoginPage> {
                           
                           Navigator.pop(context); // ปิด Dialog หลังส่งเสร็จสิ้น
                           
-                          if (err != null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(err),
-                                backgroundColor: Colors.redAccent,
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text('ระบบได้ส่งลิงก์ตั้งรหัสผ่านใหม่ไปยังอีเมลของคุณเรียบร้อยแล้ว กรุณาตรวจสอบกล่องจดหมาย'),
-                                backgroundColor: Colors.green.shade600,
-                                duration: const Duration(seconds: 5),
-                              ),
-                            );
-                          }
+                          // 🔒 ป้องกัน Account Enumeration: ไม่ว่ามีอีเมลในระบบหรือไม่ จะแสดงข้อความเดียวกัน
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('หากอีเมลถูกต้อง ระบบได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว กรุณาตรวจสอบกล่องจดหมาย'),
+                              backgroundColor: Colors.teal,
+                              duration: Duration(seconds: 5),
+                            ),
+                          );
                         },
                         child: const Text('ส่งลิงก์'),
                       ),
@@ -413,10 +405,10 @@ class _LoginPageState extends State<LoginPage> {
                             Row(
                               children: [
                                 Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
-                                Padding(
+                                const Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 10),
                                   child: Text(
-                                    l10n.orLoginWith,
+                                    'หรือเข้าสู่ระบบด้วย',
                                     style: TextStyle(color: Colors.grey, fontSize: 13),
                                   ),
                                 ),
@@ -430,10 +422,11 @@ class _LoginPageState extends State<LoginPage> {
                                   child: OutlinedButton.icon(
                                     onPressed: () async {
                                       final messenger = ScaffoldMessenger.of(context);
-                                      final err = await context.read<AuthService>().signInWithGoogle();
-                                      if (err != null && mounted) {
+                                      final result = await ref.read(authRepositoryProvider).signInWithGoogle();
+                                      if (!mounted) return;
+                                      if (result is Failure) {
                                         messenger.showSnackBar(
-                                          SnackBar(content: Text(err), backgroundColor: Colors.redAccent),
+                                          SnackBar(content: Text(result.userMessage), backgroundColor: Colors.redAccent),
                                         );
                                       }
                                     },
@@ -452,10 +445,11 @@ class _LoginPageState extends State<LoginPage> {
                                   child: OutlinedButton.icon(
                                     onPressed: () async {
                                       final messenger = ScaffoldMessenger.of(context);
-                                      final err = await context.read<AuthService>().signInWithApple();
-                                      if (err != null && mounted) {
+                                      final result = await ref.read(authRepositoryProvider).signInWithApple();
+                                      if (!mounted) return;
+                                      if (result is Failure) {
                                         messenger.showSnackBar(
-                                          SnackBar(content: Text(err), backgroundColor: Colors.redAccent),
+                                          SnackBar(content: Text(result.userMessage), backgroundColor: Colors.redAccent),
                                         );
                                       }
                                     },
@@ -487,13 +481,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         TextButton(
                           onPressed: () {
-                            // เปิดหน้าจอสมัครสมาชิกใหม่ โดยการ Push ไปยัง RegisterPage
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => RegisterPage(isar: widget.isar),
-                              ),
-                            );
+                            // เปิดหน้าจอสมัครสมาชิกใหม่ โดยใช้ GoRouter
+                            context.push('/register');
                           },
                           child: Text(
                             l10n.register,

@@ -126,7 +126,7 @@ const FoodItemSchema = CollectionSchema(
         IndexPropertySchema(
           name: r'name',
           type: IndexType.value,
-          caseSensitive: false,
+          caseSensitive: true,
         )
       ],
     )

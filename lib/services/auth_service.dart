@@ -1,5 +1,6 @@
 import 'package:isar/isar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'ckd_rule_service.dart';
 
 class AuthService {
@@ -20,7 +21,8 @@ class AuthService {
       return e.message; // คืนค่าข้อความ Error จาก Supabase
     } catch (e) {
       // ดักจับข้อผิดพลาดทั่วไป (เช่น เครือข่ายหลุด หรือไม่ได้กำหนดค่าคีย์ Supabase)
-      return 'ไม่สามารถสมัครสมาชิกได้: กรุณาตรวจสอบอินเทอร์เน็ตของคุณ ($e)';
+      debugPrint('Auth Register Error: $e');
+      return 'ไม่สามารถสมัครสมาชิกได้: กรุณาตรวจสอบอินเทอร์เน็ตของคุณ';
     }
   }
 
@@ -40,7 +42,7 @@ class AuthService {
       'height_cm': heightCm,
       'gender': gender, 
       'ckd_stage': ckdStage,
-    });
+    }, onConflict: 'user_id');
     
     // โหลดกฎการแพทย์ลงเครื่องทันทีที่เซฟโปรไฟล์!
     await _ckdSvc.syncToIsar(ckdStage);
@@ -59,7 +61,8 @@ class AuthService {
       return e.message; // คืนค่าข้อความ Error จาก Supabase
     } catch (e) {
       // ดักจับข้อผิดพลาดทั่วไป (เช่น เครือข่ายหลุด)
-      return 'ไม่สามารถเข้าสู่ระบบได้: กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ ($e)';
+      debugPrint('Auth Login Error: $e');
+      return 'ไม่สามารถเข้าสู่ระบบได้: กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ';
     }
   }
 
@@ -71,7 +74,8 @@ class AuthService {
     } on AuthException catch (e) {
       return e.message; // ส่งข้อความแจ้งข้อผิดพลาดจาก Supabase กลับไป
     } catch (e) {
-      return 'ไม่สามารถส่งลิงก์รีเซ็ตรหัสผ่านได้: $e';
+      debugPrint('Auth Reset Password Error: $e');
+      return 'ไม่สามารถส่งลิงก์รีเซ็ตรหัสผ่านได้ กรุณาลองใหม่อีกครั้ง';
     }
   }
 

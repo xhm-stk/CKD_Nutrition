@@ -1,135 +1,206 @@
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../services/food_service.dart';
-import '../../services/ckd_rule_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../providers/core_providers.dart';
+import '../../repositories/auth_repository.dart';
 import '../../services/quota_engine.dart';
-import '../../widgets/quota_bar.dart';
+import '../../widgets/nutrient_circle.dart';
+import '../../widgets/meals_list.dart';
 import '../../widgets/warning_banner.dart';
-import '../food/food_search_page.dart';
-import '../auth/health_setup_page.dart'; // ดึงหน้ากรอกสุขภาพเพื่อย้ายไปกรอกกรณีข้อมูลว่าง
-import '../auth/login_page.dart'; // ดึงหน้าเข้าสู่ระบบเพื่อใช้ย้อนกลับ
 
-class DashboardPage extends StatefulWidget {
-  final Isar isar;
-  const DashboardPage({super.key, required this.isar});
-  @override State<DashboardPage> createState() => _DashboardPageState();
-}
-
-class _DashboardPageState extends State<DashboardPage> {
-  List<NutrientQuota> _quotas = [];
-  bool _loading = true;
+class DashboardPage extends ConsumerWidget {
+  const DashboardPage({super.key});
 
   @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dashboardAsync = ref.watch(dashboardSummaryProvider);
 
-  Future<void> _loadData() async {
-    setState(() => _loading = true);
-    
-    final sb = Supabase.instance.client;
-    final user = sb.auth.currentUser;
-    if (user == null) return;
-
-    try {
-      // 1. ดึงข้อมูลสเตจโรคไตของคนไข้คนนี้
-      final data = await sb
-          .from('user_health_profiles')
-          .select('ckd_stage')
-          .eq('user_id', user.id)
-          .maybeSingle(); // ใช้ maybeSingle เพื่อป้องกันเออเรอร์หากหาข้อมูลไม่เจอ
-      
-      if (data == null) {
-        // หากไม่มีข้อมูลประวัติสุขภาพของผู้ใช้คนนี้เลย -> พากลับไปหน้ากรอกข้อมูลสุขภาพเพื่อป้องกันแอปค้าง
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('ไม่พบข้อมูลสุขภาพของคุณ กรุณากรอกประวัติสุขภาพเริ่มต้นก่อนใช้งาน'),
-            backgroundColor: Colors.amber,
-          ),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => HealthSetupPage(isar: widget.isar)),
-        );
-        return;
-      }
-      
-      final ckdStage = data['ckd_stage'] as String;
-
-      // 2. ดึงกฎข้อบังคับการกินโรคไตของ Stage นั้นจากฐานข้อมูลจำลองในเครื่อง (Isar)
-      final rule = await CkdRuleService(widget.isar).getRule(ckdStage);
-      
-      // 3. ไปดึง "ยอดรวมที่กินไปแล้ววันนี้" จากคลาวด์
-      final log = await FoodService(widget.isar).getTodayLog();
-
-      if (mounted) {
-        setState(() {
-          // 4. คำนวณสารอาหารและแจ้งผลลัพธ์ผ่านตัวแปลง
-          _quotas = QuotaEngine.calculate(log: log, rule: rule);
-          _loading = false;
-        });
-      }
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _loading = false);
-      
-      // แจ้งเตือนความผิดพลาดหากเชื่อมอินเทอร์เน็ตล้มเหลว
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('ไม่สามารถโหลดข้อมูลโภชนาการได้: กรุณาตรวจสอบอินเทอร์เน็ต ($e)'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('โภชนาการวันนี้'),
         actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _loadData),
-          // เพิ่มปุ่มออกจากระบบเพื่อสลับบัญชีทดสอบในหน้าหลัก
           IconButton(
-            icon: const Icon(Icons.logout_rounded),
-            tooltip: 'ออกจากระบบ',
-            onPressed: () async {
-              await Supabase.instance.client.auth.signOut();
-              if (!context.mounted) return;
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => LoginPage(isar: widget.isar)),
-              );
-            },
+            icon: const Icon(Icons.refresh), 
+            onPressed: () {
+              ref.invalidate(dashboardSummaryProvider);
+              ref.invalidate(todayMealsProvider);
+            }
           ),
         ],
       ),
-      body: _loading 
-        ? const Center(child: CircularProgressIndicator())
-        : RefreshIndicator(
-            onRefresh: _loadData,
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text('เมนูหลัก', style: TextStyle(color: Colors.white, fontSize: 24)),
+            ),
+            ListTile(
+              leading: const Icon(Icons.restaurant_menu),
+              title: const Text('AI แนะนำอาหาร 3 มื้อ'),
+              onTap: () {
+                Navigator.pop(context); // ปิด Drawer
+                context.push('/meal-planner');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: const Text('ประวัติและสรุปรายเดือน'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/history');
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text('ออกจากระบบ', style: TextStyle(color: Colors.red)),
+              onTap: () async {
+                await ref.read(authRepositoryProvider).logout();
+              },
+            ),
+          ],
+        ),
+      ),
+      body: dashboardAsync.when(
+        data: (log) {
+          if (log == null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.go('/health-setup');
+            });
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final quotas = QuotaEngine.calculate(log: log);
+          
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(dashboardSummaryProvider);
+              ref.invalidate(todayMealsProvider);
+            },
             child: ListView(
               children: [
-                // โชว์ป้ายเตือน (หากปริมาณสารอาหารใดเกินเกณฑ์)
-                WarningBanner(quotas: _quotas),
-                // แสดงหลอดแสดงสารอาหารทีละหลอดอย่างสวยงาม
-                ..._quotas.map((q) => QuotaBar(quota: q)),
+                WarningBanner(quotas: quotas),
+                const SizedBox(height: 16),
+                
+                // AI Planner Box
+                _buildAiPlannerSection(context, ref),
+                
+                const Divider(height: 32, thickness: 1),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    'โควต้าสารอาหารประจำวัน',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // 3x2 Grid สำหรับหลอดวงกลมโควต้า
+                GridView.count(
+                  crossAxisCount: 3,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 0.8,
+                  children: quotas.map((q) => NutrientCircle(
+                    label: q.label,
+                    current: q.consumed,
+                    limit: q.limit,
+                    unit: q.unit,
+                  )).toList(),
+                ),
+                
+                const Divider(height: 32, thickness: 1),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    'รายการมื้ออาหารวันนี้',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                
+                // รายการมื้ออาหาร (สามารถ Swipe to delete ได้)
+                const MealsListWidget(),
+                
                 const SizedBox(height: 80),
               ],
             ),
-          ),
-      // ปุ่มลอยเพื่อไปยังหน้าจอบันทึกมื้ออาหาร
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) => Center(child: Text('เกิดข้อผิดพลาด: $e')),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add),
         label: const Text('บันทึกมื้ออาหาร'),
         onPressed: () async {
-          await Navigator.push(context, MaterialPageRoute(builder: (_) => FoodSearchPage(isar: widget.isar)));
-          _loadData();
+          // ไปหน้าเลือกอาหาร
+          await context.push('/food-search');
+          // เมื่อกลับมาให้รีเฟรชข้อมูล
+          ref.invalidate(dashboardSummaryProvider);
+          ref.invalidate(todayMealsProvider);
+          ref.invalidate(mealPlannerProvider);
         },
+      ),
+    );
+  }
+
+  Widget _buildAiPlannerSection(BuildContext context, WidgetRef ref) {
+    final plannerAsync = ref.watch(mealPlannerProvider);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Card(
+        color: Colors.blue.shade50,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.blue.shade200),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '🧠 AI แนะนำเมนูอาหาร (อยู่ในโควต้า)',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh, color: Colors.blue),
+                    onPressed: () => ref.invalidate(mealPlannerProvider),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              plannerAsync.when(
+                data: (meals) {
+                  if (meals.isEmpty) {
+                    return const Text('ไม่พบเมนูที่เหมาะสมกับโควต้าของคุณ');
+                  }
+                  return Column(
+                    children: meals.map<Widget>((m) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(m['name'] ?? 'ไม่มีชื่อ')),
+                          Text('${m['protein_g']}g โปรตีน', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                        ],
+                      ),
+                    )).toList(),
+                  );
+                },
+                loading: () => const Center(child: LinearProgressIndicator()),
+                error: (err, st) => const Text('รอการอัปเดตระบบจาก Supabase...', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
