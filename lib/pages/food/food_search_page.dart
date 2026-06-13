@@ -1,67 +1,91 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import '../../models/isar/food_item.dart';
-import '../../services/food_service.dart';
+import '../../providers/core_providers.dart';
+import '../../core/result.dart';
 
-class FoodSearchPage extends StatefulWidget {
-  final Isar isar;
+class FoodSearchPage extends ConsumerStatefulWidget {
+  final Isar isar; // ยังคงส่ง isar เข้ามาได้ เพราะหน้าค้นหาอาจจะต้องใช้ Isar instance โดยตรง หรือจะดึงผ่าน ref ก็ได้
   const FoodSearchPage({super.key, required this.isar});
-  @override State<FoodSearchPage> createState() => _FoodSearchPageState();
+  @override ConsumerState<FoodSearchPage> createState() => _FoodSearchPageState();
 }
 
-class _FoodSearchPageState extends State<FoodSearchPage> {
+class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
+  final TextEditingController _searchCtrl = TextEditingController();
   List<FoodItem> _results = [];
-  late final FoodService _foodSvc;
 
   @override
   void initState() {
     super.initState();
-    _foodSvc = FoodService(widget.isar);
-    _search(''); // ตอนเปิดมาครั้งแรก โชว์อาหารทั้งหมดเลย
+    _search(''); // โชว์ทั้งหมดตอนแรก
   }
 
-  // เรียกหา Service ให้ค้นหาใน Isar
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
   void _search(String q) async {
-    final foods = await _foodSvc.searchFood(q);
-    setState(() => _results = foods);
+    debugPrint('🔍 [Food Search Page] คำค้นหาที่ป้อน: "$q"');
+    final repo = ref.read(foodRepositoryProvider);
+    final foods = await repo.searchFood(q);
+    debugPrint('🔍 [Food Search Page] ค้นพบอาหารใน Isar: ${foods.length} รายการ');
+    if (mounted) setState(() => _results = foods);
   }
 
-  // ฟังก์ชันนี้จะถูกเรียกเมื่อกดที่เมนูอาหาร (โชว์หน้าต่างลอยขึ้นมาให้กรอกจำนวน)
   void _showLogDialog(FoodItem food) {
-    final ctrl = TextEditingController(text: '1'); // ค่าเริ่มต้น 1 หน่วย
+    final ctrl = TextEditingController(text: '1');
     String type = 'lunch';
     bool isSubmitting = false;
     
-    // พยายามดึงตัวเลขน้ำหนักต่อจานออกมา (เช่น "120g" ดึงมาแค่ 120.0)
     double baseWeight = 100.0;
     final match = RegExp(r'(\d+)').firstMatch(food.servingSize);
-    if(match != null) baseWeight = double.parse(match.group(0)!);
+    if (match != null) baseWeight = double.parse(match.group(0)!);
 
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // ทำให้เวลาคีย์บอร์ดเด้ง หน้าจอไม่โดนบัง
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
           return Padding(
             padding: EdgeInsets.only(
-              bottom: MediaQuery.of(ctx).viewInsets.bottom, // ดันหน้าต่างหนีคีย์บอร์ด
+              bottom: MediaQuery.of(ctx).viewInsets.bottom,
               left: 24, right: 24, top: 24,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('บันทึก ${food.name}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Row(
+                  children: [
+                    const Icon(Icons.restaurant_menu, color: Colors.teal),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'บันทึก ${food.name}', 
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        maxLines: 1, overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: ctrl,
-                  decoration: InputDecoration(labelText: 'จำนวน', suffixText: 'หน่วย (1 หน่วย = ${food.servingSize})'),
+                  decoration: InputDecoration(
+                    labelText: 'จำนวน', 
+                    suffixText: 'หน่วย (1 หน่วย = ${food.servingSize})',
+                    border: const OutlineInputBorder(),
+                  ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: type,
-                  decoration: const InputDecoration(labelText: 'มื้ออาหาร'),
+                  decoration: const InputDecoration(labelText: 'มื้ออาหาร', border: OutlineInputBorder()),
                   items: const [
                     DropdownMenuItem(value: 'breakfast', child: Text('มื้อเช้า')),
                     DropdownMenuItem(value: 'lunch', child: Text('มื้อเที่ยง')),
@@ -75,26 +99,33 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
                   ? const Center(child: CircularProgressIndicator())
                   : SizedBox(
                       width: double.infinity,
+                      height: 50,
                       child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          backgroundColor: Colors.teal,
+                          foregroundColor: Colors.white,
+                        ),
                         onPressed: () async {
                           setModalState(() => isSubmitting = true);
-                          // คำนวณน้ำหนักกรัมที่กินจริง = ตัวคูณ * น้ำหนักตั้งต้น 1 จาน
                           double multiplier = double.tryParse(ctrl.text) ?? 1.0;
                           double totalGrams = multiplier * baseWeight;
                           
-                          // สั่งบันทึก!
-                          final err = await _foodSvc.logMeal(food: food, quantityG: totalGrams, mealType: type);
+                          final nav = Navigator.of(context);
+                          final messenger = ScaffoldMessenger.of(context);
                           
-                          if(!context.mounted) return;
-                          Navigator.pop(ctx); // ปิด BottomSheet
+                          final result = await ref.read(mealControllerProvider).logMeal(food: food, quantityG: totalGrams, mealType: type);
                           
-                          if (err != null) {
-                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
-                          } else {
-                             Navigator.pop(context); // ปิดหน้าค้นหาอาหาร กลับไป Dashboard
+                          nav.pop(); // ปิด BottomSheet
+                          
+                          switch (result) {
+                            case Success():
+                              nav.pop(); // กลับไปหน้า Dashboard
+                            case Failure(:final userMessage):
+                              messenger.showSnackBar(SnackBar(content: Text(userMessage), backgroundColor: Colors.red));
                           }
                         },
-                        child: const Text('บันทึกมื้อนี้'),
+                        child: const Text('บันทึกมื้อนี้', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
                 const SizedBox(height: 24),
@@ -111,25 +142,56 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
     return Scaffold(
       appBar: AppBar(
         title: TextField(
+          controller: _searchCtrl,
           autofocus: true,
-          decoration: const InputDecoration(hintText: 'ค้นหาอาหาร... เช่น ข้าวต้ม, ปลา', border: InputBorder.none),
+          textInputAction: TextInputAction.search,
+          decoration: InputDecoration(
+            hintText: 'ค้นหาอาหาร... เช่น ข้าวต้ม, ปลา', 
+            border: InputBorder.none,
+            hintStyle: const TextStyle(color: Colors.white70),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear, color: Colors.white),
+              onPressed: () {
+                _searchCtrl.clear();
+                _search('');
+              },
+            ),
+          ),
+          style: const TextStyle(color: Colors.white),
+          cursorColor: Colors.white,
           onChanged: _search,
+          onSubmitted: _search,
         ),
+        backgroundColor: Colors.teal,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: ListView.builder(
-        itemCount: _results.length,
-        itemBuilder: (ctx, i) {
-          final f = _results[i];
-          return ListTile(
-            title: Text(f.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('โปรตีน: ${f.proteinG}g | โซเดียม: ${f.sodiumMg}mg'),
-            trailing: const Icon(Icons.add_circle, color: Colors.green),
-            onTap: () => _showLogDialog(f),
-          );
-        }
-      ),
+      body: _results.isEmpty 
+        ? const Center(child: Text('ไม่พบรายการอาหาร', style: TextStyle(color: Colors.grey)))
+        : ListView.builder(
+            itemCount: _results.length,
+            itemBuilder: (ctx, i) {
+              final f = _results[i];
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: Colors.teal,
+                    child: Icon(Icons.fastfood, color: Colors.white, size: 20),
+                  ),
+                  title: Text(f.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(
+                    'โปรตีน: ${f.proteinG}g | โซเดียม: ${f.sodiumMg}mg',
+                    style: TextStyle(color: Colors.grey.shade700),
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.add_circle, color: Colors.teal, size: 30),
+                    onPressed: () => _showLogDialog(f),
+                  ),
+                  onTap: () => _showLogDialog(f),
+                ),
+              );
+            }
+          ),
     );
   }
-
-  
 }
