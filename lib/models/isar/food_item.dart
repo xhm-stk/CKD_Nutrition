@@ -8,7 +8,7 @@ class FoodItem {
   @Index(unique: true) 
   late String foodId; // เก็บ F001, F002 (ใช้เป็นตัวเชื่อมกับ Cloud)
   
-  @Index(type: IndexType.value, caseSensitive: false) 
+  @Index(type: IndexType.value) 
   late String name;
   
   // รองรับ 16 คอลัมน์จาก Master Data ใหม่

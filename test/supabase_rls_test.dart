@@ -2,12 +2,20 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
+
+
 
 void main() {
   HttpOverrides.global = null;
 
-  final url = const String.fromEnvironment('SUPABASE_URL');
-  final anonKey = const String.fromEnvironment('SUPABASE_ANON_KEY');
+  final envFile = File('.env').readAsStringSync();
+  String url = '';
+  String anonKey = '';
+  for (var line in envFile.split('\n')) {
+    if (line.startsWith('SUPABASE_URL=')) url = line.split('=')[1].trim();
+    if (line.startsWith('SUPABASE_ANON_KEY=')) anonKey = line.substring(18).trim();
+  }
 
   // ตัวแปรเก็บผลทดสอบ
   int passed = 0;
@@ -18,11 +26,11 @@ void main() {
   void recordResult(String name, bool success, [String? detail]) {
     if (success) {
       passed++;
-      print('🛡️ $name: ผ่าน!${detail != null ? " ($detail)" : ""}');
+      debugPrint('🛡️ $name: ผ่าน!${detail != null ? " ($detail)" : ""}');
     } else {
       failed++;
       failedTests.add(name);
-      print('🚨 $name: ไม่ผ่าน!${detail != null ? " ($detail)" : ""}');
+      debugPrint('🚨 $name: ไม่ผ่าน!${detail != null ? " ($detail)" : ""}');
     }
   }
 
@@ -37,9 +45,9 @@ void main() {
 
     final client = makeClient();
 
-    print('================================================================');
-    print('🚀 Comprehensive RLS Security Audit — CKD Nutrition App');
-    print('================================================================');
+    debugPrint('================================================================');
+    debugPrint('🚀 Comprehensive RLS Security Audit — CKD Nutrition App');
+    debugPrint('================================================================');
 
     String generateRandomEmail() {
       final rand = Random().nextInt(1000000);
@@ -49,18 +57,18 @@ void main() {
     // =================================================================
     // PHASE 1: สร้าง User A + ข้อมูลครบ (profiles, health, daily_logs, meals)
     // =================================================================
-    print('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    print('📌 PHASE 1: สร้างข้อมูลทดสอบของ User A');
-    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    debugPrint('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    debugPrint('📌 PHASE 1: สร้างข้อมูลทดสอบของ User A');
+    debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     final emailA = generateRandomEmail();
     final authA = await client.auth.signUp(email: emailA, password: 'TestPassword123!');
     expect(authA.user, isNotNull);
     final userAId = authA.user!.id;
-    print('✅ User A สมัครสำเร็จ: $userAId');
+    debugPrint('✅ User A สมัครสำเร็จ: $userAId');
 
     // 1.1 ตรวจสอบว่า profiles ถูกสร้างจาก Trigger
     final profileA = await client.from('profiles').select().eq('id', userAId).maybeSingle();
-    print('✅ Profile ของ User A: ${profileA != null ? "พบ" : "ไม่พบ"}');
+    debugPrint('✅ Profile ของ User A: ${profileA != null ? "พบ" : "ไม่พบ"}');
 
     // 1.2 เพิ่มข้อมูลสุขภาพ
     final healthA = await client.from('user_health_profiles').insert({
@@ -68,7 +76,7 @@ void main() {
       'gender': 'male', 'ckd_stage': 'stage_3a',
     }).select();
     expect(healthA, isNotEmpty);
-    print('✅ Health Profile ของ User A บันทึกสำเร็จ');
+    debugPrint('✅ Health Profile ของ User A บันทึกสำเร็จ');
 
     // 1.3 เพิ่ม daily_log
     final logA = await client.from('daily_logs').insert({
@@ -76,7 +84,7 @@ void main() {
     }).select();
     expect(logA, isNotEmpty);
     final logAId = logA[0]['id'];
-    print('✅ Daily Log ของ User A บันทึกสำเร็จ (id: $logAId)');
+    debugPrint('✅ Daily Log ของ User A บันทึกสำเร็จ (id: $logAId)');
 
     // 1.4 เพิ่ม meal เข้าไปใน log ของ User A
     String? mealAId;
@@ -88,28 +96,28 @@ void main() {
         'sugar_g': 2.0, 'carb_g': 40.0, 'water_ml': 180.0,
       }).select();
       mealAId = mealA.isNotEmpty ? mealA[0]['id'].toString() : null;
-      print('✅ Meal ของ User A บันทึกสำเร็จ (id: $mealAId)');
+      debugPrint('✅ Meal ของ User A บันทึกสำเร็จ (id: $mealAId)');
     } on PostgrestException catch (e) {
-      print('⚠️ ตาราง meals อาจยังไม่มี RLS หรือ schema ไม่ตรง: ${e.message}');
+      debugPrint('⚠️ ตาราง meals อาจยังไม่มี RLS หรือ schema ไม่ตรง: ${e.message}');
     }
 
     await client.auth.signOut();
-    print('👋 ล็อกเอาต์ User A');
+    debugPrint('👋 ล็อกเอาต์ User A');
 
     // =================================================================
     // PHASE 2: สร้าง User B แล้วโจมตีข้อมูลของ User A ทุกรูปแบบ
     // =================================================================
-    print('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    print('📌 PHASE 2: ทดสอบการโจมตีข้อมูลข้ามบัญชี (User B → User A)');
-    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    debugPrint('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    debugPrint('📌 PHASE 2: ทดสอบการโจมตีข้อมูลข้ามบัญชี (User B → User A)');
+    debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     final emailB = generateRandomEmail();
     final authB = await client.auth.signUp(email: emailB, password: 'TestPassword456!');
     expect(authB.user, isNotNull);
     final userBId = authB.user!.id;
-    print('✅ User B สมัครสำเร็จ: $userBId');
+    debugPrint('✅ User B สมัครสำเร็จ: $userBId');
 
     // ---------- SELECT Tests (อ่านข้อมูลคนอื่น) ----------
-    print('\n🔎 กลุ่มที่ 1: ทดสอบการแอบอ่านข้อมูลคนอื่น (SELECT)');
+    debugPrint('\n🔎 กลุ่มที่ 1: ทดสอบการแอบอ่านข้อมูลคนอื่น (SELECT)');
 
     // Check 1: profiles
     final s1 = await client.from('profiles').select().eq('id', userAId);
@@ -132,7 +140,7 @@ void main() {
     }
 
     // ---------- UPDATE Tests (แก้ไขข้อมูลคนอื่น) ----------
-    print('\n✏️ กลุ่มที่ 2: ทดสอบการแอบแก้ไขข้อมูลคนอื่น (UPDATE)');
+    debugPrint('\n✏️ กลุ่มที่ 2: ทดสอบการแอบแก้ไขข้อมูลคนอื่น (UPDATE)');
 
     // Check 5: UPDATE profiles
     try {
@@ -159,7 +167,7 @@ void main() {
     }
 
     // ---------- DELETE Tests (ลบข้อมูลคนอื่น) ----------
-    print('\n🗑️ กลุ่มที่ 3: ทดสอบการแอบลบข้อมูลคนอื่น (DELETE)');
+    debugPrint('\n🗑️ กลุ่มที่ 3: ทดสอบการแอบลบข้อมูลคนอื่น (DELETE)');
 
     // Check 8: DELETE daily_logs ของ User A
     try {
@@ -186,7 +194,7 @@ void main() {
     }
 
     // ---------- INSERT Impersonation Tests (แอบสวมรอยเป็นคนอื่น) ----------
-    print('\n🎭 กลุ่มที่ 4: ทดสอบการสวมรอย (INSERT ด้วย user_id ของคนอื่น)');
+    debugPrint('\n🎭 กลุ่มที่ 4: ทดสอบการสวมรอย (INSERT ด้วย user_id ของคนอื่น)');
 
     // Check 11: INSERT health ด้วย user_id ของ User A (ขณะที่ล็อกอินเป็น User B)
     try {
@@ -210,14 +218,14 @@ void main() {
     }
 
     await client.auth.signOut();
-    print('👋 ล็อกเอาต์ User B');
+    debugPrint('👋 ล็อกเอาต์ User B');
 
     // =================================================================
     // PHASE 3: ทดสอบการเข้าถึงโดยไม่ล็อกอินเลย (Unauthenticated)
     // =================================================================
-    print('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    print('📌 PHASE 3: ทดสอบการเข้าถึงโดยไม่ล็อกอิน (Unauthenticated)');
-    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    debugPrint('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    debugPrint('📌 PHASE 3: ทดสอบการเข้าถึงโดยไม่ล็อกอิน (Unauthenticated)');
+    debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     // สร้าง client ใหม่ที่ไม่มี session ใด ๆ เลย
     final anonClient = makeClient();
 
@@ -259,9 +267,9 @@ void main() {
     // =================================================================
     // PHASE 4: ตรวจยืนยันว่า User A ยังมีข้อมูลครบถ้วน (ไม่ถูกลบโดย User B)
     // =================================================================
-    print('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    print('📌 PHASE 4: ยืนยันว่าข้อมูลของ User A ยังปลอดภัยอยู่ (Data Integrity)');
-    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    debugPrint('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    debugPrint('📌 PHASE 4: ยืนยันว่าข้อมูลของ User A ยังปลอดภัยอยู่ (Data Integrity)');
+    debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     // ล็อกอินกลับเข้ามาเป็น User A เพื่อตรวจสอบข้อมูล
     await client.auth.signInWithPassword(email: emailA, password: 'TestPassword123!');
@@ -284,18 +292,18 @@ void main() {
     // =================================================================
     // SUMMARY
     // =================================================================
-    print('\n================================================================');
-    print('📊 สรุปผลการทดสอบความปลอดภัย RLS');
-    print('================================================================');
-    print('✅ ผ่าน: $passed ข้อ');
-    print('❌ ไม่ผ่าน: $failed ข้อ');
+    debugPrint('\n================================================================');
+    debugPrint('📊 สรุปผลการทดสอบความปลอดภัย RLS');
+    debugPrint('================================================================');
+    debugPrint('✅ ผ่าน: $passed ข้อ');
+    debugPrint('❌ ไม่ผ่าน: $failed ข้อ');
     if (failedTests.isNotEmpty) {
-      print('\n🚨 รายการที่ไม่ผ่าน:');
+      debugPrint('\n🚨 รายการที่ไม่ผ่าน:');
       for (final t in failedTests) {
-        print('   - $t');
+        debugPrint('   - $t');
       }
     }
-    print('================================================================');
+    debugPrint('================================================================');
 
     expect(failed, 0, reason: 'มีการทดสอบความปลอดภัยไม่ผ่าน $failed ข้อ: ${failedTests.join(", ")}');
   });

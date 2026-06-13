@@ -1,96 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'l10n/app_localizations.dart';
 
 import 'models/isar/food_item.dart';
 import 'services/isar_seed_service.dart';
-import 'services/auth_service.dart';
-import 'package:provider/provider.dart';
-// import หน้าจอต่างๆ ของคุณ...
-import 'pages/dashboard/dashboard_page.dart';
-import 'pages/auth/login_page.dart';
-import 'pages/auth/health_setup_page.dart';
+import 'providers/core_providers.dart';
+import 'router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // บังคับให้ Flutter สตาร์ท
 
-  // 1. เชื่อมต่อ Supabase (Cloud)
+  // 1. โหลดตัวแปรสภาพแวดล้อมจากไฟล์ .env
+  await dotenv.load(fileName: ".env");
+
+  // 2. เชื่อมต่อ Supabase (Cloud) โดยดึงค่าจาก dotenv
   await Supabase.initialize(
-    url: const String.fromEnvironment('SUPABASE_URL'),
-    anonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
   // 2. เปิด Isar (Local)
   final dir = await getApplicationDocumentsDirectory();
-  final isar = await Isar.open(
+  final isarInstance = await Isar.open(
     [FoodItemSchema, CkdRuleCacheSchema],
     directory: dir.path,
   );
 
-  // 3. ปั๊มข้อมูลอาหาร 156 เมนูลงเครื่อง
-  await IsarSeedService.seedFoodData(isar);
-
-  // สร้าง Singleton Instance ของ AuthService
-  final authService = AuthService(isar);
+  // 3. ปั๊มข้อมูลอาหาร 156 เมนูลงเครื่อง (เปิด forceUpdate: true เพื่อล้างและอัปเดตข้อมูลภาษาไทยใหม่ทั้งหมดบนอุปกรณ์)
+  await IsarSeedService.seedFoodData(isarInstance, forceUpdate: true);
 
   runApp(
-    Provider<AuthService>.value(
-      value: authService,
-      child: MyApp(isar: isar),
+    ProviderScope(
+      overrides: [
+        isarProvider.overrideWithValue(isarInstance),
+      ],
+      child: const MyApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  final Isar isar;
-  const MyApp({super.key, required this.isar});
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
       title: 'CKD Nutrition',
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('th'), // ภาษาเริ่มต้นคือไทย
-      home: StreamBuilder<AuthState>(
-        stream: Supabase.instance.client.auth.onAuthStateChange,
-        builder: (ctx, snap) {
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
-          
-          final session = snap.data!.session;
-          if (session != null) {
-            // เมื่อผู้ใช้ล็อกอินอยู่ ให้ตรวจสอบว่ามีข้อมูลโปรไฟล์สุขภาพในฐานข้อมูลแล้วหรือยัง
-            return FutureBuilder<Map<String, dynamic>?>(
-              future: Supabase.instance.client
-                  .from('user_health_profiles')
-                  .select('id')
-                  .eq('user_id', session.user.id)
-                  .maybeSingle(),
-              builder: (futureCtx, futureSnap) {
-                // ระหว่างรอผล Query ให้แสดงตัวโหลดหมุนวน
-                if (futureSnap.connectionState == ConnectionState.waiting) {
-                  return const Scaffold(
-                    body: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                
-                // หากพบข้อมูลโปรไฟล์สุขภาพแล้ว ให้เข้าหน้า Dashboard ได้ทันที
-                if (futureSnap.hasData && futureSnap.data != null) {
-                  return DashboardPage(isar: isar);
-                }
-                
-                // หากยังไม่มีข้อมูลสุขภาพ ให้นำทางผู้ใช้ไปยังหน้าตั้งค่าก่อน (HealthSetupPage)
-                return HealthSetupPage(isar: isar);
-              },
-            );
-          } else {
-            // หากไม่ได้ล็อกอิน ให้กลับไปหน้าล็อกอินปกติ
-            return LoginPage(isar: isar);
-          }
-        },
-      ),
+      routerConfig: router,
     );
   }
 }

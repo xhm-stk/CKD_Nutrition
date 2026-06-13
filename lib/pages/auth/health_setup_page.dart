@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../services/auth_service.dart';
-import '../dashboard/dashboard_page.dart'; // import ให้ตรง
-import 'login_page.dart'; // ดึงหน้าเข้าสู่ระบบเพื่อใช้ย้อนกลับ
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../providers/core_providers.dart';
+import '../../../repositories/auth_repository.dart';
 
-class HealthSetupPage extends StatefulWidget {
-  final Isar isar;
-  const HealthSetupPage({super.key, required this.isar});
-  @override State<HealthSetupPage> createState() => _HealthSetupPageState();
+class HealthSetupPage extends ConsumerStatefulWidget {
+  const HealthSetupPage({super.key});
+  @override ConsumerState<HealthSetupPage> createState() => _HealthSetupPageState();
 }
 
-class _HealthSetupPageState extends State<HealthSetupPage> {
+class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
+  final _formKey = GlobalKey<FormState>();
   final _weightCtrl = TextEditingController();
   final _heightCtrl = TextEditingController();
   String _selectedGender = 'male';
@@ -20,21 +18,13 @@ class _HealthSetupPageState extends State<HealthSetupPage> {
   bool _isLoading = false;
 
   void _saveProfile() async {
-    if (_weightCtrl.text.isEmpty || _heightCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('กรุณากรอกน้ำหนักและส่วนสูงให้ครบถ้วน'),
-          backgroundColor: Colors.amber,
-        ),
-      );
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
     
     setState(() => _isLoading = true);
 
     try {
       // เซฟโปรไฟล์ขึ้น Cloud
-      await context.read<AuthService>().saveHealthProfile(
+      await ref.read(authServiceProvider).saveHealthProfile(
         weightKg: double.parse(_weightCtrl.text.trim()),
         heightCm: double.parse(_heightCtrl.text.trim()),
         gender: _selectedGender,
@@ -45,18 +35,15 @@ class _HealthSetupPageState extends State<HealthSetupPage> {
       setState(() => _isLoading = false);
 
       // เซฟเสร็จพาไปหน้า Dashboard เลย
-      Navigator.pushReplacement(
-        context, 
-        MaterialPageRoute(builder: (_) => DashboardPage(isar: widget.isar)),
-      );
+      context.go('/dashboard');
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
       
-      // แสดงข้อความแจ้งเตือนข้อผิดพลาด
+      debugPrint('Setup Profile Error: $e'); // ซ่อน Exception ดิบ
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('บันทึกโปรไฟล์สุขภาพล้มเหลว: $e'),
+        const SnackBar(
+          content: Text('บันทึกโปรไฟล์สุขภาพล้มเหลว กรุณาลองใหม่อีกครั้ง'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -81,22 +68,41 @@ class _HealthSetupPageState extends State<HealthSetupPage> {
             icon: const Icon(Icons.logout_rounded),
             tooltip: 'ย้อนกลับ / ออกจากระบบ',
             onPressed: () async {
-              await Supabase.instance.client.auth.signOut();
-              if (!context.mounted) return;
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => LoginPage(isar: widget.isar)),
-              );
+              await ref.read(authRepositoryProvider).logout();
             },
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          TextField(controller: _weightCtrl, decoration: const InputDecoration(labelText: 'น้ำหนัก (kg)'), keyboardType: TextInputType.number),
-          const SizedBox(height: 16),
-          TextField(controller: _heightCtrl, decoration: const InputDecoration(labelText: 'ส่วนสูง (cm)'), keyboardType: TextInputType.number),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(24),
+          children: [
+            TextFormField(
+              controller: _weightCtrl, 
+              decoration: const InputDecoration(labelText: 'น้ำหนัก (kg)'), 
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              validator: (val) {
+                if (val == null || val.trim().isEmpty) return 'กรุณากรอกน้ำหนัก';
+                final w = double.tryParse(val);
+                if (w == null) return 'กรุณากรอกตัวเลขเท่านั้น';
+                if (w < 10 || w > 500) return 'น้ำหนักต้องอยู่ระหว่าง 10-500 กก.';
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _heightCtrl, 
+              decoration: const InputDecoration(labelText: 'ส่วนสูง (cm)'), 
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              validator: (val) {
+                if (val == null || val.trim().isEmpty) return 'กรุณากรอกส่วนสูง';
+                final h = double.tryParse(val);
+                if (h == null) return 'กรุณากรอกตัวเลขเท่านั้น';
+                if (h < 50 || h > 300) return 'ส่วนสูงต้องอยู่ระหว่าง 50-300 ซม.';
+                return null;
+              },
+            ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
             value: _selectedGender,
@@ -126,6 +132,7 @@ class _HealthSetupPageState extends State<HealthSetupPage> {
             ? const Center(child: CircularProgressIndicator())
             : ElevatedButton(onPressed: _saveProfile, child: const Text('บันทึกและเริ่มใช้งาน')),
         ],
+      ),
       ),
     );
   }

@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../services/auth_service.dart';
-import 'health_setup_page.dart'; // ดึงหน้าตั้งค่าสุขภาพเพื่อไปต่อหลังจากสมัครสำเร็จ
-import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../../repositories/auth_repository.dart';
+import '../../../core/result.dart';
+import '../../l10n/app_localizations.dart';
 
-class RegisterPage extends StatefulWidget {
-  final Isar isar;
-  const RegisterPage({super.key, required this.isar});
+class RegisterPage extends ConsumerStatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   // GlobalKey สำหรับใช้เช็คสถานะและตรวจสอบข้อมูลใน Form
   final _formKey = GlobalKey<FormState>();
   
@@ -94,8 +93,8 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isLoading = true);
 
     try {
-      // 2. เรียกใช้ AuthService เพื่อส่งข้อมูลอีเมลและรหัสผ่านไปยัง Supabase
-      final err = await context.read<AuthService>().register(
+      // 2. เรียกใช้ AuthRepository เพื่อส่งข้อมูลอีเมลและรหัสผ่านไปยัง Supabase
+      final result = await ref.read(authRepositoryProvider).register(
         _emailCtrl.text.trim(),
         _passCtrl.text.trim(),
       );
@@ -103,52 +102,45 @@ class _RegisterPageState extends State<RegisterPage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      if (err == null) {
-        // เช็คว่าลงทะเบียนแล้ว Supabase ล็อกอินให้เลยหรือไม่ (ขึ้นอยู่กับการตั้งค่า Confirm Email บนบอร์ด Supabase)
-        final user = Supabase.instance.client.auth.currentUser;
-        
-        if (user == null) {
-          // กรณีที่ Supabase มีการเปิด Confirm Email ไว้ (ยังไม่ได้กดยืนยันทางเมล)
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('สมัครสมาชิกสำเร็จ! กรุณาเปิดกล่องจดหมายของคุณและคลิกลิงก์ยืนยันตัวตนในอีเมลก่อนเริ่มใช้งาน'),
-              backgroundColor: Colors.amber,
-              duration: Duration(seconds: 8),
-            ),
-          );
-          // ย้อนกลับไปหน้าเข้าสู่ระบบ เพื่อให้มาล็อกอินหลังกดยืนยันตัวตนแล้ว
-          Navigator.pop(context);
-        } else {
-          // กรณีที่ไม่ต้องยืนยันอีเมล หรือยืนยันเสร็จแล้ว -> เข้าสู่หน้าตั้งค่าสุขภาพทันที
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('สมัครสมาชิกสำเร็จแล้ว! กำลังนำคุณไปยังขั้นตอนตั้งค่าสุขภาพ'),
-              backgroundColor: Colors.teal,
-            ),
-          );
+      switch (result) {
+        case Success():
+          // เช็คว่าลงทะเบียนแล้ว Supabase ล็อกอินให้เลยหรือไม่
+          final user = Supabase.instance.client.auth.currentUser;
           
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => HealthSetupPage(isar: widget.isar),
+          if (user == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('สมัครสมาชิกสำเร็จ! กรุณาเปิดกล่องจดหมายของคุณและคลิกลิงก์ยืนยันตัวตนในอีเมลก่อนเริ่มใช้งาน'),
+                backgroundColor: Colors.amber,
+                duration: Duration(seconds: 8),
+              ),
+            );
+            context.pop();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('สมัครสมาชิกสำเร็จแล้ว! กำลังนำคุณไปยังขั้นตอนตั้งค่าสุขภาพ'),
+                backgroundColor: Colors.teal,
+              ),
+            );
+            context.go('/health-setup');
+          }
+        case Failure(:final userMessage, :final debugError):
+          debugPrint('Register Error: $debugError');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(userMessage),
+              backgroundColor: Colors.redAccent,
             ),
           );
-        }
-      } else {
-        // แสดงข้อผิดพลาดหาก Supabase แจ้งเตือนข้อผิดพลาดกลับมา
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(err),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
       }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
+      debugPrint('Register Error: $e'); // ซ่อน Exception ดิบ
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('เกิดข้อผิดพลาดในการลงทะเบียน: $e'),
+        const SnackBar(
+          content: Text('เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -420,7 +412,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   padding: const EdgeInsets.symmetric(horizontal: 10),
                                   child: Text(
                                     l10n.orLoginWith,
-                                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                                    style: const TextStyle(color: Colors.grey, fontSize: 13),
                                   ),
                                 ),
                                 Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
@@ -433,10 +425,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                   child: OutlinedButton.icon(
                                     onPressed: () async {
                                       final messenger = ScaffoldMessenger.of(context);
-                                      final err = await context.read<AuthService>().signInWithGoogle();
-                                      if (err != null && mounted) {
+                                      final result = await ref.read(authRepositoryProvider).signInWithGoogle();
+                                      if (!mounted) return;
+                                      if (result is Failure) {
                                         messenger.showSnackBar(
-                                          SnackBar(content: Text(err), backgroundColor: Colors.redAccent),
+                                          SnackBar(content: Text(result.userMessage), backgroundColor: Colors.redAccent),
                                         );
                                       }
                                     },
@@ -455,10 +448,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                   child: OutlinedButton.icon(
                                     onPressed: () async {
                                       final messenger = ScaffoldMessenger.of(context);
-                                      final err = await context.read<AuthService>().signInWithApple();
-                                      if (err != null && mounted) {
+                                      final result = await ref.read(authRepositoryProvider).signInWithApple();
+                                      if (!mounted) return;
+                                      if (result is Failure) {
                                         messenger.showSnackBar(
-                                          SnackBar(content: Text(err), backgroundColor: Colors.redAccent),
+                                          SnackBar(content: Text(result.userMessage), backgroundColor: Colors.redAccent),
                                         );
                                       }
                                     },
@@ -489,7 +483,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           style: TextStyle(color: Colors.teal.shade800),
                         ),
                         TextButton(
-                          onPressed: () => Navigator.pop(context), // ปิดหน้านี้เพื่อย้อนกลับไปหน้าเดิม (Login)
+                          onPressed: () => context.pop(), // ปิดหน้านี้เพื่อย้อนกลับไปหน้าเดิม (Login)
                           child: Text(
                             l10n.login,
                             style: TextStyle(
