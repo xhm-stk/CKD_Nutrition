@@ -17,22 +17,29 @@ void main() {
     );
   }
 
-  testWidgets('NutrientCircle displays correct texts and green color for normal level', (WidgetTester tester) async {
-    await tester.pumpWidget(createWidgetUnderTest(20.0, 100.0));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'NutrientCircle displays correct texts and green color for normal level',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(createWidgetUnderTest(20.0, 100.0));
+      await tester.pumpAndSettle();
 
-    expect(find.text('โปรตีน'), findsOneWidget);
-    expect(find.text('20.0 / 100.0 g'), findsOneWidget);
-    expect(find.text('20%'), findsOneWidget);
+      expect(find.text('โปรตีน'), findsOneWidget);
+      expect(find.text('20.0 / 100.0 g'), findsOneWidget);
+      expect(find.text('20%'), findsOneWidget);
 
-    final indicatorFinder = find.byType(CircularPercentIndicator);
-    expect(indicatorFinder, findsOneWidget);
-    
-    final indicator = tester.widget<CircularPercentIndicator>(indicatorFinder);
-    expect(indicator.progressColor, Colors.green);
-  });
+      final indicatorFinder = find.byType(CircularPercentIndicator);
+      expect(indicatorFinder, findsOneWidget);
 
-  testWidgets('NutrientCircle displays orange color when near limit', (WidgetTester tester) async {
+      final indicator = tester.widget<CircularPercentIndicator>(
+        indicatorFinder,
+      );
+      expect(indicator.progressColor, Colors.green);
+    },
+  );
+
+  testWidgets('NutrientCircle displays orange color when near limit', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(createWidgetUnderTest(85.0, 100.0));
     await tester.pumpAndSettle();
 
@@ -41,7 +48,9 @@ void main() {
     expect(indicator.progressColor, Colors.orange);
   });
 
-  testWidgets('NutrientCircle displays red color when over limit', (WidgetTester tester) async {
+  testWidgets('NutrientCircle displays red color when over limit', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(createWidgetUnderTest(110.0, 100.0));
     await tester.pumpAndSettle();
 

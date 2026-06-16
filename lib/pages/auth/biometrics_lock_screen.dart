@@ -9,7 +9,8 @@ class BiometricsLockScreen extends ConsumerStatefulWidget {
   const BiometricsLockScreen({super.key});
 
   @override
-  ConsumerState<BiometricsLockScreen> createState() => _BiometricsLockScreenState();
+  ConsumerState<BiometricsLockScreen> createState() =>
+      _BiometricsLockScreenState();
 }
 
 class _BiometricsLockScreenState extends ConsumerState<BiometricsLockScreen> {
@@ -82,10 +83,7 @@ class _BiometricsLockScreenState extends ConsumerState<BiometricsLockScreen> {
               const SizedBox(height: 16),
               Text(
                 _message,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.teal.shade900,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.teal.shade900),
               ),
               const SizedBox(height: 48),
               if (!_isAuthenticating)
@@ -94,7 +92,10 @@ class _BiometricsLockScreenState extends ConsumerState<BiometricsLockScreen> {
                   icon: const Icon(Icons.lock_open_rounded),
                   label: const Text('ยืนยันตัวตนอีกครั้ง'),
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
                     backgroundColor: Colors.teal.shade700,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -110,12 +111,9 @@ class _BiometricsLockScreenState extends ConsumerState<BiometricsLockScreen> {
                   },
                   icon: const Icon(Icons.logout),
                   label: const Text('ออกจากระบบ'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
                 ),
-              if (_isAuthenticating)
-                const CircularProgressIndicator(),
+              if (_isAuthenticating) const CircularProgressIndicator(),
             ],
           ),
         ),

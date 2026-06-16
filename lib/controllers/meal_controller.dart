@@ -7,10 +7,14 @@ class MealController {
 
   MealController(this._repository);
 
-  Future<Result<void>> logMeal({required FoodItem food, required double quantityG, required String mealType}) async {
+  Future<Result<void>> logMeal({
+    required FoodItem food,
+    required double quantityG,
+    required String mealType,
+  }) async {
     // 1. Business Logic: Calculate ratio and nutrition values based on quantity consumed
     final ratio = quantityG / 100.0;
-    
+
     final protein = food.proteinG * ratio;
     final potassium = food.potassiumMg * ratio;
     final sodium = food.sodiumMg * ratio;

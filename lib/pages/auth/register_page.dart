@@ -19,9 +19,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    
+
     ref.listen<RegisterState>(registerControllerProvider, (previous, next) {
-      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
@@ -29,15 +30,19 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           ),
         );
         // Clear error asynchronously to avoid state mutation during build
-        Future.microtask(() => ref.read(registerControllerProvider.notifier).clearError());
+        Future.microtask(
+          () => ref.read(registerControllerProvider.notifier).clearError(),
+        );
       }
-      
+
       if (next.isSuccess && (previous == null || !previous.isSuccess)) {
         final user = Supabase.instance.client.auth.currentUser;
         if (user == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('สมัครสมาชิกสำเร็จ! กรุณาเปิดกล่องจดหมายของคุณและคลิกลิงก์ยืนยันตัวตนในอีเมลก่อนเริ่มใช้งาน'),
+              content: Text(
+                'สมัครสมาชิกสำเร็จ! กรุณาเปิดกล่องจดหมายของคุณและคลิกลิงก์ยืนยันตัวตนในอีเมลก่อนเริ่มใช้งาน',
+              ),
               backgroundColor: Colors.amber,
               duration: Duration(seconds: 8),
             ),
@@ -46,7 +51,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('สมัครสมาชิกสำเร็จแล้ว! กำลังนำคุณไปยังขั้นตอนตั้งค่าสุขภาพ'),
+              content: Text(
+                'สมัครสมาชิกสำเร็จแล้ว! กำลังนำคุณไปยังขั้นตอนตั้งค่าสุขภาพ',
+              ),
               backgroundColor: Colors.teal,
             ),
           );
@@ -61,16 +68,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.teal.shade50,
-              Colors.white,
-            ],
+            colors: [Colors.teal.shade50, Colors.white],
           ),
         ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -123,15 +130,30 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           const SizedBox(height: 20),
                           Row(
                             children: [
-                              Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                child: Text(
-                                  l10n.orLoginWith,
-                                  style: const TextStyle(color: Colors.grey, fontSize: 13),
+                              Expanded(
+                                child: Divider(
+                                  color: Colors.grey[300],
+                                  thickness: 1,
                                 ),
                               ),
-                              Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Text(
+                                  l10n.orLoginWith,
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Divider(
+                                  color: Colors.grey[300],
+                                  thickness: 1,
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 16),

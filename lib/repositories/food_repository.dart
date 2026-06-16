@@ -9,7 +9,7 @@ class FoodRepository {
   final Isar _isar;
   final SupabaseClient _sb;
   final OfflineSyncWorker _syncWorker;
-  
+
   FoodRepository(this._isar, this._sb, this._syncWorker);
 
   Future<List<FoodItem>> searchFood(String query) async {
@@ -21,16 +21,22 @@ class FoodRepository {
       if (isUnicode) {
         final allFoods = await _isar.foodItems.where().findAll();
         final qLower = query.toLowerCase();
-        localResults = allFoods.where((f) {
-          return f.name.toLowerCase().contains(qLower) || 
-                 f.searchKeywords.toLowerCase().contains(qLower);
-        }).take(50).toList();
+        localResults =
+            allFoods
+                .where((f) {
+                  return f.name.toLowerCase().contains(qLower) ||
+                      f.searchKeywords.toLowerCase().contains(qLower);
+                })
+                .take(50)
+                .toList();
       } else {
-        localResults = await _isar.foodItems.filter()
-          .nameContains(query, caseSensitive: false)
-          .or()
-          .searchKeywordsContains(query, caseSensitive: false)
-          .findAll();
+        localResults =
+            await _isar.foodItems
+                .filter()
+                .nameContains(query, caseSensitive: false)
+                .or()
+                .searchKeywordsContains(query, caseSensitive: false)
+                .findAll();
       }
     }
 
@@ -39,23 +45,32 @@ class FoodRepository {
     try {
       final user = _sb.auth.currentUser;
       if (user != null) {
-        var queryBuilder = _sb.from('custom_foods').select('*').eq('user_id', user.id).isFilter('deleted_at', null);
+        var queryBuilder = _sb
+            .from('custom_foods')
+            .select('*')
+            .eq('user_id', user.id)
+            .isFilter('deleted_at', null);
         if (query.isNotEmpty) {
           queryBuilder = queryBuilder.ilike('name', '%$query%');
         }
         final List<dynamic> customData = await queryBuilder.limit(20);
-        customResults = customData.map((e) => FoodItem()
-          ..foodId = e['id']
-          ..name = '⭐ ${e['name']}'
-          ..category = 'custom'
-          ..servingSize = e['serving_size']
-          ..proteinG = (e['protein_g'] as num).toDouble()
-          ..potassiumMg = (e['potassium_mg'] as num).toDouble()
-          ..sodiumMg = (e['sodium_mg'] as num).toDouble()
-          ..sugarG = (e['sugar_g'] as num).toDouble()
-          ..carbG = (e['carb_g'] as num).toDouble()
-          ..waterMl = (e['water_ml'] as num).toDouble()
-        ).toList();
+        customResults =
+            customData
+                .map(
+                  (e) =>
+                      FoodItem()
+                        ..foodId = e['id']
+                        ..name = '⭐ ${e['name']}'
+                        ..category = 'custom'
+                        ..servingSize = e['serving_size']
+                        ..proteinG = (e['protein_g'] as num).toDouble()
+                        ..potassiumMg = (e['potassium_mg'] as num).toDouble()
+                        ..sodiumMg = (e['sodium_mg'] as num).toDouble()
+                        ..sugarG = (e['sugar_g'] as num).toDouble()
+                        ..carbG = (e['carb_g'] as num).toDouble()
+                        ..waterMl = (e['water_ml'] as num).toDouble(),
+                )
+                .toList();
       }
     } catch (e) {
       // Ignore network errors for custom foods, just show local

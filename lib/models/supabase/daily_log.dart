@@ -16,8 +16,10 @@ class DailyLog with _$DailyLog {
     @JsonKey(name: 'total_sugar_g') @Default(0.0) double totalSugarG,
     @JsonKey(name: 'total_carb_g') @Default(0.0) double totalCarbG,
     @JsonKey(name: 'total_water_ml') @Default(0.0) double totalWaterMl,
-    @JsonKey(name: 'total_phosphorus_mg') @Default(0.0) double totalPhosphorusMg,
-    
+    @JsonKey(name: 'total_phosphorus_mg')
+    @Default(0.0)
+    double totalPhosphorusMg,
+
     // Custom Limits
     double? customProtein,
     double? customPotassium,
@@ -30,19 +32,30 @@ class DailyLog with _$DailyLog {
 
   const DailyLog._();
 
-  factory DailyLog.fromJson(Map<String, dynamic> json) => _$DailyLogFromJson(json);
+  factory DailyLog.fromJson(Map<String, dynamic> json) =>
+      _$DailyLogFromJson(json);
 
   // Helper factory เพื่อรองรับการนำข้อมูลจาก profile มาประกอบ
-  factory DailyLog.fromDataAndProfile(Map<String, dynamic> data, {Map<String, dynamic>? healthProfile}) {
+  factory DailyLog.fromDataAndProfile(
+    Map<String, dynamic> data, {
+    Map<String, dynamic>? healthProfile,
+  }) {
     final combined = Map<String, dynamic>.from(data);
     if (healthProfile != null) {
-      combined['customProtein'] = (healthProfile['custom_protein_limit_g'] as num?)?.toDouble();
-      combined['customPotassium'] = (healthProfile['custom_potassium_limit_mg'] as num?)?.toDouble();
-      combined['customSodium'] = (healthProfile['custom_sodium_limit_mg'] as num?)?.toDouble();
-      combined['customSugar'] = (healthProfile['custom_sugar_limit_g'] as num?)?.toDouble();
-      combined['customCarb'] = (healthProfile['custom_carb_limit_g'] as num?)?.toDouble();
-      combined['customWater'] = (healthProfile['custom_water_limit_ml'] as num?)?.toDouble();
-      combined['customPhosphorus'] = (healthProfile['custom_phosphorus_limit_mg'] as num?)?.toDouble();
+      combined['customProtein'] =
+          (healthProfile['custom_protein_limit_g'] as num?)?.toDouble();
+      combined['customPotassium'] =
+          (healthProfile['custom_potassium_limit_mg'] as num?)?.toDouble();
+      combined['customSodium'] =
+          (healthProfile['custom_sodium_limit_mg'] as num?)?.toDouble();
+      combined['customSugar'] =
+          (healthProfile['custom_sugar_limit_g'] as num?)?.toDouble();
+      combined['customCarb'] =
+          (healthProfile['custom_carb_limit_g'] as num?)?.toDouble();
+      combined['customWater'] =
+          (healthProfile['custom_water_limit_ml'] as num?)?.toDouble();
+      combined['customPhosphorus'] =
+          (healthProfile['custom_phosphorus_limit_mg'] as num?)?.toDouble();
     }
     return DailyLog.fromJson(combined);
   }

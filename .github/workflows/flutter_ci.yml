@@ -51,7 +51,7 @@ jobs:
 
       # 6. รันโค้ดทดสอบ (Automated Unit & Widget Tests)
       - name: 🎯 Run Automated Tests
-        run: flutter test --coverage
+        run: flutter test --coverage test/unit test/widget test/qa_matrix_test.dart
 
       # 7. อัปโหลดผลลัพธ์ Code Coverage (เพื่อให้ CTO ดูว่าเทสคลุมกี่เปอร์เซ็นต์)
       - name: 📊 Upload Coverage Report

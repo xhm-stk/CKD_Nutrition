@@ -7,21 +7,21 @@ part of 'meal.dart';
 // **************************************************************************
 
 _$MealImpl _$$MealImplFromJson(Map<String, dynamic> json) => _$MealImpl(
-      id: json['id'] as String,
-      logId: json['log_id'] as String,
-      foodId: json['food_id'] as String,
-      foodName: json['food_name'] as String,
-      quantityG: (json['quantity_g'] as num).toDouble(),
-      mealType: json['meal_type'] as String,
-      proteinG: (json['protein_g'] as num).toDouble(),
-      potassiumMg: (json['potassium_mg'] as num).toDouble(),
-      sodiumMg: (json['sodium_mg'] as num).toDouble(),
-      sugarG: (json['sugar_g'] as num).toDouble(),
-      carbG: (json['carb_g'] as num).toDouble(),
-      waterMl: (json['water_ml'] as num).toDouble(),
-      phosphorusMg: (json['phosphorus_mg'] as num).toDouble(),
-      eatenAt: DateTime.parse(json['eaten_at'] as String),
-    );
+  id: json['id'] as String,
+  logId: json['log_id'] as String,
+  foodId: json['food_id'] as String,
+  foodName: json['food_name'] as String,
+  quantityG: (json['quantity_g'] as num).toDouble(),
+  mealType: json['meal_type'] as String,
+  proteinG: (json['protein_g'] as num).toDouble(),
+  potassiumMg: (json['potassium_mg'] as num).toDouble(),
+  sodiumMg: (json['sodium_mg'] as num).toDouble(),
+  sugarG: (json['sugar_g'] as num).toDouble(),
+  carbG: (json['carb_g'] as num).toDouble(),
+  waterMl: (json['water_ml'] as num).toDouble(),
+  phosphorusMg: (json['phosphorus_mg'] as num).toDouble(),
+  eatenAt: DateTime.parse(json['eaten_at'] as String),
+);
 
 Map<String, dynamic> _$$MealImplToJson(_$MealImpl instance) =>
     <String, dynamic>{

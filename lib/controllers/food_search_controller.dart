@@ -29,9 +29,12 @@ class FoodSearchState {
   }
 }
 
-final foodSearchControllerProvider = StateNotifierProvider.autoDispose<FoodSearchController, FoodSearchState>((ref) {
-  return FoodSearchController(ref.watch(foodRepositoryProvider));
-});
+final foodSearchControllerProvider =
+    StateNotifierProvider.autoDispose<FoodSearchController, FoodSearchState>((
+      ref,
+    ) {
+      return FoodSearchController(ref.watch(foodRepositoryProvider));
+    });
 
 class FoodSearchController extends StateNotifier<FoodSearchState> {
   final FoodRepository _repo;

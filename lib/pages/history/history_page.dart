@@ -24,7 +24,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
             icon: const Icon(Icons.bar_chart),
             tooltip: 'สรุปรายเดือน',
             onPressed: () => context.push('/history/monthly'),
-          )
+          ),
         ],
       ),
       body: Column(
@@ -49,9 +49,12 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
           ),
           const Divider(),
           Expanded(
-            child: _selectedDay == null
-                ? const Center(child: Text('เลือกวันที่เพื่อดูประวัติ'))
-                : const Center(child: Text('กำลังโหลดประวัติของวันที่เลือก...')),
+            child:
+                _selectedDay == null
+                    ? const Center(child: Text('เลือกวันที่เพื่อดูประวัติ'))
+                    : const Center(
+                      child: Text('กำลังโหลดประวัติของวันที่เลือก...'),
+                    ),
           ),
         ],
       ),

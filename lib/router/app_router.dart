@@ -15,11 +15,10 @@ import '../pages/auth/biometrics_lock_screen.dart';
 
 // เปลี่ยน GoRouter ให้รับค่า ref เพื่อให้มันฟังเสียงจาก Auth State ได้
 final routerProvider = Provider<GoRouter>((ref) {
-  
   // ให้ Router รู้ตัวเมื่อมีการเปลี่ยนสถานะ Login/Logout (บอก Riverpod ให้ rebuild provider นี้)
   ref.watch(authStateProvider);
   ref.watch(sessionUnlockedProvider); // ให้ Router รีโหลดถ้ามีการปลดล็อก
-  
+
   final supabase = ref.read(supabaseProvider);
 
   return GoRouter(
@@ -30,7 +29,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isGoingToLogin = state.uri.path == '/login';
       final isGoingToRegister = state.uri.path == '/register';
       final isGoingToHealthSetup = state.uri.path == '/health-setup';
-      
+
       final isUnlocked = ref.read(sessionUnlockedProvider);
       final isGoingToLockScreen = state.uri.path == '/lock';
 
@@ -38,7 +37,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         return isGoingToRegister ? null : '/login';
       }
 
-      if (isAuth && !isUnlocked && !isGoingToLockScreen && !isGoingToHealthSetup && !isGoingToLogin) {
+      if (isAuth &&
+          !isUnlocked &&
+          !isGoingToLockScreen &&
+          !isGoingToHealthSetup &&
+          !isGoingToLogin) {
         return '/lock';
       }
 
@@ -50,18 +53,42 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
-      GoRoute(path: '/register', builder: (context, state) => const RegisterPage()),
-      GoRoute(path: '/health-setup', builder: (context, state) => const HealthSetupPage()),
-      GoRoute(path: '/dashboard', builder: (context, state) => const DashboardPage()),
       GoRoute(
-        path: '/food-search', 
+        path: '/register',
+        builder: (context, state) => const RegisterPage(),
+      ),
+      GoRoute(
+        path: '/health-setup',
+        builder: (context, state) => const HealthSetupPage(),
+      ),
+      GoRoute(
+        path: '/dashboard',
+        builder: (context, state) => const DashboardPage(),
+      ),
+      GoRoute(
+        path: '/food-search',
         builder: (context, state) => const FoodSearchPage(),
       ),
-      GoRoute(path: '/food-add', builder: (context, state) => const CustomFoodPage()),
-      GoRoute(path: '/history', builder: (context, state) => const HistoryPage()),
-      GoRoute(path: '/monthly-summary', builder: (context, state) => const MonthlySummaryPage()),
-      GoRoute(path: '/meal-planner', builder: (context, state) => const MealPlannerPage()),
-      GoRoute(path: '/lock', builder: (context, state) => const BiometricsLockScreen()),
+      GoRoute(
+        path: '/food-add',
+        builder: (context, state) => const CustomFoodPage(),
+      ),
+      GoRoute(
+        path: '/history',
+        builder: (context, state) => const HistoryPage(),
+      ),
+      GoRoute(
+        path: '/monthly-summary',
+        builder: (context, state) => const MonthlySummaryPage(),
+      ),
+      GoRoute(
+        path: '/meal-planner',
+        builder: (context, state) => const MealPlannerPage(),
+      ),
+      GoRoute(
+        path: '/lock',
+        builder: (context, state) => const BiometricsLockScreen(),
+      ),
     ],
   );
 });

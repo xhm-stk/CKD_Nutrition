@@ -19,9 +19,7 @@ void main() {
 
     Widget createWidgetUnderTest() {
       return ProviderScope(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(mockAuthRepo),
-        ],
+        overrides: [authRepositoryProvider.overrideWithValue(mockAuthRepo)],
         child: const MaterialApp(
           localizationsDelegates: [
             AppLocalizations.delegate,
@@ -29,16 +27,15 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: [
-            Locale('en', ''),
-            Locale('th', ''),
-          ],
+          supportedLocales: [Locale('en', ''), Locale('th', '')],
           home: LoginPage(),
         ),
       );
     }
 
-    testWidgets('Shows validation errors on empty submission', (WidgetTester tester) async {
+    testWidgets('Shows validation errors on empty submission', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -50,13 +47,15 @@ void main() {
       expect(find.text('กรุณากรอกรหัสผ่าน'), findsOneWidget);
     });
 
-    testWidgets('Shows validation error on invalid email', (WidgetTester tester) async {
+    testWidgets('Shows validation error on invalid email', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
       // Enter invalid email
       await tester.enterText(find.byType(TextFormField).first, 'invalid-email');
-      
+
       await tester.tap(find.byType(ElevatedButton).first);
       await tester.pumpAndSettle();
 

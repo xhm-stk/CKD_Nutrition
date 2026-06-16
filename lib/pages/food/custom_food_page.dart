@@ -21,7 +21,7 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
   final _sugarCtrl = TextEditingController();
   final _carbCtrl = TextEditingController();
   final _waterCtrl = TextEditingController();
-  
+
   bool _isLoading = false;
 
   @override
@@ -66,9 +66,7 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
         );
         router.pop();
       case Failure(userMessage: final msg):
-        scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text('❌ $msg')),
-        );
+        scaffoldMessenger.showSnackBar(SnackBar(content: Text('❌ $msg')));
     }
   }
 
@@ -81,7 +79,10 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
+          ),
         ),
         validator: (value) {
           if (value == null || value.isEmpty) return 'กรุณากรอกข้อมูล';
@@ -109,7 +110,11 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                   labelText: 'ชื่อเมนูอาหาร',
                   border: OutlineInputBorder(),
                 ),
-                validator: (val) => val == null || val.trim().isEmpty ? 'กรุณากรอกชื่ออาหาร' : null,
+                validator:
+                    (val) =>
+                        val == null || val.trim().isEmpty
+                            ? 'กรุณากรอกชื่ออาหาร'
+                            : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -118,31 +123,46 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                   labelText: 'ปริมาณ (เช่น 1 จาน, 100g)',
                   border: OutlineInputBorder(),
                 ),
-                validator: (val) => val == null || val.trim().isEmpty ? 'กรุณากรอกปริมาณ' : null,
+                validator:
+                    (val) =>
+                        val == null || val.trim().isEmpty
+                            ? 'กรุณากรอกปริมาณ'
+                            : null,
               ),
               const SizedBox(height: 16),
               const Align(
                 alignment: Alignment.centerLeft,
-                child: Text('คุณค่าทางโภชนาการ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                child: Text(
+                  'คุณค่าทางโภชนาการ',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _buildNumberField(_proteinCtrl, 'โปรตีน (g)')),
+                  Expanded(
+                    child: _buildNumberField(_proteinCtrl, 'โปรตีน (g)'),
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildNumberField(_potassiumCtrl, 'โพแทสเซียม (mg)')),
+                  Expanded(
+                    child: _buildNumberField(_potassiumCtrl, 'โพแทสเซียม (mg)'),
+                  ),
                 ],
               ),
               Row(
                 children: [
-                  Expanded(child: _buildNumberField(_sodiumCtrl, 'โซเดียม (mg)')),
+                  Expanded(
+                    child: _buildNumberField(_sodiumCtrl, 'โซเดียม (mg)'),
+                  ),
                   const SizedBox(width: 12),
                   Expanded(child: _buildNumberField(_sugarCtrl, 'น้ำตาล (g)')),
                 ],
               ),
               Row(
                 children: [
-                  Expanded(child: _buildNumberField(_carbCtrl, 'คาร์โบไฮเดรต (g)')),
+                  Expanded(
+                    child: _buildNumberField(_carbCtrl, 'คาร์โบไฮเดรต (g)'),
+                  ),
                   const SizedBox(width: 12),
                   Expanded(child: _buildNumberField(_waterCtrl, 'น้ำ (ml)')),
                 ],
@@ -153,9 +173,13 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _saveCustomFood,
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('💾 บันทึกเข้าระบบ', style: TextStyle(fontSize: 18)),
+                  child:
+                      _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                            '💾 บันทึกเข้าระบบ',
+                            style: TextStyle(fontSize: 18),
+                          ),
                 ),
               ),
             ],
