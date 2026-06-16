@@ -27,7 +27,7 @@ DECLARE
 BEGIN
     -- 1. Get user limits (with fallback defaults if not found)
     SELECT 
-        COALESCE(uhp.custom_protein_limit_g, cr.protein_limit_g, 60),
+        COALESCE(uhp.custom_protein_limit_g, (cr.protein_multiplier * uhp.weight_kg), 60),
         COALESCE(uhp.custom_potassium_limit_mg, cr.potassium_limit_mg, 2000),
         COALESCE(uhp.custom_sodium_limit_mg, cr.sodium_limit_mg, 2000),
         COALESCE(uhp.custom_sugar_limit_g, cr.sugar_limit_g, 50),

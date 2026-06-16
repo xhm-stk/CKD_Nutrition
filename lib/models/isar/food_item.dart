@@ -17,13 +17,14 @@ class FoodItem {
   late String ingredients;
   late String servingSize;
   
-  // สารอาหาร 6 ชนิด
+  // สารอาหาร 7 ชนิด (รวมฟอสฟอรัส)
   late double proteinG;
   late double potassiumMg;
   late double sodiumMg;
   late double sugarG;
   late double carbG;
   late double waterMl;
+  late double phosphorusMg;
   
   late String cookingMethod;
   late String source;
@@ -38,5 +39,7 @@ class CkdRuleCache {
   late double proteinLimitG, potassiumLimitMg;
   late double sodiumLimitMg, sugarLimitG;
   late double carbLimitG, waterLimitMl;
+  late double phosphorusLimitMg;
+
   late String syncedAt;
 }

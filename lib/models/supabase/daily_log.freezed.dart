@@ -36,7 +36,9 @@ mixin _$DailyLog {
   @JsonKey(name: 'total_carb_g')
   double get totalCarbG => throw _privateConstructorUsedError;
   @JsonKey(name: 'total_water_ml')
-  double get totalWaterMl =>
+  double get totalWaterMl => throw _privateConstructorUsedError;
+  @JsonKey(name: 'total_phosphorus_mg')
+  double get totalPhosphorusMg =>
       throw _privateConstructorUsedError; // Custom Limits
   double? get customProtein => throw _privateConstructorUsedError;
   double? get customPotassium => throw _privateConstructorUsedError;
@@ -44,6 +46,7 @@ mixin _$DailyLog {
   double? get customSugar => throw _privateConstructorUsedError;
   double? get customCarb => throw _privateConstructorUsedError;
   double? get customWater => throw _privateConstructorUsedError;
+  double? get customPhosphorus => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -66,12 +69,14 @@ abstract class $DailyLogCopyWith<$Res> {
       @JsonKey(name: 'total_sugar_g') double totalSugarG,
       @JsonKey(name: 'total_carb_g') double totalCarbG,
       @JsonKey(name: 'total_water_ml') double totalWaterMl,
+      @JsonKey(name: 'total_phosphorus_mg') double totalPhosphorusMg,
       double? customProtein,
       double? customPotassium,
       double? customSodium,
       double? customSugar,
       double? customCarb,
-      double? customWater});
+      double? customWater,
+      double? customPhosphorus});
 }
 
 /// @nodoc
@@ -96,12 +101,14 @@ class _$DailyLogCopyWithImpl<$Res, $Val extends DailyLog>
     Object? totalSugarG = null,
     Object? totalCarbG = null,
     Object? totalWaterMl = null,
+    Object? totalPhosphorusMg = null,
     Object? customProtein = freezed,
     Object? customPotassium = freezed,
     Object? customSodium = freezed,
     Object? customSugar = freezed,
     Object? customCarb = freezed,
     Object? customWater = freezed,
+    Object? customPhosphorus = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -140,6 +147,10 @@ class _$DailyLogCopyWithImpl<$Res, $Val extends DailyLog>
           ? _value.totalWaterMl
           : totalWaterMl // ignore: cast_nullable_to_non_nullable
               as double,
+      totalPhosphorusMg: null == totalPhosphorusMg
+          ? _value.totalPhosphorusMg
+          : totalPhosphorusMg // ignore: cast_nullable_to_non_nullable
+              as double,
       customProtein: freezed == customProtein
           ? _value.customProtein
           : customProtein // ignore: cast_nullable_to_non_nullable
@@ -164,6 +175,10 @@ class _$DailyLogCopyWithImpl<$Res, $Val extends DailyLog>
           ? _value.customWater
           : customWater // ignore: cast_nullable_to_non_nullable
               as double?,
+      customPhosphorus: freezed == customPhosphorus
+          ? _value.customPhosphorus
+          : customPhosphorus // ignore: cast_nullable_to_non_nullable
+              as double?,
     ) as $Val);
   }
 }
@@ -186,12 +201,14 @@ abstract class _$$DailyLogImplCopyWith<$Res>
       @JsonKey(name: 'total_sugar_g') double totalSugarG,
       @JsonKey(name: 'total_carb_g') double totalCarbG,
       @JsonKey(name: 'total_water_ml') double totalWaterMl,
+      @JsonKey(name: 'total_phosphorus_mg') double totalPhosphorusMg,
       double? customProtein,
       double? customPotassium,
       double? customSodium,
       double? customSugar,
       double? customCarb,
-      double? customWater});
+      double? customWater,
+      double? customPhosphorus});
 }
 
 /// @nodoc
@@ -214,12 +231,14 @@ class __$$DailyLogImplCopyWithImpl<$Res>
     Object? totalSugarG = null,
     Object? totalCarbG = null,
     Object? totalWaterMl = null,
+    Object? totalPhosphorusMg = null,
     Object? customProtein = freezed,
     Object? customPotassium = freezed,
     Object? customSodium = freezed,
     Object? customSugar = freezed,
     Object? customCarb = freezed,
     Object? customWater = freezed,
+    Object? customPhosphorus = freezed,
   }) {
     return _then(_$DailyLogImpl(
       id: null == id
@@ -258,6 +277,10 @@ class __$$DailyLogImplCopyWithImpl<$Res>
           ? _value.totalWaterMl
           : totalWaterMl // ignore: cast_nullable_to_non_nullable
               as double,
+      totalPhosphorusMg: null == totalPhosphorusMg
+          ? _value.totalPhosphorusMg
+          : totalPhosphorusMg // ignore: cast_nullable_to_non_nullable
+              as double,
       customProtein: freezed == customProtein
           ? _value.customProtein
           : customProtein // ignore: cast_nullable_to_non_nullable
@@ -282,6 +305,10 @@ class __$$DailyLogImplCopyWithImpl<$Res>
           ? _value.customWater
           : customWater // ignore: cast_nullable_to_non_nullable
               as double?,
+      customPhosphorus: freezed == customPhosphorus
+          ? _value.customPhosphorus
+          : customPhosphorus // ignore: cast_nullable_to_non_nullable
+              as double?,
     ));
   }
 }
@@ -299,12 +326,14 @@ class _$DailyLogImpl extends _DailyLog {
       @JsonKey(name: 'total_sugar_g') this.totalSugarG = 0.0,
       @JsonKey(name: 'total_carb_g') this.totalCarbG = 0.0,
       @JsonKey(name: 'total_water_ml') this.totalWaterMl = 0.0,
+      @JsonKey(name: 'total_phosphorus_mg') this.totalPhosphorusMg = 0.0,
       this.customProtein,
       this.customPotassium,
       this.customSodium,
       this.customSugar,
       this.customCarb,
-      this.customWater})
+      this.customWater,
+      this.customPhosphorus})
       : super._();
 
   factory _$DailyLogImpl.fromJson(Map<String, dynamic> json) =>
@@ -336,6 +365,9 @@ class _$DailyLogImpl extends _DailyLog {
   @override
   @JsonKey(name: 'total_water_ml')
   final double totalWaterMl;
+  @override
+  @JsonKey(name: 'total_phosphorus_mg')
+  final double totalPhosphorusMg;
 // Custom Limits
   @override
   final double? customProtein;
@@ -349,10 +381,12 @@ class _$DailyLogImpl extends _DailyLog {
   final double? customCarb;
   @override
   final double? customWater;
+  @override
+  final double? customPhosphorus;
 
   @override
   String toString() {
-    return 'DailyLog(id: $id, userId: $userId, logDate: $logDate, totalProteinG: $totalProteinG, totalPotassiumMg: $totalPotassiumMg, totalSodiumMg: $totalSodiumMg, totalSugarG: $totalSugarG, totalCarbG: $totalCarbG, totalWaterMl: $totalWaterMl, customProtein: $customProtein, customPotassium: $customPotassium, customSodium: $customSodium, customSugar: $customSugar, customCarb: $customCarb, customWater: $customWater)';
+    return 'DailyLog(id: $id, userId: $userId, logDate: $logDate, totalProteinG: $totalProteinG, totalPotassiumMg: $totalPotassiumMg, totalSodiumMg: $totalSodiumMg, totalSugarG: $totalSugarG, totalCarbG: $totalCarbG, totalWaterMl: $totalWaterMl, totalPhosphorusMg: $totalPhosphorusMg, customProtein: $customProtein, customPotassium: $customPotassium, customSodium: $customSodium, customSugar: $customSugar, customCarb: $customCarb, customWater: $customWater, customPhosphorus: $customPhosphorus)';
   }
 
   @override
@@ -375,6 +409,8 @@ class _$DailyLogImpl extends _DailyLog {
                 other.totalCarbG == totalCarbG) &&
             (identical(other.totalWaterMl, totalWaterMl) ||
                 other.totalWaterMl == totalWaterMl) &&
+            (identical(other.totalPhosphorusMg, totalPhosphorusMg) ||
+                other.totalPhosphorusMg == totalPhosphorusMg) &&
             (identical(other.customProtein, customProtein) ||
                 other.customProtein == customProtein) &&
             (identical(other.customPotassium, customPotassium) ||
@@ -386,7 +422,9 @@ class _$DailyLogImpl extends _DailyLog {
             (identical(other.customCarb, customCarb) ||
                 other.customCarb == customCarb) &&
             (identical(other.customWater, customWater) ||
-                other.customWater == customWater));
+                other.customWater == customWater) &&
+            (identical(other.customPhosphorus, customPhosphorus) ||
+                other.customPhosphorus == customPhosphorus));
   }
 
   @JsonKey(ignore: true)
@@ -402,12 +440,14 @@ class _$DailyLogImpl extends _DailyLog {
       totalSugarG,
       totalCarbG,
       totalWaterMl,
+      totalPhosphorusMg,
       customProtein,
       customPotassium,
       customSodium,
       customSugar,
       customCarb,
-      customWater);
+      customWater,
+      customPhosphorus);
 
   @JsonKey(ignore: true)
   @override
@@ -434,12 +474,14 @@ abstract class _DailyLog extends DailyLog {
       @JsonKey(name: 'total_sugar_g') final double totalSugarG,
       @JsonKey(name: 'total_carb_g') final double totalCarbG,
       @JsonKey(name: 'total_water_ml') final double totalWaterMl,
+      @JsonKey(name: 'total_phosphorus_mg') final double totalPhosphorusMg,
       final double? customProtein,
       final double? customPotassium,
       final double? customSodium,
       final double? customSugar,
       final double? customCarb,
-      final double? customWater}) = _$DailyLogImpl;
+      final double? customWater,
+      final double? customPhosphorus}) = _$DailyLogImpl;
   const _DailyLog._() : super._();
 
   factory _DailyLog.fromJson(Map<String, dynamic> json) =
@@ -471,6 +513,9 @@ abstract class _DailyLog extends DailyLog {
   @override
   @JsonKey(name: 'total_water_ml')
   double get totalWaterMl;
+  @override
+  @JsonKey(name: 'total_phosphorus_mg')
+  double get totalPhosphorusMg;
   @override // Custom Limits
   double? get customProtein;
   @override
@@ -483,6 +528,8 @@ abstract class _DailyLog extends DailyLog {
   double? get customCarb;
   @override
   double? get customWater;
+  @override
+  double? get customPhosphorus;
   @override
   @JsonKey(ignore: true)
   _$$DailyLogImplCopyWith<_$DailyLogImpl> get copyWith =>

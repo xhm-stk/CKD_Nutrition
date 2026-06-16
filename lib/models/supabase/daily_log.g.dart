@@ -17,12 +17,15 @@ _$DailyLogImpl _$$DailyLogImplFromJson(Map<String, dynamic> json) =>
       totalSugarG: (json['total_sugar_g'] as num?)?.toDouble() ?? 0.0,
       totalCarbG: (json['total_carb_g'] as num?)?.toDouble() ?? 0.0,
       totalWaterMl: (json['total_water_ml'] as num?)?.toDouble() ?? 0.0,
+      totalPhosphorusMg:
+          (json['total_phosphorus_mg'] as num?)?.toDouble() ?? 0.0,
       customProtein: (json['customProtein'] as num?)?.toDouble(),
       customPotassium: (json['customPotassium'] as num?)?.toDouble(),
       customSodium: (json['customSodium'] as num?)?.toDouble(),
       customSugar: (json['customSugar'] as num?)?.toDouble(),
       customCarb: (json['customCarb'] as num?)?.toDouble(),
       customWater: (json['customWater'] as num?)?.toDouble(),
+      customPhosphorus: (json['customPhosphorus'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$$DailyLogImplToJson(_$DailyLogImpl instance) =>
@@ -36,10 +39,12 @@ Map<String, dynamic> _$$DailyLogImplToJson(_$DailyLogImpl instance) =>
       'total_sugar_g': instance.totalSugarG,
       'total_carb_g': instance.totalCarbG,
       'total_water_ml': instance.totalWaterMl,
+      'total_phosphorus_mg': instance.totalPhosphorusMg,
       'customProtein': instance.customProtein,
       'customPotassium': instance.customPotassium,
       'customSodium': instance.customSodium,
       'customSugar': instance.customSugar,
       'customCarb': instance.customCarb,
       'customWater': instance.customWater,
+      'customPhosphorus': instance.customPhosphorus,
     };

@@ -65,6 +65,7 @@ void main() {
         'sugar_g': 10.4,
         'carb_g': 13.8,
         'water_ml': 86.0,
+        'phosphorus_mg': 11.0,
         'eaten_at': now.toIso8601String(),
       };
 

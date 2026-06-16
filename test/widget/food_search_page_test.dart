@@ -7,6 +7,7 @@ import 'package:ckd_nutrition_app/pages/food/food_search_page.dart';
 import 'package:ckd_nutrition_app/repositories/food_repository.dart';
 import 'package:ckd_nutrition_app/controllers/meal_controller.dart';
 import 'package:ckd_nutrition_app/providers/core_providers.dart';
+import 'package:ckd_nutrition_app/providers/meal_providers.dart';
 import 'package:ckd_nutrition_app/models/isar/food_item.dart';
 
 class MockIsar extends Mock implements Isar {}
@@ -15,12 +16,10 @@ class MockMealController extends Mock implements MealController {}
 
 void main() {
   group('FoodSearchPage Widget Tests', () {
-    late MockIsar mockIsar;
     late MockFoodRepository mockFoodRepo;
     late MockMealController mockMealCtrl;
 
     setUp(() {
-      mockIsar = MockIsar();
       mockFoodRepo = MockFoodRepository();
       mockMealCtrl = MockMealController();
     });
@@ -31,8 +30,8 @@ void main() {
           foodRepositoryProvider.overrideWithValue(mockFoodRepo),
           mealControllerProvider.overrideWithValue(mockMealCtrl),
         ],
-        child: MaterialApp(
-          home: FoodSearchPage(isar: mockIsar),
+        child: const MaterialApp(
+          home: FoodSearchPage(),
         ),
       );
     }

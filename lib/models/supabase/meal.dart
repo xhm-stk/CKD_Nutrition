@@ -19,6 +19,7 @@ class Meal with _$Meal {
     @JsonKey(name: 'sugar_g') required double sugarG,
     @JsonKey(name: 'carb_g') required double carbG,
     @JsonKey(name: 'water_ml') required double waterMl,
+    @JsonKey(name: 'phosphorus_mg') required double phosphorusMg,
     @JsonKey(name: 'eaten_at') required DateTime eatenAt,
   }) = _Meal;
 

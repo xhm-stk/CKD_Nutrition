@@ -1,19 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/core_providers.dart';
 
-final mealPlannerProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
-  final sb = ref.watch(supabaseProvider);
-  final user = sb.auth.currentUser;
-  if (user == null) throw Exception('กรุณาเข้าสู่ระบบ');
-
-  // เรียกใช้ RPC recommend_meals ที่ Backend Architect เขียนไว้
-  final response = await sb.rpc('recommend_meals', params: {
-    'p_user_id': user.id,
-  });
-  return response as List<dynamic>;
-});
-
+import '../../providers/meal_providers.dart';
 class MealPlannerPage extends ConsumerWidget {
   const MealPlannerPage({super.key});
 

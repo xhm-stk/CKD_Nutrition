@@ -17,6 +17,7 @@ class MealController {
     final sugar = food.sugarG * ratio;
     final carb = food.carbG * ratio;
     final water = food.waterMl * ratio;
+    final phosphorus = food.phosphorusMg * ratio;
 
     // 2. Delegate to repository for persistence
     return _repository.logMealData(
@@ -30,6 +31,8 @@ class MealController {
       sugar: sugar,
       carb: carb,
       water: water,
+      phosphorus: phosphorus,
+      eatenAt: DateTime.now(),
     );
   }
 }

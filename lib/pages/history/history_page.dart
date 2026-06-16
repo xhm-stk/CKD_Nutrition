@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:go_router/go_router.dart';
 
 class HistoryPage extends ConsumerStatefulWidget {
   const HistoryPage({super.key});
@@ -16,7 +17,16 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('📅 ประวัติการกินอาหาร')),
+      appBar: AppBar(
+        title: const Text('📅 ประวัติการกินอาหาร'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
+            tooltip: 'สรุปรายเดือน',
+            onPressed: () => context.push('/history/monthly'),
+          )
+        ],
+      ),
       body: Column(
         children: [
           TableCalendar(
