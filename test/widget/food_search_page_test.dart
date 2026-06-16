@@ -11,7 +11,9 @@ import 'package:ckd_nutrition_app/providers/meal_providers.dart';
 import 'package:ckd_nutrition_app/models/isar/food_item.dart';
 
 class MockIsar extends Mock implements Isar {}
+
 class MockFoodRepository extends Mock implements FoodRepository {}
+
 class MockMealController extends Mock implements MealController {}
 
 void main() {
@@ -30,13 +32,13 @@ void main() {
           foodRepositoryProvider.overrideWithValue(mockFoodRepo),
           mealControllerProvider.overrideWithValue(mockMealCtrl),
         ],
-        child: const MaterialApp(
-          home: FoodSearchPage(),
-        ),
+        child: const MaterialApp(home: FoodSearchPage()),
       );
     }
 
-    testWidgets('Shows no results message when empty', (WidgetTester tester) async {
+    testWidgets('Shows no results message when empty', (
+      WidgetTester tester,
+    ) async {
       when(() => mockFoodRepo.searchFood(any())).thenAnswer((_) async => []);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -45,15 +47,20 @@ void main() {
       expect(find.text('ไม่พบรายการอาหาร'), findsOneWidget);
     });
 
-    testWidgets('Shows food items and opens BottomSheet on tap', (WidgetTester tester) async {
-      final food1 = FoodItem()
-        ..foodId = 'F1'
-        ..name = 'Apple'
-        ..proteinG = 0.5
-        ..sodiumMg = 1.0
-        ..servingSize = '100g';
+    testWidgets('Shows food items and opens BottomSheet on tap', (
+      WidgetTester tester,
+    ) async {
+      final food1 =
+          FoodItem()
+            ..foodId = 'F1'
+            ..name = 'Apple'
+            ..proteinG = 0.5
+            ..sodiumMg = 1.0
+            ..servingSize = '100g';
 
-      when(() => mockFoodRepo.searchFood(any())).thenAnswer((_) async => [food1]);
+      when(
+        () => mockFoodRepo.searchFood(any()),
+      ).thenAnswer((_) async => [food1]);
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();

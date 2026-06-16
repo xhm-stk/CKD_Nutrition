@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
 import '../../providers/meal_providers.dart';
+
 class MonthlySummaryPage extends ConsumerStatefulWidget {
   const MonthlySummaryPage({super.key});
 
@@ -25,14 +26,26 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
           IconButton(
             icon: const Icon(Icons.arrow_back_ios, size: 16),
             onPressed: () {
-              setState(() => _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1));
+              setState(
+                () =>
+                    _currentMonth = DateTime(
+                      _currentMonth.year,
+                      _currentMonth.month - 1,
+                    ),
+              );
             },
           ),
           Center(child: Text(DateFormat('MMM yyyy').format(_currentMonth))),
           IconButton(
             icon: const Icon(Icons.arrow_forward_ios, size: 16),
             onPressed: () {
-              setState(() => _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1));
+              setState(
+                () =>
+                    _currentMonth = DateTime(
+                      _currentMonth.year,
+                      _currentMonth.month + 1,
+                    ),
+              );
             },
           ),
         ],
@@ -40,22 +53,28 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
       body: summaryAsync.when(
         data: (data) {
           if (data.isEmpty) {
-            return const Center(child: Text('ไม่มีประวัติการกินอาหารในเดือนนี้'));
+            return const Center(
+              child: Text('ไม่มีประวัติการกินอาหารในเดือนนี้'),
+            );
           }
 
           // เตรียมข้อมูลจุดกราฟของโปรตีน
-          final spots = data.asMap().entries.map((e) {
-            final idx = e.key.toDouble();
-            final protein = (e.value['total_protein_g'] as num).toDouble();
-            return FlSpot(idx, protein);
-          }).toList();
+          final spots =
+              data.asMap().entries.map((e) {
+                final idx = e.key.toDouble();
+                final protein = (e.value['total_protein_g'] as num).toDouble();
+                return FlSpot(idx, protein);
+              }).toList();
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('กราฟปริมาณโปรตีนที่รับประทาน (g)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text(
+                  'กราฟปริมาณโปรตีนที่รับประทาน (g)',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 24),
                 Expanded(
                   child: LineChart(
@@ -68,7 +87,10 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
                           barWidth: 4,
                           isStrokeCapRound: true,
                           dotData: const FlDotData(show: true),
-                          belowBarData: BarAreaData(show: true, color: Colors.blue.withValues(alpha: 0.2)),
+                          belowBarData: BarAreaData(
+                            show: true,
+                            color: Colors.blue.withValues(alpha: 0.2),
+                          ),
                         ),
                       ],
                       titlesData: FlTitlesData(
@@ -76,33 +98,63 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
                           sideTitles: SideTitles(
                             showTitles: true,
                             getTitlesWidget: (value, meta) {
-                              if (value.toInt() >= 0 && value.toInt() < data.length) {
-                                final dateStr = data[value.toInt()]['log_date'] as String;
+                              if (value.toInt() >= 0 &&
+                                  value.toInt() < data.length) {
+                                final dateStr =
+                                    data[value.toInt()]['log_date'] as String;
                                 final day = DateTime.parse(dateStr).day;
-                                return Text('$day', style: const TextStyle(fontSize: 10));
+                                return Text(
+                                  '$day',
+                                  style: const TextStyle(fontSize: 10),
+                                );
                               }
                               return const Text('');
                             },
                           ),
                         ),
-                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        topTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
                       ),
-                      borderData: FlBorderData(show: true, border: Border.all(color: Colors.grey.shade300)),
+                      borderData: FlBorderData(
+                        show: true,
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text('สรุปผล (เฉลี่ยรายเดือน)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text(
+                  'สรุปผล (เฉลี่ยรายเดือน)',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        _buildStatRow('โปรตีนเฉลี่ย', _calculateAvg(data, 'total_protein_g'), 'g', Colors.blue),
-                        _buildStatRow('โซเดียมเฉลี่ย', _calculateAvg(data, 'total_sodium_mg'), 'mg', Colors.orange),
-                        _buildStatRow('โพแทสเซียมเฉลี่ย', _calculateAvg(data, 'total_potassium_mg'), 'mg', Colors.purple),
+                        _buildStatRow(
+                          'โปรตีนเฉลี่ย',
+                          _calculateAvg(data, 'total_protein_g'),
+                          'g',
+                          Colors.blue,
+                        ),
+                        _buildStatRow(
+                          'โซเดียมเฉลี่ย',
+                          _calculateAvg(data, 'total_sodium_mg'),
+                          'mg',
+                          Colors.orange,
+                        ),
+                        _buildStatRow(
+                          'โพแทสเซียมเฉลี่ย',
+                          _calculateAvg(data, 'total_potassium_mg'),
+                          'mg',
+                          Colors.purple,
+                        ),
                       ],
                     ),
                   ),
@@ -133,7 +185,10 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label),
-          Text('${value.toStringAsFixed(1)} $unit', style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+          Text(
+            '${value.toStringAsFixed(1)} $unit',
+            style: TextStyle(fontWeight: FontWeight.bold, color: color),
+          ),
         ],
       ),
     );

@@ -31,10 +31,12 @@ class BiometricService {
 
     try {
       return await _auth.authenticate(
-        localizedReason: 'กรุณาสแกนใบหน้าหรือลายนิ้วมือเพื่อเข้าถึงข้อมูลสุขภาพส่วนบุคคลของคุณ',
+        localizedReason:
+            'กรุณาสแกนใบหน้าหรือลายนิ้วมือเพื่อเข้าถึงข้อมูลสุขภาพส่วนบุคคลของคุณ',
         options: const AuthenticationOptions(
           stickyAuth: true,
-          biometricOnly: false, // อนุญาตให้ใช้ PIN/Password เครื่องได้ด้วยถ้าสแกนนิ้วไม่ผ่าน
+          biometricOnly:
+              false, // อนุญาตให้ใช้ PIN/Password เครื่องได้ด้วยถ้าสแกนนิ้วไม่ผ่าน
         ),
       );
     } on PlatformException catch (_) {

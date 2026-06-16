@@ -10,7 +10,8 @@ class OfflineBanner extends StatelessWidget {
       stream: Connectivity().onConnectivityChanged,
       builder: (context, snapshot) {
         final results = snapshot.data ?? [ConnectivityResult.none];
-        final isOffline = results.contains(ConnectivityResult.none) || results.isEmpty;
+        final isOffline =
+            results.contains(ConnectivityResult.none) || results.isEmpty;
 
         if (!isOffline) return const SizedBox.shrink();
 
@@ -26,7 +27,11 @@ class OfflineBanner extends StatelessWidget {
               Expanded(
                 child: Text(
                   'คุณกำลังอยู่ในโหมดออฟไลน์ ข้อมูลจะถูกซิงก์ภายหลัง',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ],

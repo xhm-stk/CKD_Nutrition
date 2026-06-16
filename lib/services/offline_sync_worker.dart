@@ -10,12 +10,15 @@ class OfflineSyncWorker {
   final Isar _isar;
   final SupabaseClient _sb;
   bool _isSyncing = false;
-  late final StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  late final StreamSubscription<List<ConnectivityResult>>
+  _connectivitySubscription;
 
   OfflineSyncWorker(this._isar, this._sb) {
     // ดักจับการเปลี่ยนแปลงอินเทอร์เน็ต (ถ้าเน็ตกลับมา ให้ทำงานทันที)
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
-      if (results.contains(ConnectivityResult.mobile) || 
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
+      List<ConnectivityResult> results,
+    ) {
+      if (results.contains(ConnectivityResult.mobile) ||
           results.contains(ConnectivityResult.wifi)) {
         _processQueue();
       }
@@ -27,11 +30,15 @@ class OfflineSyncWorker {
   }
 
   /// เพิ่มคำสั่งเข้าคิว (เรียกใช้เมื่อแอปบันทึกข้อมูลไม่สำเร็จเพราะไม่มีเน็ต)
-  Future<void> enqueueAction(String actionType, Map<String, dynamic> payload) async {
-    final action = OfflineAction()
-      ..actionType = actionType
-      ..payloadJson = jsonEncode(payload)
-      ..createdAt = DateTime.now();
+  Future<void> enqueueAction(
+    String actionType,
+    Map<String, dynamic> payload,
+  ) async {
+    final action =
+        OfflineAction()
+          ..actionType = actionType
+          ..payloadJson = jsonEncode(payload)
+          ..createdAt = DateTime.now();
 
     await _isar.writeTxn(() async {
       await _isar.offlineActions.put(action);
@@ -48,7 +55,8 @@ class OfflineSyncWorker {
 
     try {
       // ดึงคิวทั้งหมดเรียงจากเก่าไปใหม่
-      final actions = await _isar.offlineActions.where().sortByCreatedAt().findAll();
+      final actions =
+          await _isar.offlineActions.where().sortByCreatedAt().findAll();
 
       for (final action in actions) {
         if (action.retryCount >= 5) {
@@ -93,9 +101,11 @@ class OfflineSyncWorker {
 
       switch (action.actionType) {
         case 'UPSERT_PROFILE':
-          await _sb.from('user_health_profiles').upsert(payload, onConflict: 'user_id');
+          await _sb
+              .from('user_health_profiles')
+              .upsert(payload, onConflict: 'user_id');
           return _SyncStatus.success;
-          
+
         case 'LOG_MEAL_RPC':
           // เช็คว่า p_eaten_at มีส่งมาไหม (แก้บั๊กเวลาเพี้ยนข้ามวัน Patch 8)
           final params = {
@@ -115,9 +125,10 @@ class OfflineSyncWorker {
           return _SyncStatus.success;
 
         case 'DELETE_MEAL_RPC':
-          await _sb.rpc('delete_meal', params: {
-            'p_meal_id': payload['meal_id'],
-          });
+          await _sb.rpc(
+            'delete_meal',
+            params: {'p_meal_id': payload['meal_id']},
+          );
           return _SyncStatus.success;
 
         case 'ADD_CUSTOM_FOOD':
@@ -127,7 +138,7 @@ class OfflineSyncWorker {
             await _sb.from('custom_foods').insert(payload);
           }
           return _SyncStatus.success;
-          
+
         default:
           debugPrint('Unknown Action Type: ${action.actionType}');
           return _SyncStatus.permanentError; // ไม่รู้จัก Type นี้
@@ -142,8 +153,4 @@ class OfflineSyncWorker {
   }
 }
 
-enum _SyncStatus {
-  success,
-  temporaryError,
-  permanentError,
-}
+enum _SyncStatus { success, temporaryError, permanentError }

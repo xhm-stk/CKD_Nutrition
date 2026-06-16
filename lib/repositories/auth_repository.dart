@@ -20,7 +20,11 @@ class AuthRepository {
     } on AuthException catch (e, stack) {
       return Failure(e.message, e, stack);
     } catch (e, stack) {
-      return Failure('ไม่สามารถเข้าสู่ระบบได้ กรุณาตรวจสอบอินเทอร์เน็ต', e, stack);
+      return Failure(
+        'ไม่สามารถเข้าสู่ระบบได้ กรุณาตรวจสอบอินเทอร์เน็ต',
+        e,
+        stack,
+      );
     }
   }
 
@@ -31,7 +35,11 @@ class AuthRepository {
     } on AuthException catch (e, stack) {
       return Failure(e.message, e, stack);
     } catch (e, stack) {
-      return Failure('ไม่สามารถสมัครสมาชิกได้ กรุณาตรวจสอบอินเทอร์เน็ต', e, stack);
+      return Failure(
+        'ไม่สามารถสมัครสมาชิกได้ กรุณาตรวจสอบอินเทอร์เน็ต',
+        e,
+        stack,
+      );
     }
   }
 
@@ -42,7 +50,11 @@ class AuthRepository {
     } on AuthException catch (e, stack) {
       return Failure(e.message, e, stack);
     } catch (e, stack) {
-      return Failure('ไม่สามารถส่งลิงก์รีเซ็ตรหัสผ่านได้ กรุณาลองใหม่อีกครั้ง', e, stack);
+      return Failure(
+        'ไม่สามารถส่งลิงก์รีเซ็ตรหัสผ่านได้ กรุณาลองใหม่อีกครั้ง',
+        e,
+        stack,
+      );
     }
   }
 
@@ -82,10 +94,8 @@ class AuthRepository {
     try {
       final user = _sb.auth.currentUser;
       if (user == null) return Failure('กรุณาเข้าสู่ระบบก่อน');
-      
-      await _sb.rpc('delete_user_account', params: {
-        'p_user_id': user.id,
-      });
+
+      await _sb.rpc('delete_user_account', params: {'p_user_id': user.id});
       await logout();
       return Success(null);
     } catch (e, stack) {

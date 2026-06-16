@@ -40,9 +40,10 @@ class LoginState {
   }
 }
 
-final loginControllerProvider = StateNotifierProvider<LoginController, LoginState>((ref) {
-  return LoginController(ref.watch(authRepositoryProvider));
-});
+final loginControllerProvider =
+    StateNotifierProvider<LoginController, LoginState>((ref) {
+      return LoginController(ref.watch(authRepositoryProvider));
+    });
 
 class LoginController extends StateNotifier<LoginState> {
   final AuthRepository _repo;
@@ -52,12 +53,20 @@ class LoginController extends StateNotifier<LoginState> {
   Future<void> login(String email, String password) async {
     // 1. เช็คว่าติด Lockout ไหม
     if (state.isLockedOut) {
-      final diffSeconds = state.lockoutUntil!.difference(DateTime.now()).inSeconds;
-      state = state.copyWith(errorMessage: 'คุณล็อกอินผิดพลาดเกินกำหนด กรุณารองอีกครั้งในอีก $diffSeconds วินาที');
+      final diffSeconds =
+          state.lockoutUntil!.difference(DateTime.now()).inSeconds;
+      state = state.copyWith(
+        errorMessage:
+            'คุณล็อกอินผิดพลาดเกินกำหนด กรุณารองอีกครั้งในอีก $diffSeconds วินาที',
+      );
       return;
     } else if (state.lockoutUntil != null) {
       // หมดเวลา Lockout แล้ว
-      state = state.copyWith(attempts: 0, lockoutUntil: null, errorMessage: null);
+      state = state.copyWith(
+        attempts: 0,
+        lockoutUntil: null,
+        errorMessage: null,
+      );
     }
 
     state = state.copyWith(isLoading: true, errorMessage: null);
@@ -66,7 +75,12 @@ class LoginController extends StateNotifier<LoginState> {
 
     switch (result) {
       case Success():
-        state = state.copyWith(isLoading: false, isSuccess: true, attempts: 0, lockoutUntil: null);
+        state = state.copyWith(
+          isLoading: false,
+          isSuccess: true,
+          attempts: 0,
+          lockoutUntil: null,
+        );
       case Failure(:final userMessage):
         final newAttempts = state.attempts + 1;
         DateTime? newLockout;
@@ -74,9 +88,11 @@ class LoginController extends StateNotifier<LoginState> {
 
         if (newAttempts >= 5) {
           newLockout = DateTime.now().add(const Duration(minutes: 1));
-          finalMessage = 'กรอกรหัสผ่านผิดครบ 5 ครั้ง! โดนระงับการเข้าใช้งานชั่วคราว 1 นาที';
+          finalMessage =
+              'กรอกรหัสผ่านผิดครบ 5 ครั้ง! โดนระงับการเข้าใช้งานชั่วคราว 1 นาที';
         } else {
-          finalMessage = '$userMessage (เหลือสิทธิ์ให้ลองอีก ${5 - newAttempts} ครั้ง)';
+          finalMessage =
+              '$userMessage (เหลือสิทธิ์ให้ลองอีก ${5 - newAttempts} ครั้ง)';
         }
 
         state = state.copyWith(

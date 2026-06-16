@@ -20,7 +20,8 @@ class SocialAuthButtons extends ConsumerWidget {
         Expanded(
           child: OutlinedButton.icon(
             onPressed: () async {
-              final error = await ref.read(authControllerProvider).signInWithGoogle();
+              final error =
+                  await ref.read(authControllerProvider).signInWithGoogle();
               if (error != null) {
                 if (!context.mounted) return;
                 _handleError(context, error);
@@ -41,7 +42,8 @@ class SocialAuthButtons extends ConsumerWidget {
           Expanded(
             child: OutlinedButton.icon(
               onPressed: () async {
-                final error = await ref.read(authControllerProvider).signInWithApple();
+                final error =
+                    await ref.read(authControllerProvider).signInWithApple();
                 if (error != null) {
                   if (!context.mounted) return;
                   _handleError(context, error);

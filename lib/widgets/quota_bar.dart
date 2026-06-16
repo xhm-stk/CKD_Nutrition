@@ -8,9 +8,12 @@ class QuotaBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // กำหนดสีตามสถานะที่คำนวณมาจาก QuotaEngine
-    final color = quota.isOverLimit ? Colors.red 
-                : quota.isNearLimit ? Colors.orange 
-                : Colors.green;
+    final color =
+        quota.isOverLimit
+            ? Colors.red
+            : quota.isNearLimit
+            ? Colors.orange
+            : Colors.green;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -20,8 +23,13 @@ class QuotaBar extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(quota.label, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text('${quota.consumed.toStringAsFixed(1)} / ${quota.limit} ${quota.unit}'),
+              Text(
+                quota.label,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '${quota.consumed.toStringAsFixed(1)} / ${quota.limit} ${quota.unit}',
+              ),
             ],
           ),
           const SizedBox(height: 4),

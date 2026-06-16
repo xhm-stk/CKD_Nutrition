@@ -6,7 +6,8 @@ import '../../../repositories/auth_repository.dart';
 
 class HealthSetupPage extends ConsumerStatefulWidget {
   const HealthSetupPage({super.key});
-  @override ConsumerState<HealthSetupPage> createState() => _HealthSetupPageState();
+  @override
+  ConsumerState<HealthSetupPage> createState() => _HealthSetupPageState();
 }
 
 class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
@@ -14,22 +15,24 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
   final _weightCtrl = TextEditingController();
   final _heightCtrl = TextEditingController();
   String _selectedGender = 'male';
-  String _selectedStage  = 'stage_3a'; // ตั้งค่าเริ่มต้นเป็นระยะ 3a
+  String _selectedStage = 'stage_3a'; // ตั้งค่าเริ่มต้นเป็นระยะ 3a
   bool _isLoading = false;
 
   void _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() => _isLoading = true);
 
     try {
       // เซฟโปรไฟล์ขึ้น Cloud
-      await ref.read(healthProfileServiceProvider).saveHealthProfile(
-        weightKg: double.parse(_weightCtrl.text.trim()),
-        heightCm: double.parse(_heightCtrl.text.trim()),
-        gender: _selectedGender,
-        ckdStage: _selectedStage,
-      );
+      await ref
+          .read(healthProfileServiceProvider)
+          .saveHealthProfile(
+            weightKg: double.parse(_weightCtrl.text.trim()),
+            heightCm: double.parse(_heightCtrl.text.trim()),
+            gender: _selectedGender,
+            ckdStage: _selectedStage,
+          );
 
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -39,7 +42,7 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      
+
       debugPrint('Setup Profile Error: $e'); // ซ่อน Exception ดิบ
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -79,60 +82,76 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
           padding: const EdgeInsets.all(24),
           children: [
             TextFormField(
-              controller: _weightCtrl, 
-              decoration: const InputDecoration(labelText: 'น้ำหนัก (kg)'), 
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              controller: _weightCtrl,
+              decoration: const InputDecoration(labelText: 'น้ำหนัก (kg)'),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               validator: (val) {
-                if (val == null || val.trim().isEmpty) return 'กรุณากรอกน้ำหนัก';
+                if (val == null || val.trim().isEmpty)
+                  return 'กรุณากรอกน้ำหนัก';
                 final w = double.tryParse(val);
                 if (w == null) return 'กรุณากรอกตัวเลขเท่านั้น';
-                if (w < 10 || w > 500) return 'น้ำหนักต้องอยู่ระหว่าง 10-500 กก.';
+                if (w < 10 || w > 500)
+                  return 'น้ำหนักต้องอยู่ระหว่าง 10-500 กก.';
                 return null;
               },
             ),
             const SizedBox(height: 16),
             TextFormField(
-              controller: _heightCtrl, 
-              decoration: const InputDecoration(labelText: 'ส่วนสูง (cm)'), 
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              controller: _heightCtrl,
+              decoration: const InputDecoration(labelText: 'ส่วนสูง (cm)'),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               validator: (val) {
-                if (val == null || val.trim().isEmpty) return 'กรุณากรอกส่วนสูง';
+                if (val == null || val.trim().isEmpty)
+                  return 'กรุณากรอกส่วนสูง';
                 final h = double.tryParse(val);
                 if (h == null) return 'กรุณากรอกตัวเลขเท่านั้น';
-                if (h < 50 || h > 300) return 'ส่วนสูงต้องอยู่ระหว่าง 50-300 ซม.';
+                if (h < 50 || h > 300)
+                  return 'ส่วนสูงต้องอยู่ระหว่าง 50-300 ซม.';
                 return null;
               },
             ),
-          const SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            value: _selectedGender,
-            decoration: const InputDecoration(labelText: 'เพศ'),
-            items: const [
-              DropdownMenuItem(value: 'male', child: Text('ชาย')),
-              DropdownMenuItem(value: 'female', child: Text('หญิง')),
-            ],
-            onChanged: (val) => setState(() => _selectedGender = val!),
-          ),
-          const SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            value: _selectedStage,
-            decoration: const InputDecoration(labelText: 'ระยะโรคไต (CKD Stage)'),
-            items: const [
-              DropdownMenuItem(value: 'stage_1', child: Text('ระยะที่ 1')),
-              DropdownMenuItem(value: 'stage_2', child: Text('ระยะที่ 2')),
-              DropdownMenuItem(value: 'stage_3a', child: Text('ระยะที่ 3a')),
-              DropdownMenuItem(value: 'stage_3b', child: Text('ระยะที่ 3b')),
-              DropdownMenuItem(value: 'stage_4', child: Text('ระยะที่ 4')),
-              DropdownMenuItem(value: 'stage_5', child: Text('ระยะที่ 5 (ฟอกไต)')),
-            ],
-            onChanged: (val) => setState(() => _selectedStage = val!),
-          ),
-          const SizedBox(height: 32),
-          _isLoading 
-            ? const Center(child: CircularProgressIndicator())
-            : ElevatedButton(onPressed: _saveProfile, child: const Text('บันทึกและเริ่มใช้งาน')),
-        ],
-      ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _selectedGender,
+              decoration: const InputDecoration(labelText: 'เพศ'),
+              items: const [
+                DropdownMenuItem(value: 'male', child: Text('ชาย')),
+                DropdownMenuItem(value: 'female', child: Text('หญิง')),
+              ],
+              onChanged: (val) => setState(() => _selectedGender = val!),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _selectedStage,
+              decoration: const InputDecoration(
+                labelText: 'ระยะโรคไต (CKD Stage)',
+              ),
+              items: const [
+                DropdownMenuItem(value: 'stage_1', child: Text('ระยะที่ 1')),
+                DropdownMenuItem(value: 'stage_2', child: Text('ระยะที่ 2')),
+                DropdownMenuItem(value: 'stage_3a', child: Text('ระยะที่ 3a')),
+                DropdownMenuItem(value: 'stage_3b', child: Text('ระยะที่ 3b')),
+                DropdownMenuItem(value: 'stage_4', child: Text('ระยะที่ 4')),
+                DropdownMenuItem(
+                  value: 'stage_5',
+                  child: Text('ระยะที่ 5 (ฟอกไต)'),
+                ),
+              ],
+              onChanged: (val) => setState(() => _selectedStage = val!),
+            ),
+            const SizedBox(height: 32),
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ElevatedButton(
+                  onPressed: _saveProfile,
+                  child: const Text('บันทึกและเริ่มใช้งาน'),
+                ),
+          ],
+        ),
       ),
     );
   }

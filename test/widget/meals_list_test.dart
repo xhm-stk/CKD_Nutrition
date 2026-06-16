@@ -34,23 +34,25 @@ void main() {
         child: const MaterialApp(
           home: Scaffold(
             body: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(child: MealsListWidget()),
-              ],
+              slivers: [SliverToBoxAdapter(child: MealsListWidget())],
             ),
           ),
         ),
       );
     }
 
-    testWidgets('Shows empty message when meals is empty', (WidgetTester tester) async {
+    testWidgets('Shows empty message when meals is empty', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest([]));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('ยังไม่มีรายการอาหารวันนี้'), findsOneWidget);
     });
 
-    testWidgets('Shows list of meals and allows swipe to delete', (WidgetTester tester) async {
+    testWidgets('Shows list of meals and allows swipe to delete', (
+      WidgetTester tester,
+    ) async {
       final now = DateTime.now();
       final meal1 = Meal(
         id: '1',
@@ -69,7 +71,9 @@ void main() {
         eatenAt: now,
       );
 
-      when(() => mockRepo.deleteMeal(any())).thenAnswer((_) async => Success(null));
+      when(
+        () => mockRepo.deleteMeal(any()),
+      ).thenAnswer((_) async => Success(null));
 
       await tester.pumpWidget(createWidgetUnderTest([meal1]));
       await tester.pumpAndSettle();

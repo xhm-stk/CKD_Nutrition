@@ -18,10 +18,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    
+
     // รับฟัง Error เพื่อแสดง SnackBar
     ref.listen<LoginState>(loginControllerProvider, (previous, next) {
-      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
@@ -29,7 +30,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         );
         // Clear error asynchronously to avoid state mutation during build
-        Future.microtask(() => ref.read(loginControllerProvider.notifier).clearError());
+        Future.microtask(
+          () => ref.read(loginControllerProvider.notifier).clearError(),
+        );
       }
     });
 
@@ -39,16 +42,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.teal.shade50,
-              Colors.white,
-            ],
+            colors: [Colors.teal.shade50, Colors.white],
           ),
         ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -100,15 +103,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           const SizedBox(height: 20),
                           Row(
                             children: [
-                              Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
+                              Expanded(
+                                child: Divider(
+                                  color: Colors.grey[300],
+                                  thickness: 1,
+                                ),
+                              ),
                               const Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Text(
                                   'หรือเข้าสู่ระบบด้วย',
-                                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ),
-                              Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
+                              Expanded(
+                                child: Divider(
+                                  color: Colors.grey[300],
+                                  thickness: 1,
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 16),

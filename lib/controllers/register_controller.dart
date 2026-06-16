@@ -26,9 +26,10 @@ class RegisterState {
   }
 }
 
-final registerControllerProvider = StateNotifierProvider.autoDispose<RegisterController, RegisterState>((ref) {
-  return RegisterController(ref.watch(authRepositoryProvider));
-});
+final registerControllerProvider =
+    StateNotifierProvider.autoDispose<RegisterController, RegisterState>((ref) {
+      return RegisterController(ref.watch(authRepositoryProvider));
+    });
 
 class RegisterController extends StateNotifier<RegisterState> {
   final AuthRepository _repo;
@@ -48,7 +49,10 @@ class RegisterController extends StateNotifier<RegisterState> {
           state = state.copyWith(isLoading: false, errorMessage: userMessage);
       }
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: 'เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง',
+      );
     }
   }
 
