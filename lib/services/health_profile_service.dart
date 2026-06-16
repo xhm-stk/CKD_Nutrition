@@ -16,36 +16,43 @@ class HealthProfileService {
 
   // บันทึกโปรไฟล์สุขภาพ
   Future<void> saveHealthProfile({
-    required double weightKg, required double heightCm,
-    required String gender, required String ckdStage,
+    required double weightKg,
+    required double heightCm,
+    required String gender,
+    required String ckdStage,
   }) async {
     final user = _sb.auth.currentUser;
     if (user == null) {
-      throw Exception('ไม่พบข้อมูลผู้ใช้งานที่ล็อกอินอยู่ กรุณาเข้าสู่ระบบใหม่อีกครั้ง');
+      throw Exception(
+        'ไม่พบข้อมูลผู้ใช้งานที่ล็อกอินอยู่ กรุณาเข้าสู่ระบบใหม่อีกครั้ง',
+      );
     }
-    
+
     final payload = {
       'user_id': user.id,
-      'weight_kg': weightKg, 
+      'weight_kg': weightKg,
       'height_cm': heightCm,
-      'gender': gender, 
+      'gender': gender,
       'ckd_stage': ckdStage,
     };
 
     try {
-      await _sb.from('user_health_profiles').upsert(payload, onConflict: 'user_id');
+      await _sb
+          .from('user_health_profiles')
+          .upsert(payload, onConflict: 'user_id');
     } catch (e) {
       debugPrint('🚨 Supabase failed, falling back to offline queue: $e');
-      
-      final action = OfflineAction()
-        ..actionType = 'UPSERT_PROFILE'
-        ..payloadJson = jsonEncode(payload)
-        ..createdAt = DateTime.now();
+
+      final action =
+          OfflineAction()
+            ..actionType = 'UPSERT_PROFILE'
+            ..payloadJson = jsonEncode(payload)
+            ..createdAt = DateTime.now();
       await _isar.writeTxn(() async {
         await _isar.offlineActions.put(action);
       });
     }
-    
+
     await _ckdSvc.syncToIsar(ckdStage);
   }
 }

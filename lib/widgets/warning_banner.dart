@@ -8,8 +8,14 @@ class WarningBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // กรองหาชื่อสารอาหารที่เกินกำหนด
-    final over = quotas.where((q) => q.isOverLimit).map((q) => q.label).join(', ');
-    final near = quotas.where((q) => q.isNearLimit).map((q) => q.label).join(', ');
+    final over = quotas
+        .where((q) => q.isOverLimit)
+        .map((q) => q.label)
+        .join(', ');
+    final near = quotas
+        .where((q) => q.isNearLimit)
+        .map((q) => q.label)
+        .join(', ');
 
     // ถ้าไม่มีอะไรน่าเป็นห่วง ไม่ต้องโชว์ป้ายนี้ (หดตัวหายไปเลย)
     if (over.isEmpty && near.isEmpty) return const SizedBox.shrink();
@@ -24,13 +30,16 @@ class WarningBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: over.isNotEmpty ? Colors.red : Colors.orange),
+          Icon(
+            Icons.warning_amber_rounded,
+            color: over.isNotEmpty ? Colors.red : Colors.orange,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              over.isNotEmpty 
-                ? 'ระวัง! คุณทาน $over เกินโควต้าแล้ว' 
-                : 'แจ้งเตือน: ปริมาณ $near ใกล้เกินกำหนด (เกิน 80%)',
+              over.isNotEmpty
+                  ? 'ระวัง! คุณทาน $over เกินโควต้าแล้ว'
+                  : 'แจ้งเตือน: ปริมาณ $near ใกล้เกินกำหนด (เกิน 80%)',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),

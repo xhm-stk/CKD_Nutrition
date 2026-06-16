@@ -16,7 +16,10 @@ class DashboardPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen<AsyncValue<DailyLog?>>(dashboardSummaryProvider, (previous, next) {
+    ref.listen<AsyncValue<DailyLog?>>(dashboardSummaryProvider, (
+      previous,
+      next,
+    ) {
       if (next is AsyncData && next.value == null) {
         context.go('/health-setup');
       }
@@ -29,11 +32,11 @@ class DashboardPage extends ConsumerWidget {
         title: const Text('โภชนาการวันนี้'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh), 
+            icon: const Icon(Icons.refresh),
             onPressed: () {
               ref.invalidate(dashboardSummaryProvider);
               ref.invalidate(todayMealsProvider);
-            }
+            },
           ),
         ],
       ),
@@ -43,7 +46,10 @@ class DashboardPage extends ConsumerWidget {
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.blue),
-              child: Text('เมนูหลัก', style: TextStyle(color: Colors.white, fontSize: 24)),
+              child: Text(
+                'เมนูหลัก',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.restaurant_menu),
@@ -72,7 +78,10 @@ class DashboardPage extends ConsumerWidget {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.orange),
-              title: const Text('ออกจากระบบ', style: TextStyle(color: Colors.orange)),
+              title: const Text(
+                'ออกจากระบบ',
+                style: TextStyle(color: Colors.orange),
+              ),
               onTap: () async {
                 await ref.read(authControllerProvider).logout();
               },
@@ -80,7 +89,13 @@ class DashboardPage extends ConsumerWidget {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.delete_forever, color: Colors.red),
-              title: const Text('ลบบัญชีถาวร', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              title: const Text(
+                'ลบบัญชีถาวร',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               onTap: () {
                 Navigator.pop(context); // ปิด Drawer ก่อน
                 _showDeleteAccountDialog(context, ref);
@@ -96,7 +111,7 @@ class DashboardPage extends ConsumerWidget {
           }
 
           final quotas = QuotaEngine.calculate(log: log);
-          
+
           return RefreshIndicator(
             onRefresh: () async {
               ref.invalidate(dashboardSummaryProvider);
@@ -107,10 +122,10 @@ class DashboardPage extends ConsumerWidget {
                 const OfflineBanner(),
                 WarningBanner(quotas: quotas),
                 const SizedBox(height: 16),
-                
+
                 // AI Planner Box
                 _buildAiPlannerSection(context, ref),
-                
+
                 const Divider(height: 32, thickness: 1),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -120,21 +135,26 @@ class DashboardPage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // 3x2 Grid สำหรับหลอดวงกลมโควต้า
                 GridView.count(
                   crossAxisCount: 3,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   childAspectRatio: 0.8,
-                  children: quotas.map((q) => NutrientCircle(
-                    label: q.label,
-                    current: q.consumed,
-                    limit: q.limit,
-                    unit: q.unit,
-                  )).toList(),
+                  children:
+                      quotas
+                          .map(
+                            (q) => NutrientCircle(
+                              label: q.label,
+                              current: q.consumed,
+                              limit: q.limit,
+                              unit: q.unit,
+                            ),
+                          )
+                          .toList(),
                 ),
-                
+
                 const Divider(height: 32, thickness: 1),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -143,10 +163,10 @@ class DashboardPage extends ConsumerWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
-                
+
                 // รายการมื้ออาหาร (สามารถ Swipe to delete ได้)
                 const MealsListWidget(),
-                
+
                 const SizedBox(height: 80),
               ],
             ),
@@ -199,20 +219,32 @@ class DashboardPage extends ConsumerWidget {
                             color: Colors.teal.shade50,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.auto_awesome, color: Colors.teal, size: 28),
+                          child: const Icon(
+                            Icons.auto_awesome,
+                            color: Colors.teal,
+                            size: 28,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         const Expanded(
                           child: Text(
                             'AI แนะนำเมนูอาหาร',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.teal,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.refresh, color: Colors.teal, size: 28),
+                    icon: const Icon(
+                      Icons.refresh,
+                      color: Colors.teal,
+                      size: 28,
+                    ),
                     onPressed: () => ref.invalidate(mealPlannerProvider),
                   ),
                 ],
@@ -223,70 +255,114 @@ class DashboardPage extends ConsumerWidget {
                   if (meals.isEmpty) {
                     return const Padding(
                       padding: EdgeInsets.all(16.0),
-                      child: Text('ไม่พบเมนูที่เหมาะสมกับโควต้าของคุณในขณะนี้', style: TextStyle(fontSize: 16)),
+                      child: Text(
+                        'ไม่พบเมนูที่เหมาะสมกับโควต้าของคุณในขณะนี้',
+                        style: TextStyle(fontSize: 16),
+                      ),
                     );
                   }
                   return Column(
-                    children: meals.map<Widget>((m) => Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.teal.shade100,
-                          radius: 24,
-                          child: const Icon(Icons.restaurant, color: Colors.teal, size: 24),
-                        ),
-                        title: Text(
-                          m['name'] ?? 'ไม่มีชื่อ',
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    children:
+                        meals
+                            .map<Widget>(
+                              (m) => Container(
+                                margin: const EdgeInsets.only(bottom: 12),
                                 decoration: BoxDecoration(
-                                  color: Colors.green.shade50,
-                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey.shade50,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: Colors.grey.shade200,
+                                  ),
                                 ),
-                                child: Text(
-                                  'โปรตีน ${(m['protein_g'] as num).toDouble().toStringAsFixed(1)}g',
-                                  style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.bold),
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  leading: CircleAvatar(
+                                    backgroundColor: Colors.teal.shade100,
+                                    radius: 24,
+                                    child: const Icon(
+                                      Icons.restaurant,
+                                      color: Colors.teal,
+                                      size: 24,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    m['name'] ?? 'ไม่มีชื่อ',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green.shade50,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'โปรตีน ${(m['protein_g'] as num).toDouble().toStringAsFixed(1)}g',
+                                            style: TextStyle(
+                                              color: Colors.green.shade700,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.orange.shade50,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'โซเดียม ${(m['sodium_mg'] as num).toDouble().toStringAsFixed(0)}mg',
+                                            style: TextStyle(
+                                              color: Colors.orange.shade800,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.shade50,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  'โซเดียม ${(m['sodium_mg'] as num).toDouble().toStringAsFixed(0)}mg',
-                                  style: TextStyle(color: Colors.orange.shade800, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )).toList(),
+                            )
+                            .toList(),
                   );
                 },
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (err, st) => Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text('รอซิงก์ข้อมูลกับระบบออนไลน์...', style: TextStyle(color: Colors.red.shade400, fontSize: 16)),
-                ),
+                loading:
+                    () => const Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                error:
+                    (err, st) => Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'รอซิงก์ข้อมูลกับระบบออนไลน์...',
+                        style: TextStyle(
+                          color: Colors.red.shade400,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
               ),
             ],
           ),
@@ -299,67 +375,95 @@ class DashboardPage extends ConsumerWidget {
   void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('⚠️ คำเตือน: ลบบัญชีถาวร', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-        content: const Text(
-          'การกระทำนี้ไม่สามารถย้อนกลับได้\n\n'
-          'ข้อมูลประวัติการกินอาหาร ข้อมูลสุขภาพ และบัญชีของคุณ จะถูกลบออกจากระบบของแอปพลิเคชันอย่างถาวรตามนโยบายความเป็นส่วนตัว\n\n'
-          'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชี?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('ยกเลิก', style: TextStyle(color: Colors.grey)),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text(
+              '⚠️ คำเตือน: ลบบัญชีถาวร',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+            content: const Text(
+              'การกระทำนี้ไม่สามารถย้อนกลับได้\n\n'
+              'ข้อมูลประวัติการกินอาหาร ข้อมูลสุขภาพ และบัญชีของคุณ จะถูกลบออกจากระบบของแอปพลิเคชันอย่างถาวรตามนโยบายความเป็นส่วนตัว\n\n'
+              'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชี?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text(
+                  'ยกเลิก',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () {
+                  Navigator.pop(ctx); // ปิด Dialog แรก
+                  _showFinalConfirmationDialog(
+                    context,
+                    ref,
+                  ); // เปิด Dialog ยืนยันขั้นสุดท้าย
+                },
+                child: const Text(
+                  'ดำเนินการต่อ',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              Navigator.pop(ctx); // ปิด Dialog แรก
-              _showFinalConfirmationDialog(context, ref); // เปิด Dialog ยืนยันขั้นสุดท้าย
-            },
-            child: const Text('ดำเนินการต่อ', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
     );
   }
 
   void _showFinalConfirmationDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('ยืนยันครั้งสุดท้าย', style: TextStyle(color: Colors.red)),
-        content: const Text('คุณกำลังจะลบข้อมูลทั้งหมดทิ้งถาวร กดยืนยันเพื่อดำเนินการทันที'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('ยกเลิก'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () async {
-              Navigator.pop(ctx); // ปิด Dialog
-              
-              // แสดง Loading ชั่วคราว (ถ้าทำได้)
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('กำลังลบข้อมูลบัญชีของคุณ...')),
-              );
-              Navigator.pop(context); // ปิด Dialog โหลด
-              final error = await ref.read(authControllerProvider).deleteAccount();
-              if (error != null) {
-                if (context.mounted) {
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text(
+              'ยืนยันครั้งสุดท้าย',
+              style: TextStyle(color: Colors.red),
+            ),
+            content: const Text(
+              'คุณกำลังจะลบข้อมูลทั้งหมดทิ้งถาวร กดยืนยันเพื่อดำเนินการทันที',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('ยกเลิก'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () async {
+                  Navigator.pop(ctx); // ปิด Dialog
+
+                  // แสดง Loading ชั่วคราว (ถ้าทำได้)
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('เกิดข้อผิดพลาด: $error')),
+                    const SnackBar(
+                      content: Text('กำลังลบข้อมูลบัญชีของคุณ...'),
+                    ),
                   );
-                }
-              } else {
-                // ถ้าลบสำเร็จ state จะเปลี่ยนและเด้งไปหน้า login อัตโนมัติ (ผ่าน GoRouter refresh)
-              }
-            },
-            child: const Text('ลบทิ้งถาวร', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  Navigator.pop(context); // ปิด Dialog โหลด
+                  final error =
+                      await ref.read(authControllerProvider).deleteAccount();
+                  if (error != null) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('เกิดข้อผิดพลาด: $error')),
+                      );
+                    }
+                  } else {
+                    // ถ้าลบสำเร็จ state จะเปลี่ยนและเด้งไปหน้า login อัตโนมัติ (ผ่าน GoRouter refresh)
+                  }
+                },
+                child: const Text(
+                  'ลบทิ้งถาวร',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

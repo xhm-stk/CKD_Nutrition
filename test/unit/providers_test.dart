@@ -11,10 +11,15 @@ import 'package:isar/isar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockGoTrueClient extends Mock implements GoTrueClient {}
+
 class MockUser extends Mock implements User {}
+
 class MockOfflineSyncWorker extends Mock implements OfflineSyncWorker {}
+
 class MockIsar extends Mock implements Isar {}
+
 class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 void main() {

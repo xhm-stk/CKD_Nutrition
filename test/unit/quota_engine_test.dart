@@ -19,17 +19,18 @@ void main() {
         customProtein: 40.0,
       );
 
-      final rule = CkdRuleCache()
-        ..proteinLimitG = 50.0
-        ..potassiumLimitMg = 2000.0
-        ..sodiumLimitMg = 2000.0
-        ..sugarLimitG = 24.0
-        ..carbLimitG = 150.0
-        ..waterLimitMl = 1500.0
-        ..phosphorusLimitMg = 800.0;
+      final rule =
+          CkdRuleCache()
+            ..proteinLimitG = 50.0
+            ..potassiumLimitMg = 2000.0
+            ..sodiumLimitMg = 2000.0
+            ..sugarLimitG = 24.0
+            ..carbLimitG = 150.0
+            ..waterLimitMl = 1500.0
+            ..phosphorusLimitMg = 800.0;
 
       final quotas = QuotaEngine.calculate(log: log, rule: rule);
-      
+
       expect(quotas, isNotEmpty);
       final proteinQuota = quotas.firstWhere((q) => q.label == 'โปรตีน');
       expect(proteinQuota.limit, 40.0);
@@ -46,17 +47,18 @@ void main() {
         totalPotassiumMg: 1500.0,
       );
 
-      final rule = CkdRuleCache()
-        ..proteinLimitG = 50.0
-        ..potassiumLimitMg = 2000.0
-        ..sodiumLimitMg = 2000.0
-        ..sugarLimitG = 24.0
-        ..carbLimitG = 150.0
-        ..waterLimitMl = 1500.0
-        ..phosphorusLimitMg = 800.0;
+      final rule =
+          CkdRuleCache()
+            ..proteinLimitG = 50.0
+            ..potassiumLimitMg = 2000.0
+            ..sodiumLimitMg = 2000.0
+            ..sugarLimitG = 24.0
+            ..carbLimitG = 150.0
+            ..waterLimitMl = 1500.0
+            ..phosphorusLimitMg = 800.0;
 
       final quotas = QuotaEngine.calculate(log: log, rule: rule);
-      
+
       final potassiumQuota = quotas.firstWhere((q) => q.label == 'โพแทสเซียม');
       expect(potassiumQuota.limit, 2000.0);
       expect(potassiumQuota.consumed, 1500.0);
@@ -94,12 +96,20 @@ void main() {
       );
 
       final quotasOver = QuotaEngine.calculate(log: logOver, rule: null);
-      final sodiumQuotaOver = quotasOver.firstWhere((q) => q.label == 'โซเดียม');
+      final sodiumQuotaOver = quotasOver.firstWhere(
+        (q) => q.label == 'โซเดียม',
+      );
 
-      expect(sodiumQuotaOver.isNearLimit, isFalse); // It's over limit, not just near
+      expect(
+        sodiumQuotaOver.isNearLimit,
+        isFalse,
+      ); // It's over limit, not just near
       expect(sodiumQuotaOver.isOverLimit, isTrue);
       expect(sodiumQuotaOver.remaining, 0.0);
-      expect(sodiumQuotaOver.percent, 1.05); // percent can exceed 1.0 to show overdose
+      expect(
+        sodiumQuotaOver.percent,
+        1.05,
+      ); // percent can exceed 1.0 to show overdose
     });
   });
 }

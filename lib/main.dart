@@ -27,10 +27,9 @@ void main() async {
 
   // 1. ตรวจสอบค่า Environment (ค่าเริ่มต้นคือ dev)
   const String env = String.fromEnvironment('ENV', defaultValue: 'dev');
-  
+
   // 2. โหลดไฟล์ .env ตาม Environment ที่รัน (ถ้าไม่มีให้ fallback ไปที่ .env.dev)
   await dotenv.load(fileName: '.env.$env');
-  
 
   // --- Initializing Required Services ---
   // 1. เชื่อมต่อ Supabase
@@ -55,10 +54,11 @@ void main() async {
     debugPrint('🚨 Isar open failed: $e');
     // เพื่อไม่ให้ข้อมูลสูญหาย (destructive loss) จะไม่สั่ง deleteFromDisk ทันที
     // ให้พยายามกู้คืนหรือใช้ fallback ก่อน (ตอนนี้ทำแค่โยน error ให้รับรู้ หรือลองเปิดแบบไม่มี key)
-    isarInstance = await Isar.open(
-      [FoodItemSchema, CkdRuleCacheSchema, OfflineActionSchema],
-      directory: dir.path,
-    );
+    isarInstance = await Isar.open([
+      FoodItemSchema,
+      CkdRuleCacheSchema,
+      OfflineActionSchema,
+    ], directory: dir.path);
   }
 
   // 4. ปั๊มข้อมูลอาหาร 156 เมนูลงเครื่อง (แก้บั๊ก forceUpdate: true ทำให้ช้าทุกครั้งที่เปิดแอป)
@@ -77,17 +77,18 @@ void main() async {
       options.dsn = dotenv.env['SENTRY_DSN'];
       options.tracesSampleRate = 1.0; // ดักจับ 100% ในเวอร์ชันแรก
       // เพิ่มฟีเจอร์ช่วยให้เรารู้ว่าแอปแครชเพราะ UI หรือ Logic
-      options.attachScreenshot = true; 
+      options.attachScreenshot = true;
     },
-    appRunner: () => runApp(
-      ProviderScope(
-        overrides: [
-          isarProvider.overrideWithValue(isarInstance),
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
-        child: const MyApp(),
-      ),
-    ),
+    appRunner:
+        () => runApp(
+          ProviderScope(
+            overrides: [
+              isarProvider.overrideWithValue(isarInstance),
+              sharedPreferencesProvider.overrideWithValue(prefs),
+            ],
+            child: const MyApp(),
+          ),
+        ),
   );
 }
 
@@ -115,7 +116,8 @@ class _MyAppState extends ConsumerState<MyApp> {
           // หากพับแอปไปเกิน 1 นาที ให้เด้งหน้าจอล็อก
           if (diff.inMinutes >= 1) {
             final router = ref.read(routerProvider);
-            final currentPath = router.routerDelegate.currentConfiguration.uri.path;
+            final currentPath =
+                router.routerDelegate.currentConfiguration.uri.path;
             if (currentPath != '/lock') {
               router.push('/lock');
             }
@@ -135,7 +137,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
-    
+
     // ปลุก OfflineSyncWorker ให้ตื่นขึ้นมาจับตาดูสถานะอินเทอร์เน็ตทันทีที่เปิดแอป
     ref.watch(offlineSyncWorkerProvider);
 

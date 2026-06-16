@@ -7,9 +7,9 @@ class Success<T> extends Result<T> {
 }
 
 class Failure<T> extends Result<T> {
-  final String userMessage;   // ข้อความสำหรับเด้ง SnackBar
-  final Object? debugError;   // ข้อความ Error จริงๆ สำหรับเก็บ Log
-  final StackTrace? stack;    // บันทึกตำแหน่งบรรทัดโค้ดที่พัง
-  
+  final String userMessage; // ข้อความสำหรับเด้ง SnackBar
+  final Object? debugError; // ข้อความ Error จริงๆ สำหรับเก็บ Log
+  final StackTrace? stack; // บันทึกตำแหน่งบรรทัดโค้ดที่พัง
+
   Failure(this.userMessage, [this.debugError, this.stack]);
 }

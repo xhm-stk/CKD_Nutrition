@@ -43,7 +43,10 @@ void main() {
         'custom_potassium_limit_mg': 2000.0,
       };
 
-      final dailyLog = DailyLog.fromDataAndProfile(data, healthProfile: profile);
+      final dailyLog = DailyLog.fromDataAndProfile(
+        data,
+        healthProfile: profile,
+      );
 
       expect(dailyLog.customProtein, 55.0);
       expect(dailyLog.customPotassium, 2000.0);
