@@ -24,7 +24,7 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
 
     try {
       // เซฟโปรไฟล์ขึ้น Cloud
-      await ref.read(authServiceProvider).saveHealthProfile(
+      await ref.read(healthProfileServiceProvider).saveHealthProfile(
         weightKg: double.parse(_weightCtrl.text.trim()),
         heightCm: double.parse(_heightCtrl.text.trim()),
         gender: _selectedGender,
