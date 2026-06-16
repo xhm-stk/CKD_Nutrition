@@ -4,13 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ckd_nutrition_app/widgets/meals_list.dart';
 import 'package:ckd_nutrition_app/providers/core_providers.dart';
+import 'package:ckd_nutrition_app/providers/meal_providers.dart';
 import 'package:ckd_nutrition_app/models/supabase/meal.dart';
 import 'package:ckd_nutrition_app/repositories/meal_repository.dart';
 import 'package:ckd_nutrition_app/core/result.dart';
 
 class MockMealRepository extends Mock implements MealRepository {}
 
+class FakeMeal extends Fake implements Meal {}
+
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeMeal());
+  });
   group('MealsListWidget Tests', () {
     late MockMealRepository mockRepo;
 
@@ -59,6 +65,7 @@ void main() {
         sugarG: 0,
         carbG: 20,
         waterMl: 250,
+        phosphorusMg: 0,
         eatenAt: now,
       );
 

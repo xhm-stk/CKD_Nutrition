@@ -25,7 +25,8 @@ void main() {
         ..sodiumLimitMg = 2000.0
         ..sugarLimitG = 24.0
         ..carbLimitG = 150.0
-        ..waterLimitMl = 1500.0;
+        ..waterLimitMl = 1500.0
+        ..phosphorusLimitMg = 800.0;
 
       final quotas = QuotaEngine.calculate(log: log, rule: rule);
       
@@ -51,7 +52,8 @@ void main() {
         ..sodiumLimitMg = 2000.0
         ..sugarLimitG = 24.0
         ..carbLimitG = 150.0
-        ..waterLimitMl = 1500.0;
+        ..waterLimitMl = 1500.0
+        ..phosphorusLimitMg = 800.0;
 
       final quotas = QuotaEngine.calculate(log: log, rule: rule);
       
@@ -97,7 +99,7 @@ void main() {
       expect(sodiumQuotaOver.isNearLimit, isFalse); // It's over limit, not just near
       expect(sodiumQuotaOver.isOverLimit, isTrue);
       expect(sodiumQuotaOver.remaining, 0.0);
-      expect(sodiumQuotaOver.percent, 1.0); // clamped to 1
+      expect(sodiumQuotaOver.percent, 1.05); // percent can exceed 1.0 to show overdose
     });
   });
 }
