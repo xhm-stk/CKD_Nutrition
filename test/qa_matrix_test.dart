@@ -20,18 +20,25 @@ class FakeMealRepository implements MealRepository {
     required double sugar,
     required double carb,
     required double water,
+    required double phosphorus,
+    required DateTime eatenAt,
   }) async {
     return Success(null);
   }
 
   @override
-  Future<Result<void>> deleteMeal(String mealId) async {
+  Future<Result<void>> deleteMeal(Meal meal) async {
     return Success(null);
   }
 
   @override
   Future<Result<List<Meal>>> getTodayMeals() async {
     return Success([]);
+  }
+
+  @override
+  Future<List<Meal>> getTodayMealsWithProjection(dynamic isar, dynamic prefs) async {
+    return [];
   }
 }
 

@@ -2,20 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import '../../providers/core_providers.dart';
 
-final monthlySummaryProvider = FutureProvider.autoDispose.family<List<dynamic>, DateTime>((ref, targetMonth) async {
-  final sb = ref.watch(supabaseProvider);
-  final user = sb.auth.currentUser;
-  if (user == null) throw Exception('กรุณาเข้าสู่ระบบ');
-
-  final response = await sb.rpc('get_monthly_summary', params: {
-    'target_month': targetMonth.toIso8601String().substring(0, 10),
-    'target_user_id': user.id,
-  });
-  return response as List<dynamic>;
-});
-
+import '../../providers/meal_providers.dart';
 class MonthlySummaryPage extends ConsumerStatefulWidget {
   const MonthlySummaryPage({super.key});
 

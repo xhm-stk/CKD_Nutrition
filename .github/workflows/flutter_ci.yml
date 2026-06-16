@@ -1,0 +1,61 @@
+name: CKD Nutrition Enterprise CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build_and_test:
+    name: 🧪 Analyze & Test (Quality Gate)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. โคลนซอร์สโค้ดลงมาที่เซิร์ฟเวอร์
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. ติดตั้ง Java (จำเป็นสำหรับ Flutter Engine ในโหมด Headless)
+      - name: ☕ Setup Java (Android Core)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # 3. ติดตั้ง Flutter SDK (เปิดโหมด Cache เพื่อให้ CI รันเร็วขึ้น 300%)
+      - name: 🐦 Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0' # ล็อกเวอร์ชันให้ตรงกับโปรเจค
+          channel: 'stable'
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+
+      # 4. จำลองไฟล์ .env.dev จาก GitHub Secrets
+      - name: 🔐 Inject Environment Variables
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_DEV }}" >> .env.dev
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_DEV }}" >> .env.dev
+
+      # 5. ดาวน์โหลด Packages ทั้งหมด
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      # 5. ตรวจสอบมาตรฐานโค้ด (Strict Linting)
+      - name: 🔎 Verify Formatting & Analyze Code
+        run: |
+          dart format --output=none --set-exit-if-changed .
+          flutter analyze --fatal-infos --fatal-warnings
+
+      # 6. รันโค้ดทดสอบ (Automated Unit & Widget Tests)
+      - name: 🎯 Run Automated Tests
+        run: flutter test --coverage
+
+      # 7. อัปโหลดผลลัพธ์ Code Coverage (เพื่อให้ CTO ดูว่าเทสคลุมกี่เปอร์เซ็นต์)
+      - name: 📊 Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/lcov.info

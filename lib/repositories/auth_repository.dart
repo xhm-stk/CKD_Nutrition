@@ -77,4 +77,19 @@ class AuthRepository {
       return Failure('เกิดข้อผิดพลาดในการเชื่อมต่อ Apple', e, stack);
     }
   }
+
+  Future<Result<void>> deleteAccount() async {
+    try {
+      final user = _sb.auth.currentUser;
+      if (user == null) return Failure('กรุณาเข้าสู่ระบบก่อน');
+      
+      await _sb.rpc('delete_user_account', params: {
+        'p_user_id': user.id,
+      });
+      await logout();
+      return Success(null);
+    } catch (e, stack) {
+      return Failure('ไม่สามารถลบบัญชีได้: $e', e, stack);
+    }
+  }
 }

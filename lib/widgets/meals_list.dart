@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/core_providers.dart';
-import '../repositories/meal_repository.dart';
+import '../providers/meal_providers.dart';
 import '../core/result.dart';
 
 class MealsListWidget extends ConsumerStatefulWidget {
@@ -50,22 +50,7 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                 color: Colors.redAccent,
                 child: const Icon(Icons.delete, color: Colors.white),
               ),
-              confirmDismiss: (direction) async {
-                return await showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('ลบรายการอาหาร'),
-                    content: Text('คุณแน่ใจหรือไม่ว่าต้องการลบเมนู ${meal.foodName}?'),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('ยกเลิก')),
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, true), 
-                        child: const Text('ลบ', style: TextStyle(color: Colors.red)),
-                      ),
-                    ],
-                  ),
-                );
-              },
+
               onDismissed: (direction) {
                 // Optimistically remove from UI to prevent Dismissible assertion error
                 setState(() {
@@ -76,23 +61,39 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                 final scaffoldMessenger = ScaffoldMessenger.of(context);
                 final repo = ref.read(mealRepositoryProvider);
                 
-                repo.deleteMeal(meal.id).then((res) {
-                  if (mounted) {
-                    if (res is Success) {
-                      scaffoldMessenger.showSnackBar(
-                        SnackBar(content: Text('ลบเมนู ${meal.foodName} แล้ว')),
-                      );
-                      ref.invalidate(dashboardSummaryProvider);
-                      ref.invalidate(todayMealsProvider);
-                    } else if (res is Failure) {
-                      scaffoldMessenger.showSnackBar(
-                        SnackBar(content: Text(res.userMessage), backgroundColor: Colors.red),
-                      );
-                      // Revert optimistic delete on failure
-                      setState(() {
-                        _optimisticDeletedIds.remove(meal.id);
-                      });
-                    }
+                final snackBar = SnackBar(
+                  content: Text('ลบเมนู ${meal.foodName} แล้ว'),
+                  duration: const Duration(seconds: 5),
+                  action: SnackBarAction(
+                    label: 'เลิกทำ (Undo)',
+                    onPressed: () {
+                      if (mounted) {
+                        setState(() {
+                          _optimisticDeletedIds.remove(meal.id);
+                        });
+                      }
+                    },
+                  ),
+                );
+
+                scaffoldMessenger.showSnackBar(snackBar).closed.then((reason) {
+                  // ถ้ามันปิดไปโดยที่ไม่ได้กด Undo (action) ค่อยยิงลบจริง
+                  if (reason != SnackBarClosedReason.action) {
+                    repo.deleteMeal(meal).then((res) {
+                      if (mounted) {
+                        if (res is Success) {
+                          ref.invalidate(dashboardSummaryProvider);
+                          ref.invalidate(todayMealsProvider);
+                        } else if (res is Failure) {
+                          scaffoldMessenger.showSnackBar(
+                            SnackBar(content: Text(res.userMessage), backgroundColor: Colors.red),
+                          );
+                          setState(() {
+                            _optimisticDeletedIds.remove(meal.id);
+                          });
+                        }
+                      }
+                    });
                   }
                 });
               },

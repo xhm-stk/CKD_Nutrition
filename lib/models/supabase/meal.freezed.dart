@@ -43,6 +43,8 @@ mixin _$Meal {
   double get carbG => throw _privateConstructorUsedError;
   @JsonKey(name: 'water_ml')
   double get waterMl => throw _privateConstructorUsedError;
+  @JsonKey(name: 'phosphorus_mg')
+  double get phosphorusMg => throw _privateConstructorUsedError;
   @JsonKey(name: 'eaten_at')
   DateTime get eatenAt => throw _privateConstructorUsedError;
 
@@ -69,6 +71,7 @@ abstract class $MealCopyWith<$Res> {
       @JsonKey(name: 'sugar_g') double sugarG,
       @JsonKey(name: 'carb_g') double carbG,
       @JsonKey(name: 'water_ml') double waterMl,
+      @JsonKey(name: 'phosphorus_mg') double phosphorusMg,
       @JsonKey(name: 'eaten_at') DateTime eatenAt});
 }
 
@@ -97,6 +100,7 @@ class _$MealCopyWithImpl<$Res, $Val extends Meal>
     Object? sugarG = null,
     Object? carbG = null,
     Object? waterMl = null,
+    Object? phosphorusMg = null,
     Object? eatenAt = null,
   }) {
     return _then(_value.copyWith(
@@ -148,6 +152,10 @@ class _$MealCopyWithImpl<$Res, $Val extends Meal>
           ? _value.waterMl
           : waterMl // ignore: cast_nullable_to_non_nullable
               as double,
+      phosphorusMg: null == phosphorusMg
+          ? _value.phosphorusMg
+          : phosphorusMg // ignore: cast_nullable_to_non_nullable
+              as double,
       eatenAt: null == eatenAt
           ? _value.eatenAt
           : eatenAt // ignore: cast_nullable_to_non_nullable
@@ -176,6 +184,7 @@ abstract class _$$MealImplCopyWith<$Res> implements $MealCopyWith<$Res> {
       @JsonKey(name: 'sugar_g') double sugarG,
       @JsonKey(name: 'carb_g') double carbG,
       @JsonKey(name: 'water_ml') double waterMl,
+      @JsonKey(name: 'phosphorus_mg') double phosphorusMg,
       @JsonKey(name: 'eaten_at') DateTime eatenAt});
 }
 
@@ -201,6 +210,7 @@ class __$$MealImplCopyWithImpl<$Res>
     Object? sugarG = null,
     Object? carbG = null,
     Object? waterMl = null,
+    Object? phosphorusMg = null,
     Object? eatenAt = null,
   }) {
     return _then(_$MealImpl(
@@ -252,6 +262,10 @@ class __$$MealImplCopyWithImpl<$Res>
           ? _value.waterMl
           : waterMl // ignore: cast_nullable_to_non_nullable
               as double,
+      phosphorusMg: null == phosphorusMg
+          ? _value.phosphorusMg
+          : phosphorusMg // ignore: cast_nullable_to_non_nullable
+              as double,
       eatenAt: null == eatenAt
           ? _value.eatenAt
           : eatenAt // ignore: cast_nullable_to_non_nullable
@@ -276,6 +290,7 @@ class _$MealImpl implements _Meal {
       @JsonKey(name: 'sugar_g') required this.sugarG,
       @JsonKey(name: 'carb_g') required this.carbG,
       @JsonKey(name: 'water_ml') required this.waterMl,
+      @JsonKey(name: 'phosphorus_mg') required this.phosphorusMg,
       @JsonKey(name: 'eaten_at') required this.eatenAt});
 
   factory _$MealImpl.fromJson(Map<String, dynamic> json) =>
@@ -317,12 +332,15 @@ class _$MealImpl implements _Meal {
   @JsonKey(name: 'water_ml')
   final double waterMl;
   @override
+  @JsonKey(name: 'phosphorus_mg')
+  final double phosphorusMg;
+  @override
   @JsonKey(name: 'eaten_at')
   final DateTime eatenAt;
 
   @override
   String toString() {
-    return 'Meal(id: $id, logId: $logId, foodId: $foodId, foodName: $foodName, quantityG: $quantityG, mealType: $mealType, proteinG: $proteinG, potassiumMg: $potassiumMg, sodiumMg: $sodiumMg, sugarG: $sugarG, carbG: $carbG, waterMl: $waterMl, eatenAt: $eatenAt)';
+    return 'Meal(id: $id, logId: $logId, foodId: $foodId, foodName: $foodName, quantityG: $quantityG, mealType: $mealType, proteinG: $proteinG, potassiumMg: $potassiumMg, sodiumMg: $sodiumMg, sugarG: $sugarG, carbG: $carbG, waterMl: $waterMl, phosphorusMg: $phosphorusMg, eatenAt: $eatenAt)';
   }
 
   @override
@@ -348,6 +366,8 @@ class _$MealImpl implements _Meal {
             (identical(other.sugarG, sugarG) || other.sugarG == sugarG) &&
             (identical(other.carbG, carbG) || other.carbG == carbG) &&
             (identical(other.waterMl, waterMl) || other.waterMl == waterMl) &&
+            (identical(other.phosphorusMg, phosphorusMg) ||
+                other.phosphorusMg == phosphorusMg) &&
             (identical(other.eatenAt, eatenAt) || other.eatenAt == eatenAt));
   }
 
@@ -367,6 +387,7 @@ class _$MealImpl implements _Meal {
       sugarG,
       carbG,
       waterMl,
+      phosphorusMg,
       eatenAt);
 
   @JsonKey(ignore: true)
@@ -397,6 +418,7 @@ abstract class _Meal implements Meal {
       @JsonKey(name: 'sugar_g') required final double sugarG,
       @JsonKey(name: 'carb_g') required final double carbG,
       @JsonKey(name: 'water_ml') required final double waterMl,
+      @JsonKey(name: 'phosphorus_mg') required final double phosphorusMg,
       @JsonKey(name: 'eaten_at') required final DateTime eatenAt}) = _$MealImpl;
 
   factory _Meal.fromJson(Map<String, dynamic> json) = _$MealImpl.fromJson;
@@ -436,6 +458,9 @@ abstract class _Meal implements Meal {
   @override
   @JsonKey(name: 'water_ml')
   double get waterMl;
+  @override
+  @JsonKey(name: 'phosphorus_mg')
+  double get phosphorusMg;
   @override
   @JsonKey(name: 'eaten_at')
   DateTime get eatenAt;

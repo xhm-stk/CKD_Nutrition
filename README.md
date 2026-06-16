@@ -1,6 +1,16 @@
-# 🥗 CKD Nutrition App
+<div align="center">
+  <h1>🥗 CKD Nutrition App</h1>
+  <p><strong>แอปพลิเคชันบนมือถือที่ออกแบบมาเพื่อช่วยเหลือผู้ป่วยโรคไตเรื้อรัง (Chronic Kidney Disease - CKD)</strong></p>
+  
+  [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
+  [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+  [![Isar](https://img.shields.io/badge/Isar_Database-F05F70?style=for-the-badge&logo=mongodb&logoColor=white)](https://isar.dev/)
+  [![Sentry](https://img.shields.io/badge/Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white)](https://sentry.io/)
+</div>
 
-แอปพลิเคชันบนมือถือที่ออกแบบมาเพื่อช่วยเหลือผู้ป่วยโรคไตเรื้อรัง (Chronic Kidney Disease - CKD) ในการบันทึก โภชนาการ และติดตามปริมาณสารอาหารในแต่ละวันอย่างใกล้ชิด เพื่อป้องกันไม่ให้ไตทำงานหนักเกินไป
+<br/>
+
+แอปพลิเคชันนี้ออกแบบมาเพื่อช่วยเหลือผู้ป่วยในการบันทึกโภชนาการ และติดตามปริมาณสารอาหารในแต่ละวันอย่างใกล้ชิด เพื่อป้องกันไม่ให้ไตทำงานหนักเกินไป และดูแลรักษาสุขภาพไตอย่างยั่งยืน
 
 ---
 
@@ -10,11 +20,22 @@
 ---
 
 ## ✨ ฟีเจอร์ที่มีในปัจจุบัน (Current Features)
-* **🔐 Authentication:** ระบบเข้าสู่ระบบและสมัครสมาชิกผ่านอีเมล
-* **🩺 Health Profile Setup:** การตั้งค่าประวัติสุขภาพเบื้องต้น (น้ำหนัก, ส่วนสูง, เพศ, และระยะโรคไต) เพื่อใช้คำนวณโควต้าอาหารเฉพาะบุคคล
-* **📊 Daily Nutrition Dashboard:** แดชบอร์ดแสดงผลหลอดโควต้าสารอาหารแบบ Real-time (โปรตีน, โพแทสเซียม, โซเดียม, น้ำตาล, คาร์โบไฮเดรต, น้ำ) พร้อมป้ายแจ้งเตือน (Warning Banner) เมื่อทานใกล้เกินกำหนด
-* **🍎 Food Search & Logging:** ระบบค้นหาเมนูอาหารกว่า 156 รายการ พร้อมรายละเอียดโภชนาการและบันทึกมื้ออาหารลง Cloud
-* **🚀 Offline-First Food Data:** เก็บข้อมูลโภชนาการอาหารไว้ในเครื่อง (Local Database) ด้วย Isar เพื่อความรวดเร็วในการค้นหา
+
+### 🔐 Authentication & Security
+* **ระบบเข้าสู่ระบบ:** รองรับ Email/Password, Google Sign-In และ Apple Sign-In
+* **Biometrics Lock:** รองรับการสแกนใบหน้า (FaceID) และลายนิ้วมือ (TouchID) ในการเข้าแอป
+* **Data Privacy:** ปกป้องข้อมูลผู้ใช้งานด้วยระบบ Row Level Security (RLS) ของ Supabase
+* **Environment Security:** ปกปิดคีย์และรหัสผ่านด้วยระบบไฟล์ `.env`
+
+### 🩺 Health & Nutrition
+* **Health Profile Setup:** การตั้งค่าประวัติสุขภาพเบื้องต้น (น้ำหนัก, ส่วนสูง, เพศ, และระยะโรคไต) เพื่อใช้คำนวณโควต้าอาหารเฉพาะบุคคล
+* **Daily Nutrition Dashboard:** แดชบอร์ดแสดงผลโควต้าสารอาหารแบบ Real-time (โปรตีน, โพแทสเซียม, โซเดียม, น้ำตาล, คาร์โบไฮเดรต, น้ำ) พร้อมป้ายแจ้งเตือนเมื่อทานใกล้เกินกำหนด
+* **Water Reminder:** ระบบแจ้งเตือนให้ดื่มน้ำตามความเหมาะสม
+
+### 🍎 Food Data & Offline-First
+* **Food Search & Logging:** ระบบค้นหาเมนูอาหารกว่า 156 รายการ พร้อมรายละเอียดโภชนาการและบันทึกมื้ออาหาร
+* **Offline-First Capabilities:** ข้อมูลและประวัติการกินถูกเก็บไว้ในมือถือด้วย Local Database (Isar) ทำให้ค้นหาและทำงานได้อย่างรวดเร็วแม้ไม่มีอินเทอร์เน็ต
+* **Background Sync Worker:** ระบบบันทึกข้อมูลอัตโนมัติ (Sync) ไปยัง Cloud (Supabase) เมื่อกลับมามีสัญญาณอินเทอร์เน็ต
 
 ---
 
@@ -26,59 +47,56 @@
 * **📈 Historical Charts & Reports:** กราฟแสดงสถิติการกินย้อนหลัง (รายสัปดาห์/รายเดือน)
 * **📄 PDF Export:** สร้างรายงานโภชนาการเป็นไฟล์ PDF เพื่อให้ผู้ป่วยนำไปปรึกษาแพทย์หรือนักกำหนดอาหารได้
 * **🌍 Multi-language Support (i18n):** รองรับหลายภาษา (เช่น ภาษาอังกฤษ) เพื่อก้าวสู่ความเป็น Global App
-* **🔑 Social Login:** เข้าสู่ระบบด้วย Google และ Apple Sign-In
-
----
-
-## 📋 Roadmap สู่ระดับ Production (สิ่งที่ต้องทำเพื่อให้ใช้งานได้จริง)
-รายการด้านล่างนี้คือสิ่งที่ **"ต้องทำ"** ก่อนที่จะปล่อยแอปขึ้น App Store หรือ Google Play Store เพื่อให้แอปมีมาตรฐานความปลอดภัยและสเกลได้ระดับ Global
-
-### ด้านความปลอดภัย (Security & Compliance)
-- [ ] **Environment Variables:** ย้าย Supabase URL และ AnonKey ออกจากโค้ด (Hardcode) ไปไว้ใน `--dart-define` หรือไฟล์ `.env`
-- [ ] **Row Level Security (RLS):** เขียน RLS Policy บน Supabase เพื่อล็อกไม่ให้ผู้ใช้คนอื่นเข้าถึงหรือดึงข้อมูลสุขภาพที่ละเอียดอ่อนของผู้ป่วยคนอื่นได้ (สำคัญมากระดับคอขาดบาดตาย)
-- [ ] **Email Verification:** บังคับให้ผู้ใช้ต้องยืนยันอีเมลก่อนเข้าใช้งานแอปเพื่อป้องกันบัญชีสแปม
-- [ ] **Privacy Policy & Terms of Service:** สร้างหน้าต่างยอมรับนโยบายความเป็นส่วนตัวและข้อตกลงการใช้งาน (จำเป็นสำหรับการตรวจสอบแอปของ Apple/Google)
-
-### ด้านระบบบัญชีผู้ใช้ (Auth & UX)
-- [ ] **Forgot Password:** เพิ่มปุ่มและระบบสำหรับรีเซ็ตรหัสผ่านในหน้า Login
-- [ ] **Rate Limiting:** ป้องกันการกดปุ่ม Login รัวๆ หรือการสุ่มรหัสผ่าน (Brute force protection)
-- [ ] **Loading Overlay:** ใส่หน้าจอโหลดบล็อกการกดปุ่มซ้ำขณะที่แอปรอข้อมูลจากเซิร์ฟเวอร์
-
-### ด้านโครงสร้างแอป (Architecture & Scalability)
-- [ ] **State Management:** ติดตั้งระบบจัดการ State (เช่น Riverpod หรือ Provider) เพื่อทำ Dependency Injection แทนการสร้าง `AuthService` ใหม่ทุกครั้งที่มีการเปลี่ยนหน้า
-- [ ] **Dispose Controllers:** ตรวจสอบและทำลาย (`dispose()`) TextEditingController ในหน้า Auth ทั้งหมดเพื่อป้องกัน Memory Leak
-- [ ] **Refactor Hardcoded Colors:** เปลี่ยนการกำหนดสีตายตัว (เช่น `Colors.teal.shade50`) ให้ไปเรียกใช้จาก `Theme.of(context).colorScheme` เพื่อเตรียมพร้อมสำหรับ Dark Mode
 
 ---
 
 ## 🛠️ เทคโนโลยีที่ใช้ (Tech Stack)
-* **[Flutter](https://flutter.dev/):** เฟรมเวิร์กหลักสำหรับการพัฒนาแอปพลิเคชัน (iOS / Android)
-* **[Supabase](https://supabase.com/):** Backend-as-a-Service (Auth & PostgreSQL Database)
-* **[Isar Database](https://isar.dev/):** Local NoSQL Database ประสิทธิภาพสูง
+
+| หมวดหมู่ | เทคโนโลยี / เครื่องมือ |
+| :--- | :--- |
+| **Frontend Framework** | [Flutter](https://flutter.dev/) (Dart) |
+| **Backend & Cloud DB** | [Supabase](https://supabase.com/) (PostgreSQL & Auth) |
+| **Local Database** | [Isar](https://isar.dev/) (NoSQL) |
+| **State Management** | [Riverpod](https://riverpod.dev/) |
+| **Error Monitoring** | [Sentry](https://sentry.io/) |
 
 ---
 
 ## 📁 โครงสร้างโปรเจกต์ (Project Structure)
 ```text
 lib/
-├── core/                   # การตั้งค่าพื้นฐานของโปรเจกต์ 
-├── models/                 # โครงสร้างของข้อมูล (isar, supabase)
-├── pages/                  # หน้าจอต่างๆ (auth, dashboard, food)
-├── services/               # ลอจิกการทำงานเบื้องหลัง (auth_service, food_service ฯลฯ)
-├── widgets/                # คอมโพเนนต์ UI ที่ใช้ซ้ำ
+├── controllers/            # จัดการ Business Logic ฝั่ง UI
+├── core/                   # การตั้งค่าพื้นฐานของโปรเจกต์และ Utility tools
+├── models/                 # โครงสร้างของข้อมูล (Isar, Supabase, Freezed)
+├── pages/                  # หน้าจอ UI ต่างๆ (Auth, Dashboard, Food, History)
+├── providers/              # State Management (Riverpod Providers)
+├── repositories/           # จัดการ Data Access Layer (Supabase API)
+├── router/                 # ระบบจัดการ Navigator (GoRouter)
+├── services/               # ลอจิกการทำงานเบื้องหลัง (Auth, Offline Sync, Quota)
+├── widgets/                # คอมโพเนนต์ UI ที่ถูกนำมาใช้ซ้ำ (Reusable Widgets)
 └── main.dart               # จุดเริ่มต้นของแอปพลิเคชัน
 ```
+
+---
 
 ## 🚀 วิธีการติดตั้งและรันโปรเจกต์ (Getting Started)
 
 ### 1. ความต้องการของระบบ (Prerequisites)
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) (เวอร์ชัน 3.7.2 หรือสูงกว่า)
-- Android NDK เวอร์ชัน `27.0.12077973`
+- **Android:** Android Studio พร้อม NDK เวอร์ชัน `27.0.12077973`
+- **iOS:** Xcode (สำหรับทดสอบบน Mac)
 
-### 2. การเตรียมไฟล์ข้อมูล
-แอปพลิเคชันต้องการไฟล์ Master Data เพื่อบันทึกลงในเครื่องครั้งแรก: `assets/data/food_master.json`
+### 2. การเตรียมไฟล์ตั้งค่า (.env)
+โปรเจกต์นี้ใช้ไฟล์ `.env` ในการเก็บคีย์ของ Supabase และ Sentry กรุณาสร้างไฟล์ `.env.dev` และ `.env.prod` ในโฟลเดอร์หลักของโปรเจกต์:
+```env
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SENTRY_DSN=your_sentry_dsn
+```
 
-### 3. การรันแอปพลิเคชัน
+### 3. การรันโปรเจกต์
+รันคำสั่งเหล่านี้ใน Terminal เพื่อโหลด Dependencies และสร้างโค้ด (Code Generation):
+
 ```bash
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
