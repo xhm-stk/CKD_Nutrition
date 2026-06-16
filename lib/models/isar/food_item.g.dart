@@ -52,48 +52,53 @@ const FoodItemSchema = CollectionSchema(
       name: r'notes',
       type: IsarType.string,
     ),
-    r'potassiumMg': PropertySchema(
+    r'phosphorusMg': PropertySchema(
       id: 7,
+      name: r'phosphorusMg',
+      type: IsarType.double,
+    ),
+    r'potassiumMg': PropertySchema(
+      id: 8,
       name: r'potassiumMg',
       type: IsarType.double,
     ),
     r'proteinG': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'proteinG',
       type: IsarType.double,
     ),
     r'searchKeywords': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'searchKeywords',
       type: IsarType.string,
     ),
     r'servingSize': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'servingSize',
       type: IsarType.string,
     ),
     r'sodiumMg': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'sodiumMg',
       type: IsarType.double,
     ),
     r'source': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'source',
       type: IsarType.string,
     ),
     r'sourceUrl': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'sourceUrl',
       type: IsarType.string,
     ),
     r'sugarG': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'sugarG',
       type: IsarType.double,
     ),
     r'waterMl': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'waterMl',
       type: IsarType.double,
     )
@@ -181,15 +186,16 @@ void _foodItemSerialize(
   writer.writeString(offsets[4], object.ingredients);
   writer.writeString(offsets[5], object.name);
   writer.writeString(offsets[6], object.notes);
-  writer.writeDouble(offsets[7], object.potassiumMg);
-  writer.writeDouble(offsets[8], object.proteinG);
-  writer.writeString(offsets[9], object.searchKeywords);
-  writer.writeString(offsets[10], object.servingSize);
-  writer.writeDouble(offsets[11], object.sodiumMg);
-  writer.writeString(offsets[12], object.source);
-  writer.writeString(offsets[13], object.sourceUrl);
-  writer.writeDouble(offsets[14], object.sugarG);
-  writer.writeDouble(offsets[15], object.waterMl);
+  writer.writeDouble(offsets[7], object.phosphorusMg);
+  writer.writeDouble(offsets[8], object.potassiumMg);
+  writer.writeDouble(offsets[9], object.proteinG);
+  writer.writeString(offsets[10], object.searchKeywords);
+  writer.writeString(offsets[11], object.servingSize);
+  writer.writeDouble(offsets[12], object.sodiumMg);
+  writer.writeString(offsets[13], object.source);
+  writer.writeString(offsets[14], object.sourceUrl);
+  writer.writeDouble(offsets[15], object.sugarG);
+  writer.writeDouble(offsets[16], object.waterMl);
 }
 
 FoodItem _foodItemDeserialize(
@@ -207,15 +213,16 @@ FoodItem _foodItemDeserialize(
   object.ingredients = reader.readString(offsets[4]);
   object.name = reader.readString(offsets[5]);
   object.notes = reader.readStringOrNull(offsets[6]);
-  object.potassiumMg = reader.readDouble(offsets[7]);
-  object.proteinG = reader.readDouble(offsets[8]);
-  object.searchKeywords = reader.readString(offsets[9]);
-  object.servingSize = reader.readString(offsets[10]);
-  object.sodiumMg = reader.readDouble(offsets[11]);
-  object.source = reader.readString(offsets[12]);
-  object.sourceUrl = reader.readStringOrNull(offsets[13]);
-  object.sugarG = reader.readDouble(offsets[14]);
-  object.waterMl = reader.readDouble(offsets[15]);
+  object.phosphorusMg = reader.readDouble(offsets[7]);
+  object.potassiumMg = reader.readDouble(offsets[8]);
+  object.proteinG = reader.readDouble(offsets[9]);
+  object.searchKeywords = reader.readString(offsets[10]);
+  object.servingSize = reader.readString(offsets[11]);
+  object.sodiumMg = reader.readDouble(offsets[12]);
+  object.source = reader.readString(offsets[13]);
+  object.sourceUrl = reader.readStringOrNull(offsets[14]);
+  object.sugarG = reader.readDouble(offsets[15]);
+  object.waterMl = reader.readDouble(offsets[16]);
   return object;
 }
 
@@ -245,18 +252,20 @@ P _foodItemDeserializeProp<P>(
     case 8:
       return (reader.readDouble(offset)) as P;
     case 9:
-      return (reader.readString(offset)) as P;
+      return (reader.readDouble(offset)) as P;
     case 10:
       return (reader.readString(offset)) as P;
     case 11:
-      return (reader.readDouble(offset)) as P;
-    case 12:
       return (reader.readString(offset)) as P;
-    case 13:
-      return (reader.readStringOrNull(offset)) as P;
-    case 14:
+    case 12:
       return (reader.readDouble(offset)) as P;
+    case 13:
+      return (reader.readString(offset)) as P;
+    case 14:
+      return (reader.readStringOrNull(offset)) as P;
     case 15:
+      return (reader.readDouble(offset)) as P;
+    case 16:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1510,6 +1519,69 @@ extension FoodItemQueryFilter
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> phosphorusMgEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'phosphorusMg',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      phosphorusMgGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'phosphorusMg',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> phosphorusMgLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'phosphorusMg',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> phosphorusMgBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'phosphorusMg',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> potassiumMgEqualTo(
     double value, {
     double epsilon = Query.epsilon,
@@ -2457,6 +2529,18 @@ extension FoodItemQuerySortBy on QueryBuilder<FoodItem, FoodItem, QSortBy> {
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByPhosphorusMg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phosphorusMg', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByPhosphorusMgDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phosphorusMg', Sort.desc);
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByPotassiumMg() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'potassiumMg', Sort.asc);
@@ -2664,6 +2748,18 @@ extension FoodItemQuerySortThenBy
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByPhosphorusMg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phosphorusMg', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByPhosphorusMgDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phosphorusMg', Sort.desc);
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByPotassiumMg() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'potassiumMg', Sort.asc);
@@ -2824,6 +2920,12 @@ extension FoodItemQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByPhosphorusMg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'phosphorusMg');
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByPotassiumMg() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'potassiumMg');
@@ -2934,6 +3036,12 @@ extension FoodItemQueryProperty
     });
   }
 
+  QueryBuilder<FoodItem, double, QQueryOperations> phosphorusMgProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'phosphorusMg');
+    });
+  }
+
   QueryBuilder<FoodItem, double, QQueryOperations> potassiumMgProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'potassiumMg');
@@ -3005,38 +3113,43 @@ const CkdRuleCacheSchema = CollectionSchema(
       name: r'carbLimitG',
       type: IsarType.double,
     ),
-    r'potassiumLimitMg': PropertySchema(
+    r'phosphorusLimitMg': PropertySchema(
       id: 1,
+      name: r'phosphorusLimitMg',
+      type: IsarType.double,
+    ),
+    r'potassiumLimitMg': PropertySchema(
+      id: 2,
       name: r'potassiumLimitMg',
       type: IsarType.double,
     ),
     r'proteinLimitG': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'proteinLimitG',
       type: IsarType.double,
     ),
     r'sodiumLimitMg': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'sodiumLimitMg',
       type: IsarType.double,
     ),
     r'stage': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'stage',
       type: IsarType.string,
     ),
     r'sugarLimitG': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'sugarLimitG',
       type: IsarType.double,
     ),
     r'syncedAt': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'syncedAt',
       type: IsarType.string,
     ),
     r'waterLimitMl': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'waterLimitMl',
       type: IsarType.double,
     )
@@ -3087,13 +3200,14 @@ void _ckdRuleCacheSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeDouble(offsets[0], object.carbLimitG);
-  writer.writeDouble(offsets[1], object.potassiumLimitMg);
-  writer.writeDouble(offsets[2], object.proteinLimitG);
-  writer.writeDouble(offsets[3], object.sodiumLimitMg);
-  writer.writeString(offsets[4], object.stage);
-  writer.writeDouble(offsets[5], object.sugarLimitG);
-  writer.writeString(offsets[6], object.syncedAt);
-  writer.writeDouble(offsets[7], object.waterLimitMl);
+  writer.writeDouble(offsets[1], object.phosphorusLimitMg);
+  writer.writeDouble(offsets[2], object.potassiumLimitMg);
+  writer.writeDouble(offsets[3], object.proteinLimitG);
+  writer.writeDouble(offsets[4], object.sodiumLimitMg);
+  writer.writeString(offsets[5], object.stage);
+  writer.writeDouble(offsets[6], object.sugarLimitG);
+  writer.writeString(offsets[7], object.syncedAt);
+  writer.writeDouble(offsets[8], object.waterLimitMl);
 }
 
 CkdRuleCache _ckdRuleCacheDeserialize(
@@ -3105,13 +3219,14 @@ CkdRuleCache _ckdRuleCacheDeserialize(
   final object = CkdRuleCache();
   object.carbLimitG = reader.readDouble(offsets[0]);
   object.id = id;
-  object.potassiumLimitMg = reader.readDouble(offsets[1]);
-  object.proteinLimitG = reader.readDouble(offsets[2]);
-  object.sodiumLimitMg = reader.readDouble(offsets[3]);
-  object.stage = reader.readString(offsets[4]);
-  object.sugarLimitG = reader.readDouble(offsets[5]);
-  object.syncedAt = reader.readString(offsets[6]);
-  object.waterLimitMl = reader.readDouble(offsets[7]);
+  object.phosphorusLimitMg = reader.readDouble(offsets[1]);
+  object.potassiumLimitMg = reader.readDouble(offsets[2]);
+  object.proteinLimitG = reader.readDouble(offsets[3]);
+  object.sodiumLimitMg = reader.readDouble(offsets[4]);
+  object.stage = reader.readString(offsets[5]);
+  object.sugarLimitG = reader.readDouble(offsets[6]);
+  object.syncedAt = reader.readString(offsets[7]);
+  object.waterLimitMl = reader.readDouble(offsets[8]);
   return object;
 }
 
@@ -3131,12 +3246,14 @@ P _ckdRuleCacheDeserializeProp<P>(
     case 3:
       return (reader.readDouble(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
-    case 5:
       return (reader.readDouble(offset)) as P;
-    case 6:
+    case 5:
       return (reader.readString(offset)) as P;
+    case 6:
+      return (reader.readDouble(offset)) as P;
     case 7:
+      return (reader.readString(offset)) as P;
+    case 8:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -3452,6 +3569,72 @@ extension CkdRuleCacheQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<CkdRuleCache, CkdRuleCache, QAfterFilterCondition>
+      phosphorusLimitMgEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'phosphorusLimitMg',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<CkdRuleCache, CkdRuleCache, QAfterFilterCondition>
+      phosphorusLimitMgGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'phosphorusLimitMg',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<CkdRuleCache, CkdRuleCache, QAfterFilterCondition>
+      phosphorusLimitMgLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'phosphorusLimitMg',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<CkdRuleCache, CkdRuleCache, QAfterFilterCondition>
+      phosphorusLimitMgBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'phosphorusLimitMg',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -4079,6 +4262,20 @@ extension CkdRuleCacheQuerySortBy
   }
 
   QueryBuilder<CkdRuleCache, CkdRuleCache, QAfterSortBy>
+      sortByPhosphorusLimitMg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phosphorusLimitMg', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CkdRuleCache, CkdRuleCache, QAfterSortBy>
+      sortByPhosphorusLimitMgDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phosphorusLimitMg', Sort.desc);
+    });
+  }
+
+  QueryBuilder<CkdRuleCache, CkdRuleCache, QAfterSortBy>
       sortByPotassiumLimitMg() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'potassiumLimitMg', Sort.asc);
@@ -4197,6 +4394,20 @@ extension CkdRuleCacheQuerySortThenBy
   }
 
   QueryBuilder<CkdRuleCache, CkdRuleCache, QAfterSortBy>
+      thenByPhosphorusLimitMg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phosphorusLimitMg', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CkdRuleCache, CkdRuleCache, QAfterSortBy>
+      thenByPhosphorusLimitMgDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phosphorusLimitMg', Sort.desc);
+    });
+  }
+
+  QueryBuilder<CkdRuleCache, CkdRuleCache, QAfterSortBy>
       thenByPotassiumLimitMg() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'potassiumLimitMg', Sort.asc);
@@ -4296,6 +4507,13 @@ extension CkdRuleCacheQueryWhereDistinct
   }
 
   QueryBuilder<CkdRuleCache, CkdRuleCache, QDistinct>
+      distinctByPhosphorusLimitMg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'phosphorusLimitMg');
+    });
+  }
+
+  QueryBuilder<CkdRuleCache, CkdRuleCache, QDistinct>
       distinctByPotassiumLimitMg() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'potassiumLimitMg');
@@ -4354,6 +4572,13 @@ extension CkdRuleCacheQueryProperty
   QueryBuilder<CkdRuleCache, double, QQueryOperations> carbLimitGProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'carbLimitG');
+    });
+  }
+
+  QueryBuilder<CkdRuleCache, double, QQueryOperations>
+      phosphorusLimitMgProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'phosphorusLimitMg');
     });
   }
 

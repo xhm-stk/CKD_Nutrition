@@ -3,11 +3,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/isar/food_item.dart';
 import '../core/result.dart';
 
+import '../services/offline_sync_worker.dart';
+
 class FoodRepository {
   final Isar _isar;
   final SupabaseClient _sb;
+  final OfflineSyncWorker _syncWorker;
   
-  FoodRepository(this._isar, this._sb);
+  FoodRepository(this._isar, this._sb, this._syncWorker);
 
   Future<List<FoodItem>> searchFood(String query) async {
     List<FoodItem> localResults = [];
@@ -88,7 +91,19 @@ class FoodRepository {
       });
       return Success(null);
     } catch (e) {
-      return Failure('ไม่สามารถบันทึกเมนูส่วนตัวได้', e);
+      // 🛜 Offline Fallback
+      final payload = {
+        'name': name,
+        'serving_size': servingSize,
+        'protein_g': proteinG,
+        'potassium_mg': potassiumMg,
+        'sodium_mg': sodiumMg,
+        'sugar_g': sugarG,
+        'carb_g': carbG,
+        'water_ml': waterMl,
+      };
+      await _syncWorker.enqueueAction('ADD_CUSTOM_FOOD', payload);
+      return Success(null);
     }
   }
 }
