@@ -27,7 +27,7 @@ jobs:
       - name: 🐦 Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0' # ล็อกเวอร์ชันให้ตรงกับโปรเจค
+          flutter-version: '3.29.3' # ล็อกเวอร์ชันให้ตรงกับโปรเจค
           channel: 'stable'
           cache: true
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
