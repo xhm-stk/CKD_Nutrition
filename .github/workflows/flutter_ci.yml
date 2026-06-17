@@ -59,6 +59,9 @@ jobs:
       - name: 🔎 Verify Formatting
         run: dart format --output=none --set-exit-if-changed .
 
+      - name: 🔐 Create Placeholder Env Files
+        run: touch .env.dev .env.prod
+
       - name: 📦 Install Dependencies
         run: flutter pub get
 
