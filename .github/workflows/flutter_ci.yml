@@ -7,57 +7,166 @@ on:
     branches: [ "main", "develop" ]
 
 jobs:
-  build_and_test:
-    name: 🧪 Analyze & Test (Quality Gate)
+  # ==========================================
+  # Stage 0: Security & Dependency Scan
+  # ==========================================
+  security-scan:
+    name: 🔒 Security & Dependency Check
     runs-on: ubuntu-latest
-
     steps:
-      # 1. โคลนซอร์สโค้ดลงมาที่เซิร์ฟเวอร์
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      # 2. ติดตั้ง Java (จำเป็นสำหรับ Flutter Engine ในโหมด Headless)
-      - name: ☕ Setup Java (Android Core)
+      # สแกนหา Secret Key หรือ Password ที่เผลอ Hardcode ทิ้งไว้ใน Source Code
+      - name: 🕵️ Gitleaks - Scan for Secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: false
+
+      - name: 🐦 Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          channel: 'stable'
+          cache: true
+      
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      # สแกนหาช่องโหว่ความปลอดภัยของ Library ภายนอก
+      - name: 📦 Dependency Vulnerability Check
+        run: dart pub outdated --no-dependency-overrides --no-dev-dependencies
+
+  # ==========================================
+  # Stage 1: Code Quality & Linting
+  # ==========================================
+  lint-and-analyze:
+    name: 🔎 Code Quality (Lint & Analyze)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          channel: 'stable'
+          cache: true
+
+      # บังคับมาตรฐานหน้าตาโค้ด (ห้ามลืมใส่ปีกกา, ห้ามเว้นบรรทัดมั่ว)
+      - name: 🔎 Verify Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      # สแกนหา Warning และ Error ทั้งหมดในโปรเจค
+      - name: 🔎 Analyze Code
+        run: flutter analyze --fatal-infos --fatal-warnings
+
+  # ==========================================
+  # Stage 2: Automated Tests & Coverage Gate
+  # ==========================================
+  unit-tests:
+    name: 🧪 Unit Tests & Coverage Gate
+    needs: lint-and-analyze
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          channel: 'stable'
+          cache: true
+
+      - name: 🔐 Inject Environment Variables (Dummy for Test)
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_DEV }}" >> .env.dev
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_DEV }}" >> .env.dev
+          touch .env.prod
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      - name: 🎯 Run Automated Tests
+        run: flutter test --coverage test/unit test/widget test/qa_matrix_test.dart
+
+      # ตรวจสอบ Coverage: ต้องครอบคลุมมากกว่า 80% ป้องกันโค้ด Healthcare คำนวณผิด
+      - name: 📊 Enforce Code Coverage Gate (80%)
+        run: |
+          sudo apt-get install lcov
+          COVERAGE=$(lcov --summary coverage/lcov.info | grep lines | awk '{print $2}' | cut -d'%' -f1 | cut -d'.' -f1)
+          echo "Current Coverage: $COVERAGE%"
+          if [ "$COVERAGE" -lt 80 ]; then
+            echo "❌ Coverage is below 80% ($COVERAGE%). Failing the build to protect healthcare logic!"
+            exit 1
+          fi
+
+      - name: 📤 Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/lcov.info
+          retention-days: 14
+
+  # ==========================================
+  # Stage 3: Build & Artifact Management
+  # ==========================================
+  build-app:
+    name: 📦 Build Android App Bundle (.aab)
+    needs: [security-scan, unit-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      # 3. ติดตั้ง Flutter SDK (เปิดโหมด Cache เพื่อให้ CI รันเร็วขึ้น 300%)
       - name: 🐦 Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3' # ล็อกเวอร์ชันให้ตรงกับโปรเจค
+          flutter-version: '3.29.3'
           channel: 'stable'
           cache: true
-          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
-          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
 
-      # 4. จำลองไฟล์ .env.dev จาก GitHub Secrets
-      - name: 🔐 Inject Environment Variables
+      - name: 🏷️ Generate Build Number
+        run: echo "BUILD_NUM=${{ github.run_number }}" >> $GITHUB_ENV
+
+      # ระบบแยก Environment ป้องกันการสับสนระหว่างข้อมูลคนไข้จริงและตัวทดสอบ
+      - name: 🔐 Inject Staging Environment
+        if: github.ref == 'refs/heads/develop' || github.event_name == 'pull_request'
         run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_DEV }}" >> .env.dev
-          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_DEV }}" >> .env.dev
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_STAGING }}" >> .env.dev
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_STAGING }}" >> .env.dev
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_STAGING }}" >> .env.prod
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_STAGING }}" >> .env.prod
 
-      # 5. ตรวจสอบมาตรฐานโค้ด (Strict Linting) ของโค้ดที่ Commit ขึ้นมา
-      - name: 🔎 Verify Formatting
-        run: dart format --output=none --set-exit-if-changed .
+      - name: 🔐 Inject Production Environment
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_PROD }}" >> .env.dev
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_PROD }}" >> .env.dev
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_PROD }}" >> .env.prod
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_PROD }}" >> .env.prod
 
-      # 6. ดาวน์โหลด Packages ทั้งหมด
       - name: 📦 Install Dependencies
         run: flutter pub get
 
-      # 7. วิเคราะห์โค้ดหา Error/Warning
-      - name: 🔎 Analyze Code
-        run: flutter analyze --fatal-infos --fatal-warnings
+      - name: 📱 Build Android App Bundle
+        run: flutter build appbundle --build-number=$BUILD_NUM
 
-      # 6. รันโค้ดทดสอบ (Automated Unit & Widget Tests)
-      - name: 🎯 Run Automated Tests
-        run: flutter test --coverage test/unit test/widget test/qa_matrix_test.dart
-
-      # 7. อัปโหลดผลลัพธ์ Code Coverage (เพื่อให้ CTO ดูว่าเทสคลุมกี่เปอร์เซ็นต์)
-      - name: 📊 Upload Coverage Report
+      - name: 📤 Upload Android Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: coverage/lcov.info
+          name: release-android-appbundle
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
