@@ -11,8 +11,9 @@ void main() {
   String anonKey = '';
   for (var line in envFile.split('\n')) {
     if (line.startsWith('SUPABASE_URL=')) url = line.split('=')[1].trim();
-    if (line.startsWith('SUPABASE_ANON_KEY='))
+    if (line.startsWith('SUPABASE_ANON_KEY=')) {
       anonKey = line.substring(18).trim();
+    }
   }
 
   // ข้อมูลจำลองสำหรับ 5 บัญชี

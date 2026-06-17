@@ -83,8 +83,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                       ),
                       validator: (val) {
                         if (val == null || val.isEmpty) return 'กรุณากรอกอีเมล';
-                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(val))
+                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(val)) {
                           return 'รูปแบบอีเมลไม่ถูกต้อง';
+                        }
                         return null;
                       },
                     ),
@@ -176,8 +177,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             ),
             validator: (val) {
               if (val == null || val.isEmpty) return 'กรุณากรอกอีเมล';
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val))
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) {
                 return 'กรุณากรอกอีเมลที่ถูกต้อง';
+              }
               return null;
             },
           ),
