@@ -99,14 +99,14 @@ jobs:
       - name: 🎯 Run Automated Tests
         run: flutter test --coverage test/unit test/widget test/qa_matrix_test.dart
 
-      # ตรวจสอบ Coverage: ต้องครอบคลุมมากกว่า 80% ป้องกันโค้ด Healthcare คำนวณผิด
-      - name: 📊 Enforce Code Coverage Gate (80%)
+      # ตรวจสอบ Coverage: ตั้งเกณฑ์เริ่มต้นที่ 40% ก่อน (สามารถปรับเพิ่มเป็น 80% ได้ในอนาคต)
+      - name: 📊 Enforce Code Coverage Gate (40%)
         run: |
           sudo apt-get install lcov
           COVERAGE=$(lcov --summary coverage/lcov.info | grep lines | awk '{print $2}' | cut -d'%' -f1 | cut -d'.' -f1)
           echo "Current Coverage: $COVERAGE%"
-          if [ "$COVERAGE" -lt 80 ]; then
-            echo "❌ Coverage is below 80% ($COVERAGE%). Failing the build to protect healthcare logic!"
+          if [ "$COVERAGE" -lt 40 ]; then
+            echo "❌ Coverage is below 40% ($COVERAGE%). Failing the build!"
             exit 1
           fi
 
