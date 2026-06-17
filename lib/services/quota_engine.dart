@@ -42,8 +42,9 @@ class QuotaEngine {
     final phosphorusLimit =
         log?.customPhosphorus ?? rule?.phosphorusLimitMg ?? 0;
 
-    if (proteinLimit == 0 && potassiumLimit == 0)
+    if (proteinLimit == 0 && potassiumLimit == 0) {
       return []; // ไม่มีข้อมูล rule และ profile
+    }
 
     return [
       NutrientQuota(

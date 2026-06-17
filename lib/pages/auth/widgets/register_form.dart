@@ -131,8 +131,9 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
             ),
             validator: (val) {
               if (val == null || val.isEmpty) return 'กรุณากรอกอีเมล';
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val))
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) {
                 return 'กรุณากรอกอีเมลที่ถูกต้อง';
+              }
               return null;
             },
           ),
@@ -170,14 +171,18 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
             ),
             validator: (val) {
               if (val == null || val.isEmpty) return 'กรุณากรอกรหัสผ่าน';
-              if (val.length < 8)
+              if (val.length < 8) {
                 return 'รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร';
-              if (!RegExp(r'[A-Z]').hasMatch(val))
+              }
+              if (!RegExp(r'[A-Z]').hasMatch(val)) {
                 return 'ต้องมีตัวพิมพ์ใหญ่ (A-Z) อย่างน้อย 1 ตัว';
-              if (!RegExp(r'[a-z]').hasMatch(val))
+              }
+              if (!RegExp(r'[a-z]').hasMatch(val)) {
                 return 'ต้องมีตัวพิมพ์เล็ก (a-z) อย่างน้อย 1 ตัว';
-              if (!RegExp(r'[0-9]').hasMatch(val))
+              }
+              if (!RegExp(r'[0-9]').hasMatch(val)) {
                 return 'ต้องมีตัวเลข (0-9) อย่างน้อย 1 ตัว';
+              }
               if (!RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(val)) {
                 return 'ต้องมีอักขระพิเศษ (เช่น !@#\$%^&*) อย่างน้อย 1 ตัว';
               }

@@ -88,12 +88,14 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                 decimal: true,
               ),
               validator: (val) {
-                if (val == null || val.trim().isEmpty)
+                if (val == null || val.trim().isEmpty) {
                   return 'กรุณากรอกน้ำหนัก';
+                }
                 final w = double.tryParse(val);
                 if (w == null) return 'กรุณากรอกตัวเลขเท่านั้น';
-                if (w < 10 || w > 500)
+                if (w < 10 || w > 500) {
                   return 'น้ำหนักต้องอยู่ระหว่าง 10-500 กก.';
+                }
                 return null;
               },
             ),
@@ -105,12 +107,14 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                 decimal: true,
               ),
               validator: (val) {
-                if (val == null || val.trim().isEmpty)
+                if (val == null || val.trim().isEmpty) {
                   return 'กรุณากรอกส่วนสูง';
+                }
                 final h = double.tryParse(val);
                 if (h == null) return 'กรุณากรอกตัวเลขเท่านั้น';
-                if (h < 50 || h > 300)
+                if (h < 50 || h > 300) {
                   return 'ส่วนสูงต้องอยู่ระหว่าง 50-300 ซม.';
+                }
                 return null;
               },
             ),
