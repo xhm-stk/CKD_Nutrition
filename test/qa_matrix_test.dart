@@ -105,6 +105,7 @@ void main() {
                     ..proteinG = 5.0 * mult
                     ..potassiumMg = 200.0 * mult
                     ..sodiumMg = 200.0 * mult
+                    ..phosphorusMg = 100.0 * mult
                     ..sugarG = 2.0 * mult
                     ..carbG = 15.0 * mult
                     ..waterMl = 50.0 * mult;
@@ -135,14 +136,14 @@ void main() {
                   final quotas = QuotaEngine.calculate(log: log, rule: rule);
                   expect(
                     quotas.length,
-                    6,
-                    reason: 'Should return 6 nutrient quotas',
+                    7,
+                    reason: 'Should return 7 nutrient quotas',
                   );
                   for (final quota in quotas) {
                     expect(quota.consumed, greaterThanOrEqualTo(0));
                     expect(quota.limit, greaterThanOrEqualTo(0));
                     expect(
-                      quota.percent,
+                      quota.progressBarPercent,
                       inInclusiveRange(0.0, 1.0),
                     ); // Clamp logic
                     expect(
