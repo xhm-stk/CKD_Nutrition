@@ -39,15 +39,17 @@ jobs:
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_DEV }}" >> .env.dev
           echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_DEV }}" >> .env.dev
 
-      # 5. ดาวน์โหลด Packages ทั้งหมด
+      # 5. ตรวจสอบมาตรฐานโค้ด (Strict Linting) ของโค้ดที่ Commit ขึ้นมา
+      - name: 🔎 Verify Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      # 6. ดาวน์โหลด Packages ทั้งหมด
       - name: 📦 Install Dependencies
         run: flutter pub get
 
-      # 5. ตรวจสอบมาตรฐานโค้ด (Strict Linting)
-      - name: 🔎 Verify Formatting & Analyze Code
-        run: |
-          dart format --output=none --set-exit-if-changed .
-          flutter analyze --fatal-infos --fatal-warnings
+      # 7. วิเคราะห์โค้ดหา Error/Warning
+      - name: 🔎 Analyze Code
+        run: flutter analyze --fatal-infos --fatal-warnings
 
       # 6. รันโค้ดทดสอบ (Automated Unit & Widget Tests)
       - name: 🎯 Run Automated Tests
