@@ -11,7 +11,7 @@ import '../pages/food/custom_food_page.dart';
 import '../pages/history/history_page.dart';
 import '../pages/history/monthly_summary_page.dart';
 import '../pages/planner/meal_planner_page.dart';
-import '../pages/auth/biometrics_lock_screen.dart';
+import '../widgets/main_scaffold.dart';
 
 // เปลี่ยน GoRouter ให้รับค่า ref เพื่อให้มันฟังเสียงจาก Auth State ได้
 final routerProvider = Provider<GoRouter>((ref) {
@@ -28,21 +28,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuth = session != null;
       final isGoingToLogin = state.uri.path == '/login';
       final isGoingToRegister = state.uri.path == '/register';
-      final isGoingToHealthSetup = state.uri.path == '/health-setup';
-
-      final isUnlocked = ref.read(sessionUnlockedProvider);
-      final isGoingToLockScreen = state.uri.path == '/lock';
 
       if (!isAuth) {
         return isGoingToRegister ? null : '/login';
-      }
-
-      if (isAuth &&
-          !isUnlocked &&
-          !isGoingToLockScreen &&
-          !isGoingToHealthSetup &&
-          !isGoingToLogin) {
-        return '/lock';
       }
 
       if (isAuth && (isGoingToLogin || isGoingToRegister)) {
@@ -58,26 +46,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RegisterPage(),
       ),
       GoRoute(
-        path: '/health-setup',
-        builder: (context, state) => const HealthSetupPage(),
-      ),
-      GoRoute(
-        path: '/dashboard',
-        builder: (context, state) => const DashboardPage(),
-      ),
-      GoRoute(
-        path: '/food-search',
-        builder: (context, state) => const FoodSearchPage(),
-      ),
-      GoRoute(
-        path: '/food-add',
-        builder: (context, state) => const CustomFoodPage(),
-      ),
-      GoRoute(
-        path: '/history',
-        builder: (context, state) => const HistoryPage(),
-      ),
-      GoRoute(
         path: '/monthly-summary',
         builder: (context, state) => const MonthlySummaryPage(),
       ),
@@ -86,8 +54,53 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const MealPlannerPage(),
       ),
       GoRoute(
-        path: '/lock',
-        builder: (context, state) => const BiometricsLockScreen(),
+        path: '/food-add',
+        builder: (context, state) => const CustomFoodPage(),
+      ),
+      // --- ระบบ Bottom Navigation Bar ---
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          // ต้อง import '../widgets/main_scaffold.dart' ด้านบน
+          return MainScaffold(navigationShell: navigationShell);
+        },
+        branches: [
+          // Index 0: แดชบอร์ด
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/dashboard',
+                builder: (context, state) => const DashboardPage(),
+              ),
+            ],
+          ),
+          // Index 1: ไดอารี่ (ประวัติ)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/history',
+                builder: (context, state) => const HistoryPage(),
+              ),
+            ],
+          ),
+          // Index 2: รายการอาหาร
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/food-search',
+                builder: (context, state) => const FoodSearchPage(),
+              ),
+            ],
+          ),
+          // Index 3: บัญชี (โปรไฟล์สุขภาพชั่วคราว)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/health-setup',
+                builder: (context, state) => const HealthSetupPage(),
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );

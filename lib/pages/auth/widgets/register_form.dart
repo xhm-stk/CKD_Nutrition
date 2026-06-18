@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controllers/register_controller.dart';
-import '../../../l10n/app_localizations.dart';
+import '../../../widgets/premium_primary_button.dart';
+import '../../../widgets/premium_text_field.dart';
 
 class RegisterForm extends ConsumerStatefulWidget {
   const RegisterForm({super.key});
@@ -11,21 +12,145 @@ class RegisterForm extends ConsumerStatefulWidget {
 }
 
 class _RegisterFormState extends ConsumerState<RegisterForm> {
-  final _formKey = GlobalKey<FormState>();
+  final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _confirmPassCtrl = TextEditingController();
 
-  bool _obscurePass = true;
-  bool _obscureConfirmPass = true;
   bool _acceptPrivacyPolicy = false;
+
+  String? _nameError;
+  String? _emailError;
+  String? _passError;
+  String? _confirmError;
 
   @override
   void dispose() {
+    _nameCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
     _confirmPassCtrl.dispose();
     super.dispose();
+  }
+
+  int _calculatePasswordStrength(String password) {
+    int score = 0;
+    if (password.length >= 8) score++;
+    if (RegExp(r'[A-Z]').hasMatch(password)) score++;
+    if (RegExp(r'[0-9]').hasMatch(password)) score++;
+    if (RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(password)) score++;
+    return score;
+  }
+
+  void _validateAll() {
+    setState(() {
+      _nameError = _nameCtrl.text.trim().isEmpty ? 'กรุณากรอกชื่อ' : null;
+
+      final email = _emailCtrl.text.trim();
+      if (email.isEmpty) {
+        _emailError = 'กรุณากรอกอีเมล';
+      } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+        _emailError = 'รูปแบบอีเมลไม่ถูกต้อง';
+      } else {
+        _emailError = null;
+      }
+
+      final pass = _passCtrl.text;
+      if (pass.isEmpty) {
+        _passError = 'กรุณากรอกรหัสผ่าน';
+      } else if (_calculatePasswordStrength(pass) < 4) {
+        _passError = 'รหัสผ่านยังไม่แข็งแกร่งพอ';
+      } else {
+        _passError = null;
+      }
+
+      final confirm = _confirmPassCtrl.text;
+      if (confirm.isEmpty) {
+        _confirmError = 'กรุณายืนยันรหัสผ่าน';
+      } else if (confirm != pass) {
+        _confirmError = 'รหัสผ่านไม่ตรงกัน';
+      } else {
+        _confirmError = null;
+      }
+    });
+  }
+
+  bool _isFormValid() {
+    if (_nameCtrl.text.trim().isEmpty) return false;
+    final email = _emailCtrl.text.trim();
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email))
+      return false;
+    if (_calculatePasswordStrength(_passCtrl.text) < 4) return false;
+    if (_passCtrl.text != _confirmPassCtrl.text) return false;
+    if (!_acceptPrivacyPolicy) return false;
+    return true;
+  }
+
+  void _register() {
+    _validateAll();
+    if (!_isFormValid()) return;
+
+    // TODO: Ideally we should save the name to Supabase user metadata as well
+    // But for now we just call the existing register controller
+    ref
+        .read(registerControllerProvider.notifier)
+        .register(_emailCtrl.text.trim(), _passCtrl.text.trim());
+  }
+
+  Widget _buildPasswordStrengthIndicator() {
+    final score = _calculatePasswordStrength(_passCtrl.text);
+    if (_passCtrl.text.isEmpty) return const SizedBox.shrink();
+
+    Color strengthColor = const Color(0xFFEF4444); // Red
+    String text = 'รัดกุมต่ำ (ควรมี 8 ตัวอักษร, พิมพ์ใหญ่, ตัวเลข, สัญลักษณ์)';
+    double widthFactor = 0.33;
+
+    if (score == 4) {
+      strengthColor = const Color(0xFF10B981); // Green
+      text = 'รัดกุมสูงมาก';
+      widthFactor = 1.0;
+    } else if (score >= 2) {
+      strengthColor = const Color(0xFFF59E0B); // Amber
+      text = 'รัดกุมปานกลาง (เพิ่มตัวพิมพ์ใหญ่/ตัวเลข/สัญลักษณ์)';
+      widthFactor = 0.66;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0, left: 4, right: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              Container(
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: 4,
+                width: MediaQuery.of(context).size.width * widthFactor,
+                decoration: BoxDecoration(
+                  color: strengthColor,
+                  borderRadius: BorderRadius.circular(2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: strengthColor.withValues(alpha: 0.5),
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(text, style: TextStyle(color: strengthColor, fontSize: 12)),
+        ],
+      ),
+    );
   }
 
   void _showPrivacyPolicyDialog() {
@@ -33,18 +158,22 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: const Color(0xFF1E293B),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: Row(
+          title: const Row(
             children: [
               Icon(
                 Icons.privacy_tip_outlined,
-                color: Colors.teal.shade700,
+                color: Color(0xFF00E5FF),
                 size: 28,
               ),
-              const SizedBox(width: 8),
-              const Text('นโยบายความเป็นส่วนตัว'),
+              SizedBox(width: 8),
+              Text(
+                'นโยบายความเป็นส่วนตัว',
+                style: TextStyle(color: Colors.white),
+              ),
             ],
           ),
           content: const SingleChildScrollView(
@@ -53,17 +182,25 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
               children: [
                 Text(
                   'ข้อตกลงและนโยบายความเป็นส่วนตัว (Privacy Policy)',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
                 ),
                 SizedBox(height: 12),
                 Text(
                   '1. การรวบรวมข้อมูลสุขภาพ\n'
-                  'แอปพลิเคชัน CKD Nutrition จำเป็นต้องรวบรวมข้อมูลสุขภาพส่วนบุคคลของคุณ เช่น น้ำหนัก ส่วนสูง เพศ และระยะโรคไต (CKD Stage) เพื่อใช้ในการคำนวณโควต้าโปรตีน โซเดียม โพแทสเซียม และปริมาณน้ำที่เหมาะสมสำหรับสุขภาพไตของคุณ\n\n'
+                  'แอปพลิเคชัน CKD Nutrition จำเป็นต้องรวบรวมข้อมูลสุขภาพส่วนบุคคลของคุณ เพื่อใช้ในการคำนวณโควต้าที่เหมาะสม\n\n'
                   '2. การรักษาความปลอดภัยของข้อมูล\n'
-                  'ข้อมูลทั้งหมดของคุณจะถูกจัดเก็บอย่างปลอดภัยบนระบบฐานข้อมูล Supabase ภายใต้เกราะป้องกัน Row Level Security (RLS) ซึ่งจะจำกัดสิทธิ์ให้เข้าถึงได้เฉพาะเจ้าของบัญชีเท่านั้น\n\n'
+                  'ข้อมูลของคุณจะถูกจัดเก็บอย่างปลอดภัยและเข้ารหัส (RLS) \n\n'
                   '3. การแบ่งปันข้อมูล\n'
-                  'เราไม่มีนโยบายการเปิดเผยข้อมูลส่วนบุคคลหรือข้อมูลสุขภาพของคุณให้กับบริษัทภายนอกเพื่อประโยชน์ทางการค้าใดๆ ทั้งสิ้น ข้อมูลทั้งหมดจะใช้เพื่อวัตถุประสงค์ในการคำนวณอาหารภายในแอปพลิเคชันนี้เท่านั้น',
-                  style: TextStyle(fontSize: 14, height: 1.4),
+                  'เราไม่มีนโยบายการเปิดเผยข้อมูลส่วนบุคคลหรือข้อมูลสุขภาพของคุณให้กับบริษัทภายนอก',
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.4,
+                    color: Colors.white70,
+                  ),
                 ),
               ],
             ),
@@ -71,7 +208,10 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('รับทราบ'),
+              child: const Text(
+                'รับทราบ',
+                style: TextStyle(color: Color(0xFF00E5FF)),
+              ),
             ),
           ],
         );
@@ -79,218 +219,128 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
     );
   }
 
-  void _register() {
-    if (!_acceptPrivacyPolicy) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('กรุณากดยอมรับนโยบายความเป็นส่วนตัวก่อนสมัครสมาชิก'),
-          backgroundColor: Colors.amber,
-        ),
-      );
-      return;
-    }
-
-    if (!_formKey.currentState!.validate()) return;
-
-    ref
-        .read(registerControllerProvider.notifier)
-        .register(_emailCtrl.text.trim(), _passCtrl.text.trim());
-  }
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
     final registerState = ref.watch(registerControllerProvider);
+    final isValid = _isFormValid();
 
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          TextFormField(
-            controller: _emailCtrl,
-            keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              labelText: l10n.email,
-              hintText: 'example@gmail.com',
-              prefixIcon: Icon(
-                Icons.mail_outline_rounded,
-                color: Colors.teal.shade600,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.teal.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.teal.shade600, width: 2),
-              ),
-            ),
-            validator: (val) {
-              if (val == null || val.isEmpty) return 'กรุณากรอกอีเมล';
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) {
-                return 'กรุณากรอกอีเมลที่ถูกต้อง';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _passCtrl,
-            obscureText: _obscurePass,
-            decoration: InputDecoration(
-              labelText: l10n.password,
-              hintText: 'อย่างน้อย 8 ตัวอักษร (A-Z, a-z, 0-9, อักขระพิเศษ)',
-              prefixIcon: Icon(
-                Icons.lock_outline_rounded,
-                color: Colors.teal.shade600,
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePass
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                  color: Colors.teal.shade600,
-                ),
-                onPressed: () => setState(() => _obscurePass = !_obscurePass),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.teal.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.teal.shade600, width: 2),
-              ),
-            ),
-            validator: (val) {
-              if (val == null || val.isEmpty) return 'กรุณากรอกรหัสผ่าน';
-              if (val.length < 8) {
-                return 'รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร';
-              }
-              if (!RegExp(r'[A-Z]').hasMatch(val)) {
-                return 'ต้องมีตัวพิมพ์ใหญ่ (A-Z) อย่างน้อย 1 ตัว';
-              }
-              if (!RegExp(r'[a-z]').hasMatch(val)) {
-                return 'ต้องมีตัวพิมพ์เล็ก (a-z) อย่างน้อย 1 ตัว';
-              }
-              if (!RegExp(r'[0-9]').hasMatch(val)) {
-                return 'ต้องมีตัวเลข (0-9) อย่างน้อย 1 ตัว';
-              }
-              if (!RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(val)) {
-                return 'ต้องมีอักขระพิเศษ (เช่น !@#\$%^&*) อย่างน้อย 1 ตัว';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _confirmPassCtrl,
-            obscureText: _obscureConfirmPass,
-            decoration: InputDecoration(
-              labelText: l10n.confirmPassword,
-              prefixIcon: Icon(
-                Icons.lock_clock_outlined,
-                color: Colors.teal.shade600,
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureConfirmPass
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                  color: Colors.teal.shade600,
-                ),
-                onPressed:
-                    () => setState(
-                      () => _obscureConfirmPass = !_obscureConfirmPass,
+    return Column(
+      children: [
+        PremiumTextField(
+          label: 'ชื่อเล่น / ชื่อเรียก',
+          controller: _nameCtrl,
+          prefixIcon: Icons.person_outline_rounded,
+          errorText: _nameError,
+          onChanged: (v) {
+            if (_nameError != null) setState(() => _nameError = null);
+            setState(() {});
+          },
+        ),
+        const SizedBox(height: 16),
+        PremiumTextField(
+          label: 'อีเมล',
+          controller: _emailCtrl,
+          prefixIcon: Icons.mail_outline_rounded,
+          keyboardType: TextInputType.emailAddress,
+          errorText: _emailError,
+          onChanged: (v) {
+            if (_emailError != null) setState(() => _emailError = null);
+            setState(() {});
+          },
+        ),
+        const SizedBox(height: 16),
+        PremiumTextField(
+          label: 'รหัสผ่าน',
+          controller: _passCtrl,
+          prefixIcon: Icons.lock_outline_rounded,
+          isPassword: true,
+          errorText: _passError,
+          onChanged: (v) {
+            if (_passError != null) setState(() => _passError = null);
+            if (_confirmError != null && _confirmPassCtrl.text == v) {
+              setState(() => _confirmError = null);
+            }
+            setState(() {});
+          },
+        ),
+        _buildPasswordStrengthIndicator(),
+        const SizedBox(height: 16),
+        PremiumTextField(
+          label: 'ยืนยันรหัสผ่าน',
+          controller: _confirmPassCtrl,
+          prefixIcon: Icons.lock_outline_rounded,
+          isPassword: true,
+          errorText: _confirmError,
+          onChanged: (v) {
+            if (v == _passCtrl.text) {
+              setState(() => _confirmError = null);
+            } else if (_confirmError == null) {
+              setState(() => _confirmError = 'รหัสผ่านไม่ตรงกัน');
+            }
+            setState(() {});
+          },
+        ),
+        const SizedBox(height: 24),
+
+        // Privacy Policy Checkbox
+        InkWell(
+          onTap: () {
+            setState(() => _acceptPrivacyPolicy = !_acceptPrivacyPolicy);
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              children: [
+                SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: Checkbox(
+                    value: _acceptPrivacyPolicy,
+                    onChanged: (val) {
+                      setState(() => _acceptPrivacyPolicy = val ?? false);
+                    },
+                    activeColor: const Color(0xFF00E5FF),
+                    checkColor: Colors.black,
+                    side: const BorderSide(color: Colors.white54),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
                     ),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.teal.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.teal.shade600, width: 2),
-              ),
-            ),
-            validator: (val) {
-              if (val == null || val.isEmpty) return 'กรุณากรอกรหัสยืนยัน';
-              if (val != _passCtrl.text) return 'รหัสผ่านไม่ตรงกัน';
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Checkbox(
-                activeColor: Colors.teal.shade700,
-                value: _acceptPrivacyPolicy,
-                onChanged:
-                    (val) =>
-                        setState(() => _acceptPrivacyPolicy = val ?? false),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: _showPrivacyPolicyDialog,
-                  child: RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        color: Colors.teal.shade800,
-                        fontSize: 13,
-                        fontFamily: theme.textTheme.bodyMedium?.fontFamily,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Wrap(
+                    children: [
+                      const Text(
+                        'ฉันยอมรับ ',
+                        style: TextStyle(fontSize: 14, color: Colors.white70),
                       ),
-                      children: [
-                        const TextSpan(text: 'ฉันยอมรับ '),
-                        TextSpan(
-                          text: 'นโยบายความเป็นส่วนตัว และ ข้อตกลงการใช้งาน',
+                      GestureDetector(
+                        onTap: _showPrivacyPolicyDialog,
+                        child: const Text(
+                          'เงื่อนไขและนโยบายความเป็นส่วนตัว',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Color(0xFF00E5FF),
                             decoration: TextDecoration.underline,
-                            color: Colors.teal.shade900,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
-          registerState.isLoading
-              ? const CircularProgressIndicator()
-              : Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  gradient: LinearGradient(
-                    colors: [Colors.teal.shade700, Colors.green.shade600],
-                  ),
-                ),
-                child: ElevatedButton(
-                  onPressed: _register,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: Center(child: Text(l10n.register)),
-                ),
-              ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 32),
+        PremiumPrimaryButton(
+          text: 'สร้างบัญชี',
+          isLoading: registerState.isLoading,
+          onPressed: isValid ? _register : null,
+        ),
+      ],
     );
   }
 }

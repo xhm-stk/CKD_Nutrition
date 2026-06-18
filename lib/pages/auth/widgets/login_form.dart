@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../repositories/auth_repository.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../widgets/premium_primary_button.dart';
+import '../../../widgets/premium_text_field.dart';
 
 class LoginForm extends ConsumerStatefulWidget {
   const LoginForm({super.key});
@@ -15,7 +17,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
-  bool _obscurePass = true;
+
+  String? _emailError;
+  String? _passError;
 
   @override
   void dispose() {
@@ -24,11 +28,35 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     super.dispose();
   }
 
-  void _login() async {
-    if (!_formKey.currentState!.validate()) return;
-    await ref
-        .read(loginControllerProvider.notifier)
-        .login(_emailCtrl.text.trim(), _passCtrl.text.trim());
+  void _validateAndLogin() async {
+    setState(() {
+      _emailError = null;
+      _passError = null;
+    });
+
+    final email = _emailCtrl.text.trim();
+    final pass = _passCtrl.text.trim();
+    bool isValid = true;
+
+    if (email.isEmpty) {
+      _emailError = 'กรุณากรอกอีเมล';
+      isValid = false;
+    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+      _emailError = 'รูปแบบอีเมลไม่ถูกต้อง';
+      isValid = false;
+    }
+
+    if (pass.isEmpty) {
+      _passError = 'กรุณากรอกรหัสผ่าน';
+      isValid = false;
+    }
+
+    if (!isValid) {
+      setState(() {});
+      return;
+    }
+
+    await ref.read(loginControllerProvider.notifier).login(email, pass);
   }
 
   void _showForgotPasswordDialog() {
@@ -43,18 +71,19 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
+              backgroundColor: const Color(0xFF1E293B), // bgElevated
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              title: Row(
+              title: const Row(
                 children: [
                   Icon(
                     Icons.lock_reset_rounded,
-                    color: Colors.teal.shade700,
+                    color: Color(0xFF00E5FF),
                     size: 28,
                   ),
-                  const SizedBox(width: 8),
-                  const Text('รีเซ็ตรหัสผ่าน'),
+                  SizedBox(width: 8),
+                  Text('รีเซ็ตรหัสผ่าน', style: TextStyle(color: Colors.white)),
                 ],
               ),
               content: Form(
@@ -64,30 +93,19 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                   children: [
                     const Text(
                       'กรุณากรอกอีเมลที่ใช้สมัครบัญชีของคุณ ระบบจะส่งลิงก์ตั้งรหัสผ่านใหม่ไปให้ที่กล่องจดหมายของคุณ',
-                      style: TextStyle(fontSize: 14, height: 1.4),
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.4,
+                        color: Colors.white70,
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    PremiumTextField(
+                      label: 'อีเมลของคุณ',
+                      hint: 'example@gmail.com',
                       controller: emailCtrl,
+                      prefixIcon: Icons.mail_outline_rounded,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: 'อีเมลของคุณ',
-                        hintText: 'example@gmail.com',
-                        prefixIcon: Icon(
-                          Icons.mail_outline_rounded,
-                          color: Colors.teal.shade600,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      validator: (val) {
-                        if (val == null || val.isEmpty) return 'กรุณากรอกอีเมล';
-                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(val)) {
-                          return 'รูปแบบอีเมลไม่ถูกต้อง';
-                        }
-                        return null;
-                      },
                     ),
                   ],
                 ),
@@ -96,7 +114,10 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 TextButton(
                   onPressed:
                       isDialogLoading ? null : () => Navigator.pop(context),
-                  child: const Text('ยกเลิก'),
+                  child: const Text(
+                    'ยกเลิก',
+                    style: TextStyle(color: Colors.white54),
+                  ),
                 ),
                 isDialogLoading
                     ? const Padding(
@@ -104,19 +125,22 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                       child: SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Color(0xFF00E5FF),
+                        ),
                       ),
                     )
                     : ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal.shade700,
-                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFF00E5FF),
+                        foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       onPressed: () async {
-                        if (!formKey.currentState!.validate()) return;
+                        if (emailCtrl.text.isEmpty) return;
                         setDialogState(() => isDialogLoading = true);
                         await ref
                             .read(authRepositoryProvider)
@@ -128,8 +152,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                           const SnackBar(
                             content: Text(
                               'หากอีเมลถูกต้อง ระบบได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว กรุณาตรวจสอบกล่องจดหมาย',
+                              style: TextStyle(color: Colors.black),
                             ),
-                            backgroundColor: Colors.teal,
+                            backgroundColor: Color(0xFF00E5FF),
                             duration: Duration(seconds: 5),
                           ),
                         );
@@ -153,70 +178,26 @@ class _LoginFormState extends ConsumerState<LoginForm> {
       key: _formKey,
       child: Column(
         children: [
-          TextFormField(
+          PremiumTextField(
+            label: l10n.email,
+            hint: 'example@gmail.com',
             controller: _emailCtrl,
+            prefixIcon: Icons.mail_outline_rounded,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              labelText: l10n.email,
-              hintText: 'example@gmail.com',
-              prefixIcon: Icon(
-                Icons.mail_outline_rounded,
-                color: Colors.teal.shade600,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.teal.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.teal.shade600, width: 2),
-              ),
-            ),
-            validator: (val) {
-              if (val == null || val.isEmpty) return 'กรุณากรอกอีเมล';
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) {
-                return 'กรุณากรอกอีเมลที่ถูกต้อง';
-              }
-              return null;
+            errorText: _emailError,
+            onChanged: (val) {
+              if (_emailError != null) setState(() => _emailError = null);
             },
           ),
           const SizedBox(height: 16),
-          TextFormField(
+          PremiumTextField(
+            label: l10n.password,
             controller: _passCtrl,
-            obscureText: _obscurePass,
-            decoration: InputDecoration(
-              labelText: l10n.password,
-              prefixIcon: Icon(
-                Icons.lock_outline_rounded,
-                color: Colors.teal.shade600,
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePass
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                  color: Colors.teal.shade600,
-                ),
-                onPressed: () => setState(() => _obscurePass = !_obscurePass),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.teal.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.teal.shade600, width: 2),
-              ),
-            ),
-            validator: (val) {
-              if (val == null || val.isEmpty) return 'กรุณากรอกรหัสผ่าน';
-              return null;
+            prefixIcon: Icons.lock_outline_rounded,
+            isPassword: true,
+            errorText: _passError,
+            onChanged: (val) {
+              if (_passError != null) setState(() => _passError = null);
             },
           ),
           const SizedBox(height: 8),
@@ -229,38 +210,22 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 minimumSize: const Size(50, 30),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: Text(
-                l10n.forgotPassword,
+              child: const Text(
+                'ลืมรหัสผ่าน?',
                 style: TextStyle(
-                  color: Colors.teal.shade700,
-                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF00E5FF),
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          loginState.isLoading
-              ? const CircularProgressIndicator()
-              : Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  gradient: LinearGradient(
-                    colors: [Colors.teal.shade700, Colors.green.shade600],
-                  ),
-                ),
-                child: ElevatedButton(
-                  onPressed: _login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: Center(child: Text(l10n.login)),
-                ),
-              ),
+          const SizedBox(height: 32),
+          PremiumPrimaryButton(
+            text: l10n.login,
+            isLoading: loginState.isLoading,
+            onPressed: _validateAndLogin,
+          ),
         ],
       ),
     );

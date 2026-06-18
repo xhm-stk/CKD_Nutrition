@@ -159,11 +159,15 @@ void main() {
                       quantityG: quantity,
                       mealType: 'breakfast',
                     );
-                    expect(
-                      result,
-                      isA<Success<void>>(),
-                      reason: 'Logging should succeed without errors',
-                    );
+                    if (quantity <= 0) {
+                      expect(result, isA<Failure<void>>());
+                    } else {
+                      expect(
+                        result,
+                        isA<Success<void>>(),
+                        reason: 'Logging should succeed without errors',
+                      );
+                    }
                   } catch (e) {
                     fail(
                       'MealController crashed on Combination #$runCount: $e',

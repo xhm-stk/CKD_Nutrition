@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/isar/food_item.dart';
+import '../../providers/core_providers.dart';
 import '../../providers/meal_providers.dart';
 import '../../controllers/food_search_controller.dart';
 import '../../core/result.dart';
@@ -40,6 +41,7 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
     return Scaffold(
       appBar: AppBar(
         title: TextField(
+          key: const Key('input_search_food'),
           controller: _searchCtrl,
           autofocus: true,
           textInputAction: TextInputAction.search,
@@ -65,6 +67,7 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
+            key: const Key('btn_add_custom_food_page'),
             icon: const Icon(Icons.add_circle_outline),
             tooltip: 'สร้างอาหารแบบกำหนดเอง',
             onPressed: () {
@@ -178,6 +181,8 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
 
     if (result is Success) {
       if (!mounted) return;
+      ref.invalidate(dashboardSummaryProvider);
+      ref.invalidate(todayMealsProvider);
       Navigator.pop(context); // กลับไปหน้า Dashboard
     } else if (result is Failure) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -221,6 +226,7 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
           ),
           const SizedBox(height: 16),
           TextField(
+            key: const Key('input_portion'),
             controller: _ctrl,
             decoration: InputDecoration(
               labelText: 'จำนวน',
@@ -231,6 +237,7 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
+            key: const Key('dropdown_meal_type'),
             value: _type,
             decoration: const InputDecoration(
               labelText: 'มื้ออาหาร',
@@ -251,6 +258,7 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
+                  key: const Key('btn_confirm_eat'),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
