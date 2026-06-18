@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.food_master (
     sugar_g numeric DEFAULT 0,
     carb_g numeric DEFAULT 0,
     water_ml numeric DEFAULT 0,
-    serving_size_g numeric DEFAULT 100,
+    serving_size text DEFAULT '100g',
     created_at timestamptz DEFAULT now(),
     updated_at timestamptz DEFAULT now()
 );
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.custom_foods (
     sugar_g numeric DEFAULT 0,
     carb_g numeric DEFAULT 0,
     water_ml numeric DEFAULT 0,
-    serving_size_g numeric DEFAULT 100,
+    serving_size text DEFAULT '100g',
     created_at timestamptz DEFAULT now(),
     updated_at timestamptz DEFAULT now()
 );

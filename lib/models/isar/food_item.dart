@@ -19,13 +19,13 @@ class FoodItem {
   late String servingSize;
 
   // สารอาหาร 7 ชนิด (รวมฟอสฟอรัส)
-  late double proteinG;
-  late double potassiumMg;
-  late double sodiumMg;
-  late double sugarG;
-  late double carbG;
-  late double waterMl;
-  late double phosphorusMg;
+  double proteinG = 0.0;
+  double potassiumMg = 0.0;
+  double sodiumMg = 0.0;
+  double sugarG = 0.0;
+  double carbG = 0.0;
+  double waterMl = 0.0;
+  double phosphorusMg = 0.0;
 
   late String cookingMethod;
   late String source;
@@ -38,10 +38,13 @@ class CkdRuleCache {
   Id id = Isar.autoIncrement;
   @Index(unique: true)
   late String stage;
-  late double proteinLimitG, potassiumLimitMg;
-  late double sodiumLimitMg, sugarLimitG;
-  late double carbLimitG, waterLimitMl;
-  late double phosphorusLimitMg;
+  double proteinLimitG = 0.0;
+  double potassiumLimitMg = 0.0;
+  double sodiumLimitMg = 0.0;
+  double sugarLimitG = 0.0;
+  double carbLimitG = 0.0;
+  double waterLimitMl = 0.0;
+  double phosphorusLimitMg = 0.0;
 
   late String syncedAt;
 }

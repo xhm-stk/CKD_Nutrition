@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ckd_nutrition_app/pages/auth/login_page.dart';
 import 'package:ckd_nutrition_app/repositories/auth_repository.dart';
+import 'package:ckd_nutrition_app/widgets/premium_primary_button.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 
@@ -39,8 +40,9 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      // Tap on login button (which has text 'Login' or 'เข้าสู่ระบบ')
-      await tester.tap(find.byType(ElevatedButton).first);
+      final btnFinder = find.byType(PremiumPrimaryButton).first;
+      await tester.ensureVisible(btnFinder);
+      await tester.tap(btnFinder);
       await tester.pumpAndSettle();
 
       expect(find.text('กรุณากรอกอีเมล'), findsOneWidget);
@@ -54,12 +56,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Enter invalid email
-      await tester.enterText(find.byType(TextFormField).first, 'invalid-email');
+      await tester.enterText(find.byType(TextField).first, 'invalid-email');
 
-      await tester.tap(find.byType(ElevatedButton).first);
+      final btnFinder2 = find.byType(PremiumPrimaryButton).first;
+      await tester.ensureVisible(btnFinder2);
+      await tester.tap(btnFinder2);
       await tester.pumpAndSettle();
 
-      expect(find.text('กรุณากรอกอีเมลที่ถูกต้อง'), findsOneWidget);
+      expect(find.text('รูปแบบอีเมลไม่ถูกต้อง'), findsOneWidget);
       expect(find.text('กรุณากรอกรหัสผ่าน'), findsOneWidget);
     });
   });

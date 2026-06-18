@@ -43,7 +43,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // ค้นหาข้อความหลักในหน้า Dashboard ว่าแสดงผลได้ครบถ้วนหรือไม่
-    expect(find.text('โภชนาการวันนี้'), findsOneWidget);
+    expect(find.text('สารอาหารทั้งหมด'), findsOneWidget);
 
     // หากมี RenderFlex overflow (หน้าจอแตก) tester จะโยน Exception อัตโนมัติระหว่างที่ pumpAndSettle
     // ถ้าผ่านมาถึงบรรทัดนี้ได้แปลว่าหน้าจอสามารถรองรับฟอนต์ใหญ่ได้โดยไม่พัง

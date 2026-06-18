@@ -113,7 +113,7 @@ class MealRepository {
           'p_carb': carb,
           'p_water': water,
           'p_phosphorus': phosphorus,
-          'p_eaten_at': eatenAt.toIso8601String(),
+          'p_eaten_at': eatenAt.toUtc().toIso8601String(),
         },
       );
       return Success(null);
@@ -135,7 +135,7 @@ class MealRepository {
         'carb': carb,
         'water': water,
         'phosphorus': phosphorus,
-        'eaten_at': eatenAt.toIso8601String(),
+        'eaten_at': eatenAt.toUtc().toIso8601String(),
       };
 
       await _syncWorker.enqueueAction('LOG_MEAL_RPC', payload);

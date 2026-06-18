@@ -15,20 +15,17 @@ class FoodRepository {
   Future<List<FoodItem>> searchFood(String query) async {
     List<FoodItem> localResults = [];
     if (query.isEmpty) {
-      localResults = await _isar.foodItems.where().limit(20).findAll();
+      localResults = await _isar.foodItems.where().findAll();
     } else {
       final isUnicode = query.codeUnits.any((unit) => unit > 127);
       if (isUnicode) {
         final allFoods = await _isar.foodItems.where().findAll();
         final qLower = query.toLowerCase();
         localResults =
-            allFoods
-                .where((f) {
-                  return f.name.toLowerCase().contains(qLower) ||
-                      f.searchKeywords.toLowerCase().contains(qLower);
-                })
-                .take(50)
-                .toList();
+            allFoods.where((f) {
+              return f.name.toLowerCase().contains(qLower) ||
+                  f.searchKeywords.toLowerCase().contains(qLower);
+            }).toList();
       } else {
         localResults =
             await _isar.foodItems
@@ -68,7 +65,8 @@ class FoodRepository {
                         ..sodiumMg = (e['sodium_mg'] as num).toDouble()
                         ..sugarG = (e['sugar_g'] as num).toDouble()
                         ..carbG = (e['carb_g'] as num).toDouble()
-                        ..waterMl = (e['water_ml'] as num).toDouble(),
+                        ..waterMl = (e['water_ml'] as num).toDouble()
+                        ..phosphorusMg = 0.0,
                 )
                 .toList();
       }

@@ -12,6 +12,10 @@ class MealController {
     required double quantityG,
     required String mealType,
   }) async {
+    if (quantityG <= 0) {
+      return Failure('ปริมาณอาหารต้องมากกว่า 0 กรัม');
+    }
+
     // 1. Business Logic: Calculate ratio and nutrition values based on quantity consumed
     final ratio = quantityG / 100.0;
 

@@ -55,4 +55,22 @@ class HealthProfileService {
 
     await _ckdSvc.syncToIsar(ckdStage);
   }
+
+  // ดึงข้อมูลโปรไฟล์
+  Future<Map<String, dynamic>?> getHealthProfile() async {
+    final user = _sb.auth.currentUser;
+    if (user == null) return null;
+    try {
+      final data =
+          await _sb
+              .from('user_health_profiles')
+              .select()
+              .eq('user_id', user.id)
+              .maybeSingle();
+      return data;
+    } catch (e) {
+      debugPrint('Error getting health profile: $e');
+      return null;
+    }
+  }
 }

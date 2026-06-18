@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/core_providers.dart';
+import '../../providers/meal_providers.dart';
 import '../../core/result.dart';
 
 class CustomFoodPage extends ConsumerStatefulWidget {
@@ -62,7 +63,7 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
     switch (result) {
       case Success():
         scaffoldMessenger.showSnackBar(
-          const SnackBar(content: Text('✅ บันทึกเมนูอาหารส่วนตัวสำเร็จ!')),
+          const SnackBar(content: Text('✅ บันทึกเมนูอาหารเข้าสมุดเมนูสำเร็จ!')),
         );
         router.pop();
       case Failure(userMessage: final msg):
@@ -70,10 +71,76 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
     }
   }
 
-  Widget _buildNumberField(TextEditingController ctrl, String label) {
+  Future<void> _saveAndEatCustomFood() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+
+    // 1. บันทึกเข้าสมุดอาหาร
+    final foodRepo = ref.read(foodRepositoryProvider);
+    final result = await foodRepo.addCustomFood(
+      name: _nameCtrl.text.trim(),
+      servingSize: _servingCtrl.text.trim(),
+      proteinG: double.parse(_proteinCtrl.text),
+      potassiumMg: double.parse(_potassiumCtrl.text),
+      sodiumMg: double.parse(_sodiumCtrl.text),
+      sugarG: double.parse(_sugarCtrl.text),
+      carbG: double.parse(_carbCtrl.text),
+      waterMl: double.parse(_waterCtrl.text),
+    );
+
+    if (result is Failure) {
+      setState(() => _isLoading = false);
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text('❌ ${(result).userMessage}')),
+      );
+      return;
+    }
+
+    // 2. กินทันที! (บันทึกเข้า Dashboard)
+    final mealRepo = ref.read(mealRepositoryProvider);
+    await mealRepo.logMealData(
+      foodId:
+          'custom_${DateTime.now().millisecondsSinceEpoch}', // ใช้ ID ชั่วคราวเพื่อออฟไลน์ซิงค์
+      foodName: _nameCtrl.text.trim(),
+      quantityG: 1, // เมนูทำเองถือเป็น 1 หน่วยบริโภค
+      mealType: 'snack', // ใส่เป็นของว่างไปก่อน
+      protein: double.parse(_proteinCtrl.text),
+      potassium: double.parse(_potassiumCtrl.text),
+      sodium: double.parse(_sodiumCtrl.text),
+      sugar: double.parse(_sugarCtrl.text),
+      carb: double.parse(_carbCtrl.text),
+      water: double.parse(_waterCtrl.text),
+      phosphorus: 0,
+      eatenAt: DateTime.now(),
+    );
+
+    setState(() => _isLoading = false);
+
+    // รีเฟรช Dashboard และรายการมื้ออาหาร
+    ref.invalidate(dashboardSummaryProvider);
+    ref.invalidate(todayMealsProvider);
+
+    scaffoldMessenger.showSnackBar(
+      const SnackBar(
+        content: Text('✅ บันทึกเข้าสมุดและกินเรียบร้อย! (เช็คที่ Dashboard)'),
+      ),
+    );
+    // ดีดกลับไปหน้าแรก (Dashboard)
+    router.go('/dashboard');
+  }
+
+  Widget _buildNumberField(
+    TextEditingController ctrl,
+    String label, {
+    Key? key,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: TextFormField(
+        key: key,
         controller: ctrl,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         decoration: InputDecoration(
@@ -105,6 +172,7 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
           child: Column(
             children: [
               TextFormField(
+                key: const Key('custom_food_name'),
                 controller: _nameCtrl,
                 decoration: const InputDecoration(
                   labelText: 'ชื่อเมนูอาหาร',
@@ -118,6 +186,7 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
               ),
               const SizedBox(height: 12),
               TextFormField(
+                key: const Key('custom_food_serving'),
                 controller: _servingCtrl,
                 decoration: const InputDecoration(
                   labelText: 'ปริมาณ (เช่น 1 จาน, 100g)',
@@ -141,30 +210,58 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildNumberField(_proteinCtrl, 'โปรตีน (g)'),
+                    child: _buildNumberField(
+                      _proteinCtrl,
+                      'โปรตีน (g)',
+                      key: const Key('custom_food_protein'),
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildNumberField(_potassiumCtrl, 'โพแทสเซียม (mg)'),
+                    child: _buildNumberField(
+                      _potassiumCtrl,
+                      'โพแทสเซียม (mg)',
+                      key: const Key('custom_food_potassium'),
+                    ),
                   ),
                 ],
               ),
               Row(
                 children: [
                   Expanded(
-                    child: _buildNumberField(_sodiumCtrl, 'โซเดียม (mg)'),
+                    child: _buildNumberField(
+                      _sodiumCtrl,
+                      'โซเดียม (mg)',
+                      key: const Key('custom_food_sodium'),
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildNumberField(_sugarCtrl, 'น้ำตาล (g)')),
+                  Expanded(
+                    child: _buildNumberField(
+                      _sugarCtrl,
+                      'น้ำตาล (g)',
+                      key: const Key('custom_food_sugar'),
+                    ),
+                  ),
                 ],
               ),
               Row(
                 children: [
                   Expanded(
-                    child: _buildNumberField(_carbCtrl, 'คาร์โบไฮเดรต (g)'),
+                    child: _buildNumberField(
+                      _carbCtrl,
+                      'คาร์โบไฮเดรต (g)',
+                      key: const Key('custom_food_carb'),
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildNumberField(_waterCtrl, 'น้ำ (ml)')),
+                  Expanded(
+                    child: _buildNumberField(
+                      _waterCtrl,
+                      'น้ำ (ml)',
+                      key: const Key('custom_food_water'),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -172,13 +269,32 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _saveCustomFood,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                  ),
+                  onPressed: _isLoading ? null : _saveAndEatCustomFood,
                   child:
                       _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
-                            '💾 บันทึกเข้าระบบ',
-                            style: TextStyle(fontSize: 18),
+                            '🍽️ บันทึกและกินทันที! (ขึ้น Dashboard)',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: OutlinedButton(
+                  key: const Key('btn_save_custom_food'),
+                  onPressed: _isLoading ? null : _saveCustomFood,
+                  child:
+                      _isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text(
+                            '💾 แค่บันทึกเก็บไว้ในสมุดเมนู',
+                            style: TextStyle(fontSize: 16),
                           ),
                 ),
               ),

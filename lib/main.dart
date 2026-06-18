@@ -15,6 +15,9 @@ import 'services/isar_seed_service.dart';
 import 'services/notification_service.dart';
 import 'providers/core_providers.dart';
 import 'router/app_router.dart';
+import 'providers/auth_providers.dart';
+import 'services/biometric_service.dart';
+import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // บังคับให้ Flutter สตาร์ท
@@ -106,6 +109,16 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     super.initState();
+
+    // Check biometrics and auto-unlock if not available
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final biometricService = ref.read(biometricServiceProvider);
+      final canCheck = await biometricService.canCheckBiometrics();
+      if (!canCheck) {
+        ref.read(sessionUnlockedProvider.notifier).state = true;
+      }
+    });
+
     _listener = AppLifecycleListener(
       onPause: () {
         _pausedTime = DateTime.now();
@@ -146,6 +159,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('th'), // ภาษาเริ่มต้นคือไทย
+      theme: AppTheme.lightTheme(),
+      darkTheme: AppTheme.darkTheme(),
+      themeMode: ThemeMode.dark, // บังคับใช้ Dark Mode 100% ตาม Masterplan
       routerConfig: router,
     );
   }
