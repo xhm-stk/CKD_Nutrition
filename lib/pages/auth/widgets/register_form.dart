@@ -78,8 +78,9 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
   bool _isFormValid() {
     if (_nameCtrl.text.trim().isEmpty) return false;
     final email = _emailCtrl.text.trim();
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email))
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
       return false;
+    }
     if (_calculatePasswordStrength(_passCtrl.text) < 4) return false;
     if (_passCtrl.text != _confirmPassCtrl.text) return false;
     if (!_acceptPrivacyPolicy) return false;
