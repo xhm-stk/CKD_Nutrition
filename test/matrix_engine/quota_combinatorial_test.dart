@@ -136,8 +136,9 @@ void main() {
                           // 1. จำลองข้อมูล (Data Injection)
                           double testQty = qty;
                           if (integrity == 'Negative') testQty = -50.0;
-                          if (integrity == 'Extreme Overdose')
+                          if (integrity == 'Extreme Overdose') {
                             testQty = 9999999.0;
+                          }
 
                           final baseFood =
                               FoodItem()
