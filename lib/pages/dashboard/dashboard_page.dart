@@ -63,26 +63,28 @@ class DashboardPage extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                          Text(
-                            DateFormat('dd / MM / yyyy').format(DateTime.now()),
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.6),
-                              fontWeight: FontWeight.w500,
+                            Text(
+                              DateFormat(
+                                'dd / MM / yyyy',
+                              ).format(DateTime.now()),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'แดชบอร์ด',
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              height: 1.2,
+                            const SizedBox(height: 4),
+                            Text(
+                              'แดชบอร์ด',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                height: 1.2,
+                              ),
                             ),
-                          ),
                           ],
                         ),
                       ),
