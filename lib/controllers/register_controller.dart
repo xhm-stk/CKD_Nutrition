@@ -36,11 +36,11 @@ class RegisterController extends StateNotifier<RegisterState> {
 
   RegisterController(this._repo) : super(RegisterState());
 
-  Future<void> register(String email, String password) async {
+  Future<void> register(String email, String password, {String? name}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final result = await _repo.register(email, password);
+      final result = await _repo.register(email, password, name: name);
 
       switch (result) {
         case Success():

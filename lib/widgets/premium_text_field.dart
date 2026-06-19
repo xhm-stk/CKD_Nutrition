@@ -88,7 +88,7 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
           curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
             color: AppTheme.bgSurface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            borderRadius: BorderRadius.circular(30.0),
             border: Border.all(
               color: borderColor,
               width: _isFocused || hasError ? 1.5 : 1.0,
@@ -104,52 +104,55 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
                     ]
                     : [],
           ),
-          child: TextField(
-            controller: widget.controller,
-            focusNode: _focusNode,
-            obscureText: _obscureText,
-            keyboardType: widget.keyboardType,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-            onChanged: widget.onChanged,
-            decoration: InputDecoration(
-              hintText: widget.hint,
-              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 18,
-              ),
-              prefixIcon: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: Icon(
-                  widget.prefixIcon,
-                  key: ValueKey(_isFocused),
-                  color:
-                      _isFocused
-                          ? AppTheme.brandPrimary
-                          : Colors.white.withValues(alpha: 0.4),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30.0),
+            child: TextField(
+              controller: widget.controller,
+              focusNode: _focusNode,
+              obscureText: _obscureText,
+              keyboardType: widget.keyboardType,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              onChanged: widget.onChanged,
+              decoration: InputDecoration(
+                hintText: widget.hint,
+                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide.none),
+                errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide.none),
+                focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide.none),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
                 ),
+                prefixIcon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    widget.prefixIcon,
+                    key: ValueKey(_isFocused),
+                    color:
+                        _isFocused
+                            ? AppTheme.brandPrimary
+                            : Colors.white.withValues(alpha: 0.4),
+                  ),
+                ),
+                suffixIcon:
+                    widget.isPassword
+                        ? IconButton(
+                          icon: Icon(
+                            _obscureText
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: Colors.white.withValues(alpha: 0.4),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText = !_obscureText;
+                            });
+                          },
+                        )
+                        : null,
               ),
-              suffixIcon:
-                  widget.isPassword
-                      ? IconButton(
-                        icon: Icon(
-                          _obscureText
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color: Colors.white.withValues(alpha: 0.4),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureText = !_obscureText;
-                          });
-                        },
-                      )
-                      : null,
             ),
           ),
         ),

@@ -12,4 +12,9 @@ class AppDateUtils {
   static String getNowIsoString() {
     return now.toIso8601String();
   }
+
+  /// แปลง DateTime เป็น String แบบ YYYY-MM-DD
+  static String formatDate(DateTime date) {
+    return date.toIso8601String().substring(0, 10);
+  }
 }

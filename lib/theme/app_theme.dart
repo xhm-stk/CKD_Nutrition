@@ -25,43 +25,43 @@ class AppTheme {
   static const double radiusLarge = 32.0;
 
   // === Typography Tokens ===
-  static TextTheme _buildTextTheme(TextTheme base) {
+  static TextTheme _buildTextTheme(TextTheme base, Color textColor, Color subtitleColor) {
     return GoogleFonts.promptTextTheme(base).copyWith(
       displayLarge: GoogleFonts.prompt(
         fontSize: 32,
         fontWeight: FontWeight.bold,
         letterSpacing: -0.5,
-        color: textHighEmphasis.withValues(alpha: 0.92),
+        color: textColor,
       ),
       displayMedium: GoogleFonts.prompt(
         fontSize: 24,
         fontWeight: FontWeight.w600,
         letterSpacing: 0,
-        color: textHighEmphasis.withValues(alpha: 0.92),
+        color: textColor,
       ),
       bodyLarge: GoogleFonts.prompt(
         fontSize: 16,
         fontWeight: FontWeight.w400,
         height: 1.5,
-        color: textHighEmphasis.withValues(alpha: 0.92),
+        color: textColor,
       ),
       bodyMedium: GoogleFonts.prompt(
         fontSize: 14,
         fontWeight: FontWeight.w300,
-        color: textMediumEmphasis,
+        color: subtitleColor,
       ),
       labelSmall: GoogleFonts.prompt(
         fontSize: 12,
         fontWeight: FontWeight.w300,
-        color: textLowEmphasis,
+        color: subtitleColor.withValues(alpha: 0.6),
       ),
     );
   }
 
-  // === Light Theme (Fallback, not used actively since locked to Dark Mode) ===
+  // === Light Theme ===
   static final lightColorScheme = ColorScheme.light(
-    primary: Colors.teal.shade700,
-    secondary: Colors.orange.shade600,
+    primary: brandPrimary, // Use Emerald Green
+    secondary: brandSecondary,
     surface: const Color(0xFFF8FAFC),
     onSurface: const Color(0xFF0F172A),
     errorContainer: Colors.red.shade50,
@@ -74,7 +74,22 @@ class AppTheme {
     final base = ThemeData.light(useMaterial3: true);
     return base.copyWith(
       colorScheme: lightColorScheme,
-      textTheme: _buildTextTheme(base.textTheme),
+      scaffoldBackgroundColor: const Color(0xFFF1F5F9), // Slate 100 for light bg
+      textTheme: _buildTextTheme(
+        base.textTheme, 
+        const Color(0xFF0F172A), // Slate 900 for high emphasis
+        const Color(0xFF475569), // Slate 600 for medium emphasis
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFFF8FAFC),
+        foregroundColor: Color(0xFF0F172A),
+        elevation: 0,
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: Color(0xFFF8FAFC),
+        selectedItemColor: brandPrimary,
+        unselectedItemColor: Color(0xFF94A3B8),
+      ),
     );
   }
 
@@ -96,7 +111,11 @@ class AppTheme {
     return base.copyWith(
       colorScheme: darkColorScheme,
       scaffoldBackgroundColor: bgBase,
-      textTheme: _buildTextTheme(base.textTheme),
+      textTheme: _buildTextTheme(
+        base.textTheme,
+        textHighEmphasis.withValues(alpha: 0.92),
+        textMediumEmphasis,
+      ),
       appBarTheme: const AppBarTheme(
         backgroundColor: bgBase,
         foregroundColor: Colors.white,
