@@ -96,7 +96,8 @@ void main() async {
   );
 }
 
-final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});

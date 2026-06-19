@@ -32,15 +32,24 @@ class MainScaffold extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildNavItem(context, icon: Icons.home_rounded, label: 'แดชบอร์ด', index: 0),
-            
+            _buildNavItem(
+              context,
+              icon: Icons.home_rounded,
+              label: 'แดชบอร์ด',
+              index: 0,
+            ),
+
             // ปุ่มบวกตรงกลาง (อยู่ระดับเดียวกับเมนูอื่นๆ)
             InkWell(
               onTap: () {
                 final selectedDate = ref.read(selectedDateProvider);
                 if (!isSameDay(selectedDate, DateTime.now())) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('คุณสามารถบันทึกอาหารได้เฉพาะวันที่ปัจจุบันเท่านั้น')),
+                    const SnackBar(
+                      content: Text(
+                        'คุณสามารถบันทึกอาหารได้เฉพาะวันที่ปัจจุบันเท่านั้น',
+                      ),
+                    ),
                   );
                   return;
                 }
@@ -50,23 +59,37 @@ class MainScaffold extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary, // สีเดียวกับธีมแอป
+                  color:
+                      Theme.of(context).colorScheme.primary, // สีเดียวกับธีมแอป
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.add, color: Colors.white, size: 28),
               ),
             ),
-            
-            _buildNavItem(context, icon: Icons.person_rounded, label: 'บัญชี', index: 1), // เปลี่ยนจาก index 2 เป็น 1
+
+            _buildNavItem(
+              context,
+              icon: Icons.person_rounded,
+              label: 'บัญชี',
+              index: 1,
+            ), // เปลี่ยนจาก index 2 เป็น 1
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(BuildContext context, {required IconData icon, required String label, required int index}) {
+  Widget _buildNavItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required int index,
+  }) {
     final isSelected = navigationShell.currentIndex == index;
-    final color = isSelected ? Theme.of(context).colorScheme.primary : Colors.grey.shade500;
+    final color =
+        isSelected
+            ? Theme.of(context).colorScheme.primary
+            : Colors.grey.shade500;
     return InkWell(
       onTap: () => _goBranch(index),
       borderRadius: BorderRadius.circular(16),
