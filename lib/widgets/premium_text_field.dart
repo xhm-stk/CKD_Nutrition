@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
+/// ช่องกรอกข้อความพรีเมียม — Emerald Focus Bloom Edition
+/// รองรับ: Focus Glow สีเขียว, ความมน 24px, Error state
 class PremiumTextField extends StatefulWidget {
   final String label;
   final String? hint;
@@ -54,29 +57,38 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
     final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
 
     // สีขอบ (Border Color)
-    Color borderColor = Colors.transparent;
+    Color borderColor = Colors.white.withValues(alpha: 0.08);
     if (hasError) {
       borderColor = theme.colorScheme.error;
     } else if (_isFocused) {
-      borderColor = theme.colorScheme.primary;
+      borderColor = AppTheme.brandPrimary;
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          widget.label,
+        // Floating Label
+        AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 200),
           style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w300,
-            color: Colors.white.withValues(alpha: 0.6),
+            fontSize: 13,
+            fontWeight: _isFocused ? FontWeight.w500 : FontWeight.w300,
+            color:
+                _isFocused
+                    ? AppTheme.brandPrimary
+                    : Colors.white.withValues(alpha: 0.6),
           ),
+          child: Text(widget.label),
         ),
         const SizedBox(height: 8),
-        Container(
+
+        // Text Field Container with Focus Bloom
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
-            color: const Color(0xFF131B2B), // bgSurface
-            borderRadius: BorderRadius.circular(16),
+            color: AppTheme.bgSurface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
             border: Border.all(
               color: borderColor,
               width: _isFocused || hasError ? 1.5 : 1.0,
@@ -85,9 +97,9 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
                 _isFocused && !hasError
                     ? [
                       BoxShadow(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 0),
+                        color: AppTheme.brandPrimary.withValues(alpha: 0.15),
+                        blurRadius: 16,
+                        spreadRadius: 2,
                       ),
                     ]
                     : [],
@@ -101,6 +113,7 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
             onChanged: widget.onChanged,
             decoration: InputDecoration(
               hintText: widget.hint,
+              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
@@ -110,12 +123,16 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
                 horizontal: 20,
                 vertical: 18,
               ),
-              prefixIcon: Icon(
-                widget.prefixIcon,
-                color:
-                    _isFocused
-                        ? theme.colorScheme.primary
-                        : Colors.white.withValues(alpha: 0.4),
+              prefixIcon: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: Icon(
+                  widget.prefixIcon,
+                  key: ValueKey(_isFocused),
+                  color:
+                      _isFocused
+                          ? AppTheme.brandPrimary
+                          : Colors.white.withValues(alpha: 0.4),
+                ),
               ),
               suffixIcon:
                   widget.isPassword
@@ -136,6 +153,8 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
             ),
           ),
         ),
+
+        // Error message
         if (hasError) ...[
           const SizedBox(height: 6),
           Padding(

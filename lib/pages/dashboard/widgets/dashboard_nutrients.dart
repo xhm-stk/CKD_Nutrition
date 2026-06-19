@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import '../../../services/quota_engine.dart';
+import '../../../theme/app_theme.dart';
 
 class DashboardNutrientsWidget extends StatelessWidget {
   final List<NutrientQuota> quotas;
 
   const DashboardNutrientsWidget({super.key, required this.quotas});
 
-  // แมปปิ้งไอคอนและสีให้ตรงกับสารอาหารแต่ละตัว (ดีไซน์จำลองจาก PDF)
+  // แมปปิ้งไอคอนและสีให้ตรงกับสารอาหารแต่ละตัว (Emerald Edition)
   Map<String, dynamic> _getNutrientStyle(String label, bool isDark) {
     Color bg(Color color) =>
         isDark ? color.withValues(alpha: 0.1) : color.withValues(alpha: 0.05);
@@ -16,44 +17,44 @@ class DashboardNutrientsWidget extends StatelessWidget {
       case 'โปรตีน':
         return {
           'icon': Icons.set_meal_rounded,
-          'color': Colors.redAccent.shade200,
-          'bg': bg(Colors.redAccent.shade200),
+          'color': const Color(0xFF34D399), // Mint
+          'bg': bg(const Color(0xFF34D399)),
         };
       case 'น้ำตาล':
         return {
           'icon': Icons.cookie_rounded,
-          'color': Colors.brown.shade300,
-          'bg': bg(Colors.brown.shade300),
+          'color': AppTheme.brandSecondary,
+          'bg': bg(AppTheme.brandSecondary),
         };
       case 'โพแทสเซียม':
         return {
           'icon': Icons.science_rounded,
-          'color': Colors.red.shade600,
-          'bg': bg(Colors.red.shade600),
+          'color': const Color(0xFFF87171), // Soft Red
+          'bg': bg(const Color(0xFFF87171)),
         };
       case 'โซเดียม':
         return {
           'icon': Icons.water_drop_rounded,
-          'color': Colors.lightBlue,
-          'bg': bg(Colors.lightBlue),
+          'color': const Color(0xFF38BDF8), // Sky Blue
+          'bg': bg(const Color(0xFF38BDF8)),
         };
       case 'น้ำ':
         return {
           'icon': Icons.local_drink_rounded,
-          'color': Colors.blue.shade400,
-          'bg': bg(Colors.blue.shade400),
+          'color': const Color(0xFF60A5FA), // Indigo Light
+          'bg': bg(const Color(0xFF60A5FA)),
         };
       case 'คาร์บ':
         return {
           'icon': Icons.rice_bowl_rounded,
-          'color': Colors.amber.shade600,
-          'bg': bg(Colors.amber.shade600),
+          'color': const Color(0xFFFBBF24), // Amber
+          'bg': bg(const Color(0xFFFBBF24)),
         };
       default:
         return {
           'icon': Icons.local_dining_rounded,
-          'color': Colors.teal,
-          'bg': bg(Colors.teal),
+          'color': AppTheme.brandPrimary,
+          'bg': bg(AppTheme.brandPrimary),
         };
     }
   }
@@ -84,8 +85,8 @@ class DashboardNutrientsWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        color: AppTheme.bgSurface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.05),
           width: 1,
@@ -107,7 +108,7 @@ class DashboardNutrientsWidget extends StatelessWidget {
             crossAxisCount: 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 0.65, // ปรับให้เหมาะกับความสูงของวงกลม + ข้อความ
+            childAspectRatio: 0.55, // ปรับให้เหมาะกับวงกลม + ตัวเลข + ข้อความ
             mainAxisSpacing: 16,
             children: List.generate(displayQuotas.length, (index) {
               final q = displayQuotas[index];
@@ -120,17 +121,16 @@ class DashboardNutrientsWidget extends StatelessWidget {
 
               // วงแหวนสีตาม percent (ถ้ากินเกิน ให้เปลี่ยนเป็นสีแดงเข้มเพื่อเตือน)
               final ringColor =
-                  percent >= 1.0
-                      ? Colors.red.shade800
-                      : style['color'] as Color;
+                  percent >= 1.0 ? AppTheme.errorBase : style['color'] as Color;
 
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CircularPercentIndicator(
                     radius: 38.0,
-                    lineWidth: 4.0, // เส้นขอบบางๆ ให้ดูมินิมอลแบบ PDF
+                    lineWidth: 4.0,
                     animation: true,
+                    animationDuration: 1200,
                     percent: percent,
                     center: CircleAvatar(
                       radius: 28,
@@ -147,12 +147,34 @@ class DashboardNutrientsWidget extends StatelessWidget {
                         isDark ? Colors.grey.shade800 : Colors.grey.shade100,
                   ),
                   const SizedBox(height: 8),
+                  // Number Ticker
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0, end: q.consumed),
+                    duration: const Duration(milliseconds: 1200),
+                    curve: Curves.easeOutQuart,
+                    builder: (context, value, child) {
+                      return Text(
+                        '${value.toInt()}/${q.limit.toInt()}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 2),
                   Text(
                     q.label,
                     style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,

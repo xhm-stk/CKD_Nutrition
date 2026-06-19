@@ -1,9 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../providers/auth_providers.dart';
+import '../../../theme/app_theme.dart';
+import '../../../widgets/mesh_gradient_background.dart';
 import 'widgets/login_form.dart';
 import 'widgets/social_auth_buttons.dart';
 
@@ -24,7 +26,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
-            backgroundColor: const Color(0xFFEF4444), // Ruby Red
+            backgroundColor: AppTheme.errorBase,
           ),
         );
         Future.microtask(
@@ -38,178 +40,153 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // 1. Mesh Gradient Background Effect
-          Container(color: const Color(0xFF090E17)), // Base Void Navy
-          Positioned(
-            top: -100,
-            left: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+      body: MeshGradientBackground(
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
               ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-                child: Container(),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -50,
-            right: -50,
-            child: Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF10B981).withValues(alpha: 0.1),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-                child: Container(),
-              ),
-            ),
-          ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 80),
 
-          // 2. Foreground Content
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 16.0,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 80), // Push down to sweet spot
-                    // Logo Identity
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.water_drop_rounded,
-                          color: const Color(0xFF00E5FF),
-                          size: 40,
-                          shadows: [
-                            Shadow(
-                              color: const Color(
-                                0xFF00E5FF,
-                              ).withValues(alpha: 0.5),
-                              blurRadius: 16,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'CKD',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: -0.5,
+                  // Logo Identity — Emerald Glow
+                  Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.water_drop_rounded,
+                            color: AppTheme.brandPrimary,
+                            size: 40,
+                            shadows: [
+                              Shadow(
+                                color: AppTheme.brandPrimary.withValues(
+                                  alpha: 0.5,
+                                ),
+                                blurRadius: 16,
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          'Nutrition',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF00E5FF),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 48),
-
-                    // Header Texts
-                    Text(
-                      'ยินดีต้อนรับกลับ',
-                      style: Theme.of(context).textTheme.displayLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'เข้าสู่ระบบเพื่อจัดการโภชนาการของคุณต่อ',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 48),
-
-                    // Inputs
-                    const LoginForm(),
-                    const SizedBox(height: 32),
-
-                    // Divider
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            color: Colors.white.withValues(alpha: 0.15),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'หรือเข้าใช้งานผ่าน',
+                          const SizedBox(width: 8),
+                          const Text(
+                            'CKD',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.4),
-                              fontSize: 14,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: -0.5,
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            color: Colors.white.withValues(alpha: 0.15),
+                          const SizedBox(width: 6),
+                          const Text(
+                            'Nutrition',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w400,
+                              color: AppTheme.brandPrimary,
+                            ),
                           ),
+                        ],
+                      )
+                      .animate()
+                      .fade(duration: 600.ms)
+                      .slideY(begin: -0.1, curve: Curves.easeOutCubic),
+                  const SizedBox(height: 48),
+
+                  // Header Texts
+                  Text(
+                        'ยินดีต้อนรับกลับ',
+                        style: Theme.of(context).textTheme.displayLarge,
+                        textAlign: TextAlign.center,
+                      )
+                      .animate()
+                      .fade(delay: 200.ms, duration: 500.ms)
+                      .slideY(begin: 0.1),
+                  const SizedBox(height: 8),
+                  Text(
+                    'เข้าสู่ระบบเพื่อจัดการโภชนาการของคุณต่อ',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ).animate().fade(delay: 300.ms, duration: 500.ms),
+                  const SizedBox(height: 48),
+
+                  // Inputs
+                  const LoginForm()
+                      .animate()
+                      .fade(delay: 400.ms, duration: 500.ms)
+                      .slideY(begin: 0.05),
+                  const SizedBox(height: 32),
+
+                  // Divider
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          color: Colors.white.withValues(alpha: 0.15),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Social Buttons
-                    const SocialAuthButtons(),
-                    const SizedBox(height: 48),
-
-                    // Footer Text Button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'ยังไม่มีบัญชีใช่ไหม? ',
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'หรือเข้าใช้งานผ่าน',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.6),
+                            color: Colors.white.withValues(alpha: 0.4),
                             fontSize: 14,
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            context.push('/register');
-                          },
-                          child: const Text(
-                            'สร้างบัญชีใหม่',
-                            style: TextStyle(
-                              color: Color(0xFF00E5FF),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                          color: Colors.white.withValues(alpha: 0.15),
+                        ),
+                      ),
+                    ],
+                  ).animate().fade(delay: 500.ms, duration: 500.ms),
+                  const SizedBox(height: 32),
+
+                  // Social Buttons
+                  const SocialAuthButtons()
+                      .animate()
+                      .fade(delay: 600.ms, duration: 500.ms)
+                      .slideY(begin: 0.05),
+                  const SizedBox(height: 48),
+
+                  // Footer Text Button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'ยังไม่มีบัญชีใช่ไหม? ',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.6),
+                          fontSize: 14,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          context.push('/register');
+                        },
+                        child: const Text(
+                          'สร้างบัญชีใหม่',
+                          style: TextStyle(
+                            color: AppTheme.brandPrimary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 48),
-                  ],
-                ),
+                      ),
+                    ],
+                  ).animate().fade(delay: 700.ms, duration: 500.ms),
+                  const SizedBox(height: 48),
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
