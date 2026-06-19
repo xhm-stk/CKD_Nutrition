@@ -33,7 +33,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Future<void> _loadProfile() async {
     try {
-      final data = await ref.read(healthProfileServiceProvider).getHealthProfile();
+      final data =
+          await ref.read(healthProfileServiceProvider).getHealthProfile();
       if (data != null && mounted) {
         setState(() {
           _weightCtrl.text = data['weight_kg']?.toString() ?? '';
@@ -56,25 +57,29 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     try {
-      await ref.read(healthProfileServiceProvider).saveHealthProfile(
+      await ref
+          .read(healthProfileServiceProvider)
+          .saveHealthProfile(
             weightKg: double.parse(_weightCtrl.text.trim()),
             heightCm: double.parse(_heightCtrl.text.trim()),
             gender: _selectedGender,
             ckdStage: _selectedStage,
           );
-          
+
       final user = ref.read(supabaseProvider).auth.currentUser;
       if (user != null) {
-        await ref.read(supabaseProvider).from('users').update({
-          'avatar_id': _avatarId,
-        }).eq('id', user.id);
+        await ref
+            .read(supabaseProvider)
+            .from('users')
+            .update({'avatar_id': _avatarId})
+            .eq('id', user.id);
       }
 
       if (!mounted) return;
       setState(() => _isLoading = false);
 
       ref.invalidate(dashboardSummaryProvider);
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('บันทึกข้อมูลสำเร็จ'),
@@ -120,64 +125,82 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void _confirmLogout() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.bgElevated,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text('ยืนยันออกจากระบบ', style: TextStyle(color: Colors.white)),
-        content: const Text(
-          'คุณต้องการออกจากระบบใช่หรือไม่?',
-          style: TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('ยกเลิก', style: TextStyle(color: Colors.white54)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.brandPrimary,
-              foregroundColor: Colors.white,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: AppTheme.bgElevated,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
             ),
-            onPressed: () async {
-              Navigator.pop(context);
-              await ref.read(authRepositoryProvider).logout();
-            },
-            child: const Text('ออกจากระบบ'),
+            title: const Text(
+              'ยืนยันออกจากระบบ',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: const Text(
+              'คุณต้องการออกจากระบบใช่หรือไม่?',
+              style: TextStyle(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'ยกเลิก',
+                  style: TextStyle(color: Colors.white54),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.brandPrimary,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await ref.read(authRepositoryProvider).logout();
+                },
+                child: const Text('ออกจากระบบ'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   void _confirmDeleteAccount() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.bgElevated,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text('ยืนยันการลบบัญชี', style: TextStyle(color: AppTheme.errorBase)),
-        content: const Text(
-          'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชี? ข้อมูลทั้งหมดของคุณจะถูกลบและไม่สามารถกู้คืนได้',
-          style: TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('ยกเลิก', style: TextStyle(color: Colors.white54)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.errorBase,
-              foregroundColor: Colors.white,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: AppTheme.bgElevated,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
             ),
-            onPressed: () async {
-              Navigator.pop(context);
-              await ref.read(authRepositoryProvider).deleteAccount();
-            },
-            child: const Text('ลบถาวร'),
+            title: const Text(
+              'ยืนยันการลบบัญชี',
+              style: TextStyle(color: AppTheme.errorBase),
+            ),
+            content: const Text(
+              'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชี? ข้อมูลทั้งหมดของคุณจะถูกลบและไม่สามารถกู้คืนได้',
+              style: TextStyle(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'ยกเลิก',
+                  style: TextStyle(color: Colors.white54),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.errorBase,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await ref.read(authRepositoryProvider).deleteAccount();
+                },
+                child: const Text('ลบถาวร'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -194,7 +217,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('เลือกอวตาร์ของคุณ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+              const Text(
+                'เลือกอวตาร์ของคุณ',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
               const SizedBox(height: 16),
               Wrap(
                 spacing: 16,
@@ -212,14 +242,29 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: _avatarId == id ? AppTheme.brandPrimary : Colors.transparent,
+                          color:
+                              _avatarId == id
+                                  ? AppTheme.brandPrimary
+                                  : Colors.transparent,
                           width: 2,
                         ),
                       ),
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundColor: _avatarId == id ? AppTheme.brandPrimary.withValues(alpha: 0.2) : Colors.white10,
-                        child: Text('A$id', style: TextStyle(color: _avatarId == id ? AppTheme.brandPrimary : Colors.white54, fontWeight: FontWeight.bold)),
+                        backgroundColor:
+                            _avatarId == id
+                                ? AppTheme.brandPrimary.withValues(alpha: 0.2)
+                                : Colors.white10,
+                        child: Text(
+                          'A$id',
+                          style: TextStyle(
+                            color:
+                                _avatarId == id
+                                    ? AppTheme.brandPrimary
+                                    : Colors.white54,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   );
@@ -250,159 +295,253 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: _isFetching
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.brandPrimary))
-          : Form(
-              key: _formKey,
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                children: [
-                  Center(
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundColor: AppTheme.bgElevated,
-                          child: Text('A$_avatarId', style: const TextStyle(fontSize: 32, color: AppTheme.brandPrimary, fontWeight: FontWeight.bold)),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: _showAvatarPicker,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
+      body:
+          _isFetching
+              ? const Center(
+                child: CircularProgressIndicator(color: AppTheme.brandPrimary),
+              )
+              : Form(
+                key: _formKey,
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  children: [
+                    Center(
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundColor: AppTheme.bgElevated,
+                            child: Text(
+                              'A$_avatarId',
+                              style: const TextStyle(
+                                fontSize: 32,
                                 color: AppTheme.brandPrimary,
-                                shape: BoxShape.circle,
+                                fontWeight: FontWeight.bold,
                               ),
-                              child: const Icon(Icons.edit, size: 20, color: Colors.white),
                             ),
                           ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: _showAvatarPicker,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: const BoxDecoration(
+                                  color: AppTheme.brandPrimary,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.edit,
+                                  size: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ).animate().scale(
+                      duration: 400.ms,
+                      curve: Curves.easeOutBack,
+                    ),
+                    const SizedBox(height: 32),
+                    const Text(
+                      'ข้อมูลสุขภาพ',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ).animate().fade(duration: 400.ms).slideY(begin: 0.2),
+                    const SizedBox(height: 16),
+                    PremiumTextField(
+                      controller: _weightCtrl,
+                      label: 'น้ำหนัก (kg)',
+                      prefixIcon: Icons.monitor_weight_outlined,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                    ).animate().fade(duration: 500.ms).slideY(begin: 0.2),
+                    const SizedBox(height: 16),
+                    PremiumTextField(
+                      controller: _heightCtrl,
+                      label: 'ส่วนสูง (cm)',
+                      prefixIcon: Icons.height_outlined,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                    ).animate().fade(duration: 600.ms).slideY(begin: 0.2),
+                    const SizedBox(height: 16),
+                    PremiumDropdownField<String>(
+                      label: 'เพศ',
+                      value: _selectedGender,
+                      prefixIcon: Icons.person_outline,
+                      items: const [
+                        DropdownMenuItem(value: 'male', child: Text('ชาย')),
+                        DropdownMenuItem(value: 'female', child: Text('หญิง')),
+                      ],
+                      onChanged:
+                          (val) => setState(() => _selectedGender = val!),
+                    ).animate().fade(duration: 700.ms).slideY(begin: 0.2),
+                    const SizedBox(height: 16),
+                    PremiumDropdownField<String>(
+                      label: 'ระยะโรคไต (CKD Stage)',
+                      value: _selectedStage,
+                      prefixIcon: Icons.medical_services_outlined,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'stage_1',
+                          child: Text('ระยะที่ 1'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'stage_2',
+                          child: Text('ระยะที่ 2'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'stage_3a',
+                          child: Text('ระยะที่ 3a'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'stage_3b',
+                          child: Text('ระยะที่ 3b'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'stage_4',
+                          child: Text('ระยะที่ 4'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'stage_5',
+                          child: Text('ระยะที่ 5 (ฟอกไต)'),
                         ),
                       ],
-                    ),
-                  ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
-                  const SizedBox(height: 32),
-                  const Text('ข้อมูลสุขภาพ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white))
-                      .animate().fade(duration: 400.ms).slideY(begin: 0.2),
-                  const SizedBox(height: 16),
-                  PremiumTextField(
-                    controller: _weightCtrl,
-                    label: 'น้ำหนัก (kg)',
-                    prefixIcon: Icons.monitor_weight_outlined,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  ).animate().fade(duration: 500.ms).slideY(begin: 0.2),
-                  const SizedBox(height: 16),
-                  PremiumTextField(
-                    controller: _heightCtrl,
-                    label: 'ส่วนสูง (cm)',
-                    prefixIcon: Icons.height_outlined,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  ).animate().fade(duration: 600.ms).slideY(begin: 0.2),
-                  const SizedBox(height: 16),
-                  PremiumDropdownField<String>(
-                    label: 'เพศ',
-                    value: _selectedGender,
-                    prefixIcon: Icons.person_outline,
-                    items: const [
-                      DropdownMenuItem(value: 'male', child: Text('ชาย')),
-                      DropdownMenuItem(value: 'female', child: Text('หญิง')),
-                    ],
-                    onChanged: (val) => setState(() => _selectedGender = val!),
-                  ).animate().fade(duration: 700.ms).slideY(begin: 0.2),
-                  const SizedBox(height: 16),
-                  PremiumDropdownField<String>(
-                    label: 'ระยะโรคไต (CKD Stage)',
-                    value: _selectedStage,
-                    prefixIcon: Icons.medical_services_outlined,
-                    items: const [
-                      DropdownMenuItem(value: 'stage_1', child: Text('ระยะที่ 1')),
-                      DropdownMenuItem(value: 'stage_2', child: Text('ระยะที่ 2')),
-                      DropdownMenuItem(value: 'stage_3a', child: Text('ระยะที่ 3a')),
-                      DropdownMenuItem(value: 'stage_3b', child: Text('ระยะที่ 3b')),
-                      DropdownMenuItem(value: 'stage_4', child: Text('ระยะที่ 4')),
-                      DropdownMenuItem(value: 'stage_5', child: Text('ระยะที่ 5 (ฟอกไต)')),
-                    ],
-                    onChanged: (val) => setState(() => _selectedStage = val!),
-                  ).animate().fade(duration: 800.ms).slideY(begin: 0.2),
-                  const SizedBox(height: 32),
-                  _isLoading
-                      ? const Center(child: CircularProgressIndicator(color: AppTheme.brandPrimary))
-                      : Container(
-                          width: double.infinity,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            gradient: const LinearGradient(
-                              colors: [AppTheme.brandPrimary, AppTheme.brandAccent],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.brandPrimary.withValues(alpha: 0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
+                      onChanged: (val) => setState(() => _selectedStage = val!),
+                    ).animate().fade(duration: 800.ms).slideY(begin: 0.2),
+                    const SizedBox(height: 32),
+                    _isLoading
+                        ? const Center(
+                          child: CircularProgressIndicator(
+                            color: AppTheme.brandPrimary,
                           ),
-                          child: ElevatedButton(
-                            onPressed: _saveProfile,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
+                        )
+                        : Container(
+                              width: double.infinity,
+                              height: 56,
+                              decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(30),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    AppTheme.brandPrimary,
+                                    AppTheme.brandAccent,
+                                  ],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppTheme.brandPrimary.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                            ),
-                            child: const Text(
-                              'บันทึกข้อมูลสุขภาพ',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                            ),
-                          ),
-                        ).animate().fade(duration: 900.ms).scale(begin: const Offset(0.95, 0.95)),
-                  const SizedBox(height: 32),
-                  const Divider(color: Colors.white10).animate().fade(duration: 1000.ms),
-                  const SizedBox(height: 16),
-                  const Text('การตั้งค่าบัญชี', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white))
-                      .animate().fade(duration: 1000.ms),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: _changePassword,
-                    icon: const Icon(Icons.lock_reset, color: Colors.white70),
-                    label: const Text('เปลี่ยนรหัสผ่าน', style: TextStyle(color: Colors.white)),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: Colors.white24),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                    ),
-                  ).animate().fade(duration: 1100.ms).slideY(begin: 0.2),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: _confirmLogout,
-                    icon: const Icon(Icons.logout_rounded, color: Colors.white),
-                    label: const Text('ออกจากระบบ', style: TextStyle(color: Colors.white)),
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.white10,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide.none,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                    ),
-                  ).animate().fade(duration: 1200.ms).slideY(begin: 0.2),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: _confirmDeleteAccount,
-                    icon: const Icon(Icons.delete_forever, color: AppTheme.errorBase),
-                    label: const Text('ลบบัญชีผู้ใช้', style: TextStyle(color: AppTheme.errorBase)),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: AppTheme.errorBase),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                    ),
-                  ).animate().fade(duration: 1300.ms).slideY(begin: 0.2),
-                  const SizedBox(height: 32),
-                ],
+                              child: ElevatedButton(
+                                onPressed: _saveProfile,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'บันทึกข้อมูลสุขภาพ',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            )
+                            .animate()
+                            .fade(duration: 900.ms)
+                            .scale(begin: const Offset(0.95, 0.95)),
+                    const SizedBox(height: 32),
+                    const Divider(
+                      color: Colors.white10,
+                    ).animate().fade(duration: 1000.ms),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'การตั้งค่าบัญชี',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ).animate().fade(duration: 1000.ms),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: _changePassword,
+                      icon: const Icon(Icons.lock_reset, color: Colors.white70),
+                      label: const Text(
+                        'เปลี่ยนรหัสผ่าน',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: const BorderSide(color: Colors.white24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ).animate().fade(duration: 1100.ms).slideY(begin: 0.2),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: _confirmLogout,
+                      icon: const Icon(
+                        Icons.logout_rounded,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        'ออกจากระบบ',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.white10,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide.none,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ).animate().fade(duration: 1200.ms).slideY(begin: 0.2),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: _confirmDeleteAccount,
+                      icon: const Icon(
+                        Icons.delete_forever,
+                        color: AppTheme.errorBase,
+                      ),
+                      label: const Text(
+                        'ลบบัญชีผู้ใช้',
+                        style: TextStyle(color: AppTheme.errorBase),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: const BorderSide(color: AppTheme.errorBase),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ).animate().fade(duration: 1300.ms).slideY(begin: 0.2),
+                    const SizedBox(height: 32),
+                  ],
+                ),
               ),
-            ),
     );
   }
 }

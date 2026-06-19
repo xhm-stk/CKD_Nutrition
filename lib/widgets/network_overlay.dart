@@ -16,8 +16,9 @@ class NetworkOverlay extends ConsumerWidget {
 
     return connectivityAsync.when(
       data: (results) {
-        final isOffline = results.contains(ConnectivityResult.none) || results.isEmpty;
-        
+        final isOffline =
+            results.contains(ConnectivityResult.none) || results.isEmpty;
+
         // ถ้าออนไลน์, ผู้ใช้กดเข้าสู่โหมดออฟไลน์แล้ว, หรือยังไม่ได้ล็อกอิน ให้แสดงแอปปกติ
         if (!isOffline || isOfflineMode || supabase.auth.currentUser == null) {
           return child;
@@ -28,7 +29,9 @@ class NetworkOverlay extends ConsumerWidget {
             child, // พื้นหลังคือแอปเดิม
             // ตัวบล็อกหน้าจอ
             Container(
-              color: Colors.black.withValues(alpha: 0.8), // จำลองสีพื้นหลังตอนขึ้น Dialog
+              color: Colors.black.withValues(
+                alpha: 0.8,
+              ), // จำลองสีพื้นหลังตอนขึ้น Dialog
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -51,17 +54,21 @@ class NetworkOverlay extends ConsumerWidget {
                           const SizedBox(height: 16),
                           Text(
                             'ไม่มีการเชื่อมต่ออินเทอร์เน็ต',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 12),
                           Text(
                             'กรุณาตรวจสอบอินเทอร์เน็ตของคุณ\nหากต้องการดูข้อมูลเดิมสามารถเข้าสู่โหมดออฟไลน์ได้',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                ),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 24),
@@ -83,7 +90,8 @@ class NetworkOverlay extends ConsumerWidget {
                             child: OutlinedButton(
                               onPressed: () {
                                 // ปลดล็อกเข้าโหมดออฟไลน์
-                                ref.read(offlineModeProvider.notifier).state = true;
+                                ref.read(offlineModeProvider.notifier).state =
+                                    true;
                               },
                               child: const Text('ทำงานแบบออฟไลน์'),
                             ),
@@ -98,14 +106,11 @@ class NetworkOverlay extends ConsumerWidget {
           ],
         );
       },
-      loading: () => Stack(
-        children: [
-          child,
-          const Center(child: CircularProgressIndicator()),
-        ],
-      ),
+      loading:
+          () => Stack(
+            children: [child, const Center(child: CircularProgressIndicator())],
+          ),
       error: (e, st) => child,
     );
   }
 }
-

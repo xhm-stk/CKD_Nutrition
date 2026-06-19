@@ -25,7 +25,11 @@ class AppTheme {
   static const double radiusLarge = 32.0;
 
   // === Typography Tokens ===
-  static TextTheme _buildTextTheme(TextTheme base, Color textColor, Color subtitleColor) {
+  static TextTheme _buildTextTheme(
+    TextTheme base,
+    Color textColor,
+    Color subtitleColor,
+  ) {
     return GoogleFonts.promptTextTheme(base).copyWith(
       displayLarge: GoogleFonts.prompt(
         fontSize: 32,
@@ -74,9 +78,11 @@ class AppTheme {
     final base = ThemeData.light(useMaterial3: true);
     return base.copyWith(
       colorScheme: lightColorScheme,
-      scaffoldBackgroundColor: const Color(0xFFF1F5F9), // Slate 100 for light bg
+      scaffoldBackgroundColor: const Color(
+        0xFFF1F5F9,
+      ), // Slate 100 for light bg
       textTheme: _buildTextTheme(
-        base.textTheme, 
+        base.textTheme,
         const Color(0xFF0F172A), // Slate 900 for high emphasis
         const Color(0xFF475569), // Slate 600 for medium emphasis
       ),

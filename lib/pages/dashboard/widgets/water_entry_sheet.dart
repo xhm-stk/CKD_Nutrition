@@ -48,14 +48,14 @@ class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
             children: [
               Text(
                 'บันทึกปริมาณน้ำ',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
                 icon: const Icon(Icons.close),
-              )
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -99,30 +99,36 @@ class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
               ),
               const SizedBox(width: 12),
               FilledButton(
-                onPressed: _isLoading
-                    ? null
-                    : () {
-                        final val = int.tryParse(_customMlCtrl.text.trim()) ?? 0;
-                        if (val > 0) {
-                          _submit(val);
-                        }
-                      },
+                onPressed:
+                    _isLoading
+                        ? null
+                        : () {
+                          final val =
+                              int.tryParse(_customMlCtrl.text.trim()) ?? 0;
+                          if (val > 0) {
+                            _submit(val);
+                          }
+                        },
                 style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 24,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text('บันทึก'),
+                child:
+                    _isLoading
+                        ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                        : const Text('บันทึก'),
               ),
             ],
           ),
@@ -133,13 +139,14 @@ class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
 
   Widget _buildQuickButton(int ml) {
     return ActionChip(
-      label: Text('+ $ml ml', style: const TextStyle(fontWeight: FontWeight.bold)),
+      label: Text(
+        '+ $ml ml',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
       backgroundColor: Colors.blue.shade100,
       labelStyle: TextStyle(color: Colors.blue.shade900),
       side: BorderSide.none,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       onPressed: _isLoading ? null : () => _submit(ml),
     );
   }

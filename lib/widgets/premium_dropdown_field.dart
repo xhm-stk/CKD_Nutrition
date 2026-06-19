@@ -45,7 +45,10 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: _isFocused ? FontWeight.w500 : FontWeight.w300,
-              color: _isFocused ? AppTheme.brandPrimary : Colors.white.withValues(alpha: 0.6),
+              color:
+                  _isFocused
+                      ? AppTheme.brandPrimary
+                      : Colors.white.withValues(alpha: 0.6),
             ),
             child: Text(widget.label),
           ),
@@ -60,15 +63,16 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>> {
                 color: borderColor,
                 width: _isFocused ? 1.5 : 1.0,
               ),
-              boxShadow: _isFocused
-                  ? [
-                      BoxShadow(
-                        color: AppTheme.brandPrimary.withValues(alpha: 0.15),
-                        blurRadius: 16,
-                        spreadRadius: 2,
-                      ),
-                    ]
-                  : [],
+              boxShadow:
+                  _isFocused
+                      ? [
+                        BoxShadow(
+                          color: AppTheme.brandPrimary.withValues(alpha: 0.15),
+                          blurRadius: 16,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                      : [],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(30.0),
@@ -79,17 +83,35 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>> {
                 onChanged: (val) {
                   widget.onChanged(val);
                 },
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white.withValues(alpha: 0.4)),
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.white.withValues(alpha: 0.4),
+                ),
                 dropdownColor: AppTheme.bgElevated,
                 style: const TextStyle(color: Colors.white, fontSize: 16),
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide.none),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide.none),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide.none),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
                   prefixIcon: Icon(
                     widget.prefixIcon,
-                    color: _isFocused ? AppTheme.brandPrimary : Colors.white.withValues(alpha: 0.4),
+                    color:
+                        _isFocused
+                            ? AppTheme.brandPrimary
+                            : Colors.white.withValues(alpha: 0.4),
                   ),
                 ),
               ),

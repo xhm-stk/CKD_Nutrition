@@ -99,48 +99,62 @@ class AddActionSheet extends ConsumerWidget {
               color: Colors.lightBlue,
               onTap: () {
                 Navigator.pop(context); // ปิด ActionSheet ก่อน
-                
+
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
                   ),
-                  builder: (ctx) => WaterEntrySheet(
-                    onSave: (ml) async {
-                      final food = FoodItem()
-                        ..foodId = 'quick_water'
-                        ..name = 'น้ำเปล่า'
-                        ..waterMl = ml.toDouble()
-                        ..proteinG = 0
-                        ..sodiumMg = 0
-                        ..potassiumMg = 0
-                        ..phosphorusMg = 0
-                        ..sugarG = 0
-                        ..carbG = 0;
+                  builder:
+                      (ctx) => WaterEntrySheet(
+                        onSave: (ml) async {
+                          final food =
+                              FoodItem()
+                                ..foodId = 'quick_water'
+                                ..name = 'น้ำเปล่า'
+                                ..waterMl = ml.toDouble()
+                                ..proteinG = 0
+                                ..sodiumMg = 0
+                                ..potassiumMg = 0
+                                ..phosphorusMg = 0
+                                ..sugarG = 0
+                                ..carbG = 0;
 
-                      final result = await ref.read(mealControllerProvider).logMeal(
-                        food: food,
-                        quantityG: ml.toDouble(),
-                        mealType: 'snack',
-                      );
-                      
-                      if (context.mounted) {
-                        switch (result) {
-                          case Success():
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('บันทึกดื่มน้ำ +$ml ml เรียบร้อยแล้ว')),
-                            );
-                            ref.invalidate(dashboardSummaryProvider);
-                            ref.invalidate(todayMealsProvider);
-                          case Failure(:final userMessage):
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('บันทึกผิดพลาด: $userMessage')),
-                            );
-                        }
-                      }
-                    },
-                  ),
+                          final result = await ref
+                              .read(mealControllerProvider)
+                              .logMeal(
+                                food: food,
+                                quantityG: ml.toDouble(),
+                                mealType: 'snack',
+                              );
+
+                          if (context.mounted) {
+                            switch (result) {
+                              case Success():
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'บันทึกดื่มน้ำ +$ml ml เรียบร้อยแล้ว',
+                                    ),
+                                  ),
+                                );
+                                ref.invalidate(dashboardSummaryProvider);
+                                ref.invalidate(todayMealsProvider);
+                              case Failure(:final userMessage):
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'บันทึกผิดพลาด: $userMessage',
+                                    ),
+                                  ),
+                                );
+                            }
+                          }
+                        },
+                      ),
                 );
               },
             ),
