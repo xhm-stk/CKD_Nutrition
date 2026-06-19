@@ -32,14 +32,15 @@ class FakeMealRepository implements MealRepository {
   }
 
   @override
-  Future<Result<List<Meal>>> getTodayMeals() async {
+  Future<Result<List<Meal>>> getMealsByDate(String dateStr) async {
     return Success([]);
   }
 
   @override
-  Future<List<Meal>> getTodayMealsWithProjection(
+  Future<List<Meal>> getMealsWithProjection(
     dynamic isar,
     dynamic prefs,
+    String dateStr,
   ) async {
     return [];
   }

@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter/foundation.dart';
 import '../models/isar/offline_action.dart';
+import '../main.dart'; // To access rootScaffoldMessengerKey
 
 class OfflineSyncWorker {
   final Isar _isar;
@@ -48,19 +49,36 @@ class OfflineSyncWorker {
     _processQueue();
   }
 
+  void _showSnackBar(String message, {Color color = Colors.green}) {
+    final messenger = rootScaffoldMessengerKey.currentState;
+    if (messenger != null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: color,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   /// เริ่มกระบวนการเคลียร์คิว (FIFO - First In, First Out)
   Future<void> _processQueue() async {
     if (_isSyncing) return; // ป้องกันการซิงก์ซ้อนทับกัน
+
+    // เช็คว่ามีคิวเหลือไหมก่อนเริ่ม
+    final pendingCount = await _isar.offlineActions.count();
+    if (pendingCount == 0) return;
+
     _isSyncing = true;
+    _showSnackBar('กำลังส่งข้อมูลออฟไลน์ไปเก็บ...', color: Colors.amber.shade800);
 
     try {
       // ดึงคิวทั้งหมดเรียงจากเก่าไปใหม่
-      final actions =
-          await _isar.offlineActions.where().sortByCreatedAt().findAll();
+      final actions = await _isar.offlineActions.where().sortByCreatedAt().findAll();
 
       for (final action in actions) {
         if (action.retryCount >= 5) {
-          // Zombie Action - ลบทิ้งเพื่อไม่ให้ค้างในระบบและกวน Offline Projection
           debugPrint('Dropping Zombie Action: ${action.id} after 5 retries');
           await _isar.writeTxn(() async {
             await _isar.offlineActions.delete(action.id);
@@ -71,21 +89,24 @@ class OfflineSyncWorker {
         final status = await _executeAction(action);
 
         if (status == _SyncStatus.success) {
-          // ถ้าสำเร็จ ลบออกจากคิว
           await _isar.writeTxn(() async {
             await _isar.offlineActions.delete(action.id);
           });
         } else if (status == _SyncStatus.temporaryError) {
-          // ถ้าเน็ตพัง ให้หยุดลูปทันที ไม่ต้องทำ action อื่นต่อ และไม่ต้องนับ retry
+          // ถ้าเน็ตพัง ให้หยุดลูปทันที
           break;
         } else {
-          // ถ้าเป็น error จากข้อมูลพัง (Permanent) ให้นับ retry
           await _isar.writeTxn(() async {
             action.retryCount += 1;
             action.lastError = 'Sync Failed at ${DateTime.now()}';
             await _isar.offlineActions.put(action);
           });
         }
+      }
+      
+      final remainingCount = await _isar.offlineActions.count();
+      if (remainingCount == 0) {
+        debugPrint('All offline actions synced successfully.');
       }
     } catch (e) {
       debugPrint('Sync Worker Error: $e');

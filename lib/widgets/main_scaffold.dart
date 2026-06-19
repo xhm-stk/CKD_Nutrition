@@ -3,7 +3,11 @@ import 'package:go_router/go_router.dart';
 
 import '../pages/dashboard/widgets/add_action_sheet.dart';
 
-class MainScaffold extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/core_providers.dart';
+import 'package:table_calendar/table_calendar.dart';
+
+class MainScaffold extends ConsumerWidget {
   const MainScaffold({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
@@ -17,55 +21,70 @@ class MainScaffold extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // ปรับโครงสร้างเพื่อรองรับปุ่มใหญ่ตรงกลาง
     return Scaffold(
       body: navigationShell,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => AddActionSheet.show(context),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add, color: Colors.white, size: 32),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
+      bottomNavigationBar: BottomAppBar(
+        elevation: 0, // ลบเงา
+        color: Theme.of(context).scaffoldBackgroundColor, // สีเดียวกับพื้นหลัง
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(context, icon: Icons.home_rounded, label: 'แดชบอร์ด', index: 0),
+            
+            // ปุ่มบวกตรงกลาง (อยู่ระดับเดียวกับเมนูอื่นๆ)
+            InkWell(
+              onTap: () {
+                final selectedDate = ref.read(selectedDateProvider);
+                if (!isSameDay(selectedDate, DateTime.now())) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('คุณสามารถบันทึกอาหารได้เฉพาะวันที่ปัจจุบันเท่านั้น')),
+                  );
+                  return;
+                }
+                AddActionSheet.show(context);
+              },
+              customBorder: const CircleBorder(),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary, // สีเดียวกับธีมแอป
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.add, color: Colors.white, size: 28),
+              ),
+            ),
+            
+            _buildNavItem(context, icon: Icons.person_rounded, label: 'บัญชี', index: 1), // เปลี่ยนจาก index 2 เป็น 1
+          ],
         ),
-        child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: Colors.teal.shade700,
-          unselectedItemColor: Colors.grey.shade400,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          currentIndex: navigationShell.currentIndex,
-          onTap: (index) {
-            // เนื่องจากเรามีปุ่ม FAB ตรงกลาง ทำให้เราต้องคำนวณ Index ข้าม
-            // แท็บมี 4 อัน: 0(Dashboard), 1(Diary), 2(Food), 3(Account)
-            _goBranch(index);
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded),
-              label: 'แดชบอร์ด',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month_rounded),
-              label: 'ไดอารี่',
-            ),
-            // ช่องว่างตรงกลางสำหรับ FAB
-            // BottomNavigationBarItem(icon: Icon(Icons.clear, color: Colors.transparent), label: ''),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu_book_rounded),
-              label: 'รายการอาหาร',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_rounded),
-              label: 'บัญชี',
+      ),
+    );
+  }
+
+  Widget _buildNavItem(BuildContext context, {required IconData icon, required String label, required int index}) {
+    final isSelected = navigationShell.currentIndex == index;
+    final color = isSelected ? Theme.of(context).colorScheme.primary : Colors.grey.shade500;
+    return InkWell(
+      onTap: () => _goBranch(index),
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ],
         ),

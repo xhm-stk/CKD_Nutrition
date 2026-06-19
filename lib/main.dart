@@ -18,6 +18,7 @@ import 'router/app_router.dart';
 import 'providers/auth_providers.dart';
 import 'services/biometric_service.dart';
 import 'theme/app_theme.dart';
+import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // บังคับให้ Flutter สตาร์ท
@@ -95,6 +96,8 @@ void main() async {
   );
 }
 
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
@@ -156,12 +159,13 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     return MaterialApp.router(
       title: 'CKD Nutrition',
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('th'), // ภาษาเริ่มต้นคือไทย
       theme: AppTheme.lightTheme(),
       darkTheme: AppTheme.darkTheme(),
-      themeMode: ThemeMode.dark, // บังคับใช้ Dark Mode 100% ตาม Masterplan
+      themeMode: ref.watch(themeProvider),
       routerConfig: router,
     );
   }

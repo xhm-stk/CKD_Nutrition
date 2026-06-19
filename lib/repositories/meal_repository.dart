@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/supabase/meal.dart';
 import '../models/isar/offline_action.dart';
 import '../services/offline_sync_worker.dart';
-import '../core/utils/date_utils.dart';
+
 import '../core/result.dart';
 
 // (ลบ Provider เก่าออกเพราะย้ายไปอยู่ core_providers.dart แล้ว)
@@ -17,12 +17,10 @@ class MealRepository {
 
   MealRepository(this._sb, this._syncWorker);
 
-  Future<Result<List<Meal>>> getTodayMeals() async {
+  Future<Result<List<Meal>>> getMealsByDate(String dateStr) async {
     try {
       final user = _sb.auth.currentUser;
       if (user == null) return Failure('ผู้ใช้ยังไม่ได้เข้าสู่ระบบ');
-
-      final todayStr = AppDateUtils.getTodayString();
 
       // ดึง daily_log ของวันนี้ก่อนเพื่อเอา log_id
       final logData =
@@ -30,7 +28,7 @@ class MealRepository {
               .from('daily_logs')
               .select('id')
               .eq('user_id', user.id)
-              .eq('log_date', todayStr)
+              .eq('log_date', dateStr)
               .maybeSingle();
 
       if (logData == null) {
@@ -50,7 +48,7 @@ class MealRepository {
       final meals = mealsData.map((e) => Meal.fromJson(e)).toList();
       return Success(meals);
     } catch (e, stack) {
-      debugPrint('🚨 [MealRepository] getTodayMeals failed: $e');
+      debugPrint('🚨 [MealRepository] getMealsByDate failed: $e');
       debugPrint('$stack');
       return Failure('ไม่สามารถดึงข้อมูลมื้ออาหารได้', e);
     }
@@ -145,20 +143,20 @@ class MealRepository {
     }
   }
 
-  Future<List<Meal>> getTodayMealsWithProjection(
+  Future<List<Meal>> getMealsWithProjection(
     Isar isar,
     SharedPreferences prefs,
+    String dateStr,
   ) async {
     final user = _sb.auth.currentUser;
     if (user == null) return [];
 
-    final todayStr = AppDateUtils.getTodayString();
-    final cacheKey = 'meals_${user.id}_$todayStr';
+    final cacheKey = 'meals_${user.id}_$dateStr';
 
     List<Meal> baseMeals = [];
 
     try {
-      final result = await getTodayMeals();
+      final result = await getMealsByDate(dateStr);
       switch (result) {
         case Success(:final data):
           baseMeals = data;
