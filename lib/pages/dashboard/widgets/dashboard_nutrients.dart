@@ -108,8 +108,9 @@ class DashboardNutrientsWidget extends StatelessWidget {
             crossAxisCount: 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 0.55, // ปรับให้เหมาะกับวงกลม + ตัวเลข + ข้อความ
-            mainAxisSpacing: 16,
+            childAspectRatio: 0.85, // ปรับให้กระชับขึ้น
+            mainAxisSpacing: 8, // ลดระยะห่างแนวตั้ง
+            crossAxisSpacing: 4, // ลดระยะห่างแนวนอน
             children: List.generate(displayQuotas.length, (index) {
               final q = displayQuotas[index];
               final style = _getNutrientStyle(q.label, isDark);
@@ -127,18 +128,18 @@ class DashboardNutrientsWidget extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CircularPercentIndicator(
-                    radius: 38.0,
+                    radius: 34.0, // ย่อวงแหวนลงเล็กน้อย
                     lineWidth: 4.0,
                     animation: true,
                     animationDuration: 1200,
                     percent: percent,
                     center: CircleAvatar(
-                      radius: 28,
+                      radius: 24, // ย่อวงกลมด้านใน
                       backgroundColor: style['bg'] as Color,
                       child: Icon(
                         style['icon'] as IconData,
                         color: style['color'] as Color,
-                        size: 28,
+                        size: 24, // ย่อไอคอน
                       ),
                     ),
                     circularStrokeCap: CircularStrokeCap.round,

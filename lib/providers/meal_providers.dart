@@ -3,6 +3,7 @@ import '../models/supabase/meal.dart';
 import '../repositories/meal_repository.dart';
 import '../controllers/meal_controller.dart';
 import 'core_providers.dart'; // To access supabaseProvider, isarProvider, offlineSyncWorkerProvider, sharedPreferencesProvider
+import '../core/utils/date_utils.dart';
 
 final mealRepositoryProvider = Provider<MealRepository>((ref) {
   return MealRepository(
@@ -19,7 +20,11 @@ final todayMealsProvider = FutureProvider.autoDispose<List<Meal>>((ref) async {
   final repo = ref.watch(mealRepositoryProvider);
   final isar = ref.watch(isarProvider);
   final prefs = ref.watch(sharedPreferencesProvider);
-  return repo.getTodayMealsWithProjection(isar, prefs);
+  
+  final selectedDate = ref.watch(selectedDateProvider);
+  final dateStr = AppDateUtils.formatDate(selectedDate);
+  
+  return repo.getMealsWithProjection(isar, prefs, dateStr);
 });
 
 final mealPlannerProvider = FutureProvider.autoDispose<List<dynamic>>((
@@ -32,7 +37,6 @@ final mealPlannerProvider = FutureProvider.autoDispose<List<dynamic>>((
   // เรียกใช้ RPC recommend_meals ที่ Backend Architect เขียนไว้
   final response = await sb.rpc(
     'recommend_meals',
-    params: {'p_user_id': user.id},
   );
   return response as List<dynamic>;
 });
@@ -47,7 +51,6 @@ final monthlySummaryProvider = FutureProvider.autoDispose
         'get_monthly_summary',
         params: {
           'target_month': targetMonth.toIso8601String().substring(0, 10),
-          'target_user_id': user.id,
         },
       );
       return response as List<dynamic>;

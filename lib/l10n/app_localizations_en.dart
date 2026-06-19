@@ -15,8 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeTitle => 'Welcome to CKD Nutrition';
 
   @override
-  String get welcomeSubtitle =>
-      'Track your nutrition to care for your kidney health';
+  String get welcomeSubtitle => 'Track your nutrition to care for your kidney health';
 
   @override
   String get login => 'Sign In';

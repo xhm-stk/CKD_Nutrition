@@ -22,6 +22,7 @@ subprojects {
                 val fallback = if (group.isNotEmpty()) group else "com.example.${project.name.replace("-", "_")}"
                 android.javaClass.getMethod("setNamespace", String::class.java).invoke(android, fallback)
             }
+            android.javaClass.getMethod("setCompileSdkVersion", Int::class.java).invoke(android, 36)
         }
     }
     project.evaluationDependsOn(":app")

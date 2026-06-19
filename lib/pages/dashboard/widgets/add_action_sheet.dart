@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/result.dart';
+import '../../../models/isar/food_item.dart';
+import '../../../providers/core_providers.dart';
+import '../../../providers/meal_providers.dart';
+import 'water_entry_sheet.dart';
 
-class AddActionSheet extends StatelessWidget {
+class AddActionSheet extends ConsumerWidget {
   const AddActionSheet({super.key});
 
   static void show(BuildContext context) {
@@ -14,7 +20,7 @@ class AddActionSheet extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       decoration: const BoxDecoration(
@@ -63,46 +69,13 @@ class AddActionSheet extends StatelessWidget {
             // ปุ่มตัวเลือกต่างๆ
             _buildActionItem(
               context,
-              icon: Icons.qr_code_scanner_rounded,
-              title: 'สแกนบาร์โค้ด',
-              subtitle: 'ค้นหาจากฐานข้อมูลสินค้าสำเร็จรูป',
-              color: Colors.teal,
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('ฟีเจอร์สแกนบาร์โค้ดกำลังพัฒนา'),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildActionItem(
-              context,
               icon: Icons.restaurant_menu_rounded,
               title: 'เพิ่มเมนูจากแอป',
               subtitle: 'เลือกจากรายการอาหารสุขภาพในแอป',
               color: Colors.orange,
               onTap: () {
                 Navigator.pop(context);
-                // อาจจะลิงก์ไปหน้า Food Tab
-                context.go('/food');
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildActionItem(
-              context,
-              icon: Icons.camera_alt_rounded,
-              title: 'วิเคราะห์จากรูปภาพ',
-              subtitle: 'ใช้ AI ช่วยประเมินสารอาหารจากภาพถ่าย',
-              color: Colors.purple,
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('ฟีเจอร์ AI วิเคราะห์ภาพกำลังพัฒนา'),
-                  ),
-                );
+                context.push('/food-search');
               },
             ),
             const SizedBox(height: 16),
@@ -115,6 +88,60 @@ class AddActionSheet extends StatelessWidget {
               onTap: () {
                 Navigator.pop(context);
                 context.push('/food-add');
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildActionItem(
+              context,
+              icon: Icons.water_drop_rounded,
+              title: 'บันทึกดื่มน้ำ',
+              subtitle: 'บันทึกปริมาณน้ำที่ดื่ม',
+              color: Colors.lightBlue,
+              onTap: () {
+                Navigator.pop(context); // ปิด ActionSheet ก่อน
+                
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  builder: (ctx) => WaterEntrySheet(
+                    onSave: (ml) async {
+                      final food = FoodItem()
+                        ..foodId = 'quick_water'
+                        ..name = 'น้ำเปล่า'
+                        ..waterMl = ml.toDouble()
+                        ..proteinG = 0
+                        ..sodiumMg = 0
+                        ..potassiumMg = 0
+                        ..phosphorusMg = 0
+                        ..sugarG = 0
+                        ..carbG = 0;
+
+                      final result = await ref.read(mealControllerProvider).logMeal(
+                        food: food,
+                        quantityG: ml.toDouble(),
+                        mealType: 'snack',
+                      );
+                      
+                      if (context.mounted) {
+                        switch (result) {
+                          case Success():
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('บันทึกดื่มน้ำ +$ml ml เรียบร้อยแล้ว')),
+                            );
+                            ref.invalidate(dashboardSummaryProvider);
+                            ref.invalidate(todayMealsProvider);
+                          case Failure(:final userMessage):
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('บันทึกผิดพลาด: $userMessage')),
+                            );
+                        }
+                      }
+                    },
+                  ),
+                );
               },
             ),
           ],

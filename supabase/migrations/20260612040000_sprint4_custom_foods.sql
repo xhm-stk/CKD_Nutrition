@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS public.custom_foods (
 -- 3. Row Level Security (RLS) for Custom Foods
 ALTER TABLE public.custom_foods ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can manage their own custom foods" ON public.custom_foods;
 CREATE POLICY "Users can manage their own custom foods"
     ON public.custom_foods
     FOR ALL

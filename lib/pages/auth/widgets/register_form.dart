@@ -91,11 +91,9 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
     _validateAll();
     if (!_isFormValid()) return;
 
-    // TODO: Ideally we should save the name to Supabase user metadata as well
-    // But for now we just call the existing register controller
     ref
         .read(registerControllerProvider.notifier)
-        .register(_emailCtrl.text.trim(), _passCtrl.text.trim());
+        .register(_emailCtrl.text.trim(), _passCtrl.text.trim(), name: _nameCtrl.text.trim());
   }
 
   Widget _buildPasswordStrengthIndicator() {
