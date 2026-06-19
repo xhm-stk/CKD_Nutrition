@@ -14,10 +14,10 @@ import '../../widgets/meals_list.dart';
 import '../../widgets/offline_banner.dart';
 import '../../models/supabase/daily_log.dart';
 import 'package:intl/intl.dart';
-
 import 'widgets/dashboard_nutrients.dart';
 import 'widgets/ai_planner_card.dart';
 import 'widgets/dashboard_warnings.dart';
+import 'widgets/dashboard_calendar.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -126,6 +126,12 @@ class DashboardPage extends ConsumerWidget {
                         .fade(duration: 500.ms)
                         .slideY(begin: 0.1, curve: Curves.easeOutCubic),
                     const SizedBox(height: 24),
+                    
+                    const DashboardCalendar()
+                        .animate()
+                        .fade(delay: 100.ms, duration: 500.ms)
+                        .slideY(begin: -0.05),
+                    const SizedBox(height: 16),
 
                     const OfflineBanner(),
 

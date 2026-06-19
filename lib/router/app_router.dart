@@ -5,10 +5,9 @@ import '../providers/auth_providers.dart';
 import '../pages/auth/login_page.dart';
 import '../pages/auth/register_page.dart';
 import '../pages/auth/health_setup_page.dart';
+import '../pages/profile/profile_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
-import '../pages/food/food_search_page.dart';
 import '../pages/food/custom_food_page.dart';
-import '../pages/history/history_page.dart';
 import '../pages/history/monthly_summary_page.dart';
 import '../pages/planner/meal_planner_page.dart';
 import '../widgets/main_scaffold.dart';
@@ -57,6 +56,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/food-add',
         builder: (context, state) => const CustomFoodPage(),
       ),
+      GoRoute(
+        path: '/health-setup',
+        builder: (context, state) => const HealthSetupPage(),
+      ),
       // --- ระบบ Bottom Navigation Bar ---
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -73,30 +76,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // Index 1: ไดอารี่ (ประวัติ)
+          // Index 1: บัญชี (โปรไฟล์สุขภาพ)
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/history',
-                builder: (context, state) => const HistoryPage(),
-              ),
-            ],
-          ),
-          // Index 2: รายการอาหาร
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/food-search',
-                builder: (context, state) => const FoodSearchPage(),
-              ),
-            ],
-          ),
-          // Index 3: บัญชี (โปรไฟล์สุขภาพชั่วคราว)
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/health-setup',
-                builder: (context, state) => const HealthSetupPage(),
+                path: '/profile',
+                builder: (context, state) => const ProfilePage(),
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:isar/isar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,6 +63,21 @@ final dashboardUseCaseProvider = Provider<DashboardUseCase>(
 final dashboardSummaryProvider = FutureProvider.autoDispose<DailyLog?>((
   ref,
 ) async {
-  final todayStr = AppDateUtils.getTodayString();
-  return ref.watch(dashboardUseCaseProvider).getSummary(todayStr);
+  final selectedDate = ref.watch(selectedDateProvider);
+  final dateStr = AppDateUtils.formatDate(selectedDate);
+  return ref.watch(dashboardUseCaseProvider).getSummary(dateStr);
+});
+
+// 6. Connectivity Provider
+final connectivityProvider = StreamProvider<List<ConnectivityResult>>((ref) {
+  return Connectivity().onConnectivityChanged;
+});
+
+// 6.1. Offline Mode Toggle Provider
+final offlineModeProvider = StateProvider<bool>((ref) => false);
+
+// 7. Selected Date Provider (For Dashboard & Calendar)
+final selectedDateProvider = StateProvider<DateTime>((ref) {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day);
 });
