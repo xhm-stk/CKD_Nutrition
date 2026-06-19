@@ -124,64 +124,67 @@ class DashboardNutrientsWidget extends StatelessWidget {
               final ringColor =
                   percent >= 1.0 ? AppTheme.errorBase : style['color'] as Color;
 
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularPercentIndicator(
-                    radius: 34.0, // ย่อวงแหวนลงเล็กน้อย
-                    lineWidth: 4.0,
-                    animation: true,
-                    animationDuration: 1200,
-                    percent: percent,
-                    center: CircleAvatar(
-                      radius: 24, // ย่อวงกลมด้านใน
-                      backgroundColor: style['bg'] as Color,
-                      child: Icon(
-                        style['icon'] as IconData,
-                        color: style['color'] as Color,
-                        size: 24, // ย่อไอคอน
-                      ),
-                    ),
-                    circularStrokeCap: CircularStrokeCap.round,
-                    progressColor: ringColor,
-                    backgroundColor:
-                        isDark ? Colors.grey.shade800 : Colors.grey.shade100,
-                  ),
-                  const SizedBox(height: 8),
-                  // Number Ticker
-                  TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: 0, end: q.consumed),
-                    duration: const Duration(milliseconds: 1200),
-                    curve: Curves.easeOutQuart,
-                    builder: (context, value, child) {
-                      return Text(
-                        '${value.toInt()}/${q.limit.toInt()}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.onSurface,
+              return FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularPercentIndicator(
+                      radius: 34.0, // ย่อวงแหวนลงเล็กน้อย
+                      lineWidth: 4.0,
+                      animation: true,
+                      animationDuration: 1200,
+                      percent: percent,
+                      center: CircleAvatar(
+                        radius: 24, // ย่อวงกลมด้านใน
+                        backgroundColor: style['bg'] as Color,
+                        child: Icon(
+                          style['icon'] as IconData,
+                          color: style['color'] as Color,
+                          size: 24, // ย่อไอคอน
                         ),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    q.label,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                      circularStrokeCap: CircularStrokeCap.round,
+                      progressColor: ringColor,
+                      backgroundColor:
+                          isDark ? Colors.grey.shade800 : Colors.grey.shade100,
                     ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    // Number Ticker
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: q.consumed),
+                      duration: const Duration(milliseconds: 1200),
+                      curve: Curves.easeOutQuart,
+                      builder: (context, value, child) {
+                        return Text(
+                          '${value.toInt()}/${q.limit.toInt()}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      q.label,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               );
             }),
           ),
