@@ -71,11 +71,15 @@ class OfflineSyncWorker {
     if (pendingCount == 0) return;
 
     _isSyncing = true;
-    _showSnackBar('กำลังส่งข้อมูลออฟไลน์ไปเก็บ...', color: Colors.amber.shade800);
+    _showSnackBar(
+      'กำลังส่งข้อมูลออฟไลน์ไปเก็บ...',
+      color: Colors.amber.shade800,
+    );
 
     try {
       // ดึงคิวทั้งหมดเรียงจากเก่าไปใหม่
-      final actions = await _isar.offlineActions.where().sortByCreatedAt().findAll();
+      final actions =
+          await _isar.offlineActions.where().sortByCreatedAt().findAll();
 
       for (final action in actions) {
         if (action.retryCount >= 5) {
@@ -103,7 +107,7 @@ class OfflineSyncWorker {
           });
         }
       }
-      
+
       final remainingCount = await _isar.offlineActions.count();
       if (remainingCount == 0) {
         debugPrint('All offline actions synced successfully.');

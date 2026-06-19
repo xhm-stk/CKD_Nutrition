@@ -19,7 +19,8 @@ class AuthRepository {
   Future<Result<void>> login(String email, String password) async {
     try {
       final connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult.contains(ConnectivityResult.none) || connectivityResult.isEmpty) {
+      if (connectivityResult.contains(ConnectivityResult.none) ||
+          connectivityResult.isEmpty) {
         return Failure('ไม่มีอินเทอร์เน็ต กรุณาเชื่อมต่อก่อนเข้าสู่ระบบ');
       }
 
@@ -36,15 +37,20 @@ class AuthRepository {
     }
   }
 
-  Future<Result<void>> register(String email, String password, {String? name}) async {
+  Future<Result<void>> register(
+    String email,
+    String password, {
+    String? name,
+  }) async {
     try {
       final connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult.contains(ConnectivityResult.none) || connectivityResult.isEmpty) {
+      if (connectivityResult.contains(ConnectivityResult.none) ||
+          connectivityResult.isEmpty) {
         return Failure('ไม่มีอินเทอร์เน็ต กรุณาเชื่อมต่อก่อนสมัครสมาชิก');
       }
 
       await _sb.auth.signUp(
-        email: email, 
+        email: email,
         password: password,
         data: name != null ? {'name': name} : null,
       );
@@ -88,7 +94,7 @@ class AuthRepository {
         serverClientId: webClientId,
         clientId: iosClientId,
       );
-      
+
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         return Failure('ยกเลิกการเข้าสู่ระบบด้วย Google');

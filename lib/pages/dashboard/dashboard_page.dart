@@ -126,7 +126,7 @@ class DashboardPage extends ConsumerWidget {
                         .fade(duration: 500.ms)
                         .slideY(begin: 0.1, curve: Curves.easeOutCubic),
                     const SizedBox(height: 24),
-                    
+
                     const DashboardCalendar()
                         .animate()
                         .fade(delay: 100.ms, duration: 500.ms)

@@ -140,7 +140,9 @@ class DashboardWarningsWidget extends StatelessWidget {
                 ),
                 // ปรับไอคอนไฟ ย่อขนาด และเพิ่มแอนิเมชันกระพริบ
                 child: const Text('🔥', style: TextStyle(fontSize: 20))
-                    .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                    .animate(
+                      onPlay: (controller) => controller.repeat(reverse: true),
+                    )
                     .scale(
                       begin: const Offset(1, 1),
                       end: const Offset(1.2, 1.2),

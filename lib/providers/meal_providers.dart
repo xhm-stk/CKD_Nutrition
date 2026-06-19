@@ -20,10 +20,10 @@ final todayMealsProvider = FutureProvider.autoDispose<List<Meal>>((ref) async {
   final repo = ref.watch(mealRepositoryProvider);
   final isar = ref.watch(isarProvider);
   final prefs = ref.watch(sharedPreferencesProvider);
-  
+
   final selectedDate = ref.watch(selectedDateProvider);
   final dateStr = AppDateUtils.formatDate(selectedDate);
-  
+
   return repo.getMealsWithProjection(isar, prefs, dateStr);
 });
 
@@ -35,9 +35,7 @@ final mealPlannerProvider = FutureProvider.autoDispose<List<dynamic>>((
   if (user == null) throw Exception('กรุณาเข้าสู่ระบบ');
 
   // เรียกใช้ RPC recommend_meals ที่ Backend Architect เขียนไว้
-  final response = await sb.rpc(
-    'recommend_meals',
-  );
+  final response = await sb.rpc('recommend_meals');
   return response as List<dynamic>;
 });
 

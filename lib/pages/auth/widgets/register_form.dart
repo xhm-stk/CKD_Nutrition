@@ -93,7 +93,11 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
 
     ref
         .read(registerControllerProvider.notifier)
-        .register(_emailCtrl.text.trim(), _passCtrl.text.trim(), name: _nameCtrl.text.trim());
+        .register(
+          _emailCtrl.text.trim(),
+          _passCtrl.text.trim(),
+          name: _nameCtrl.text.trim(),
+        );
   }
 
   Widget _buildPasswordStrengthIndicator() {
