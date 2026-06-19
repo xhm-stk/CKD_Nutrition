@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../theme/app_theme.dart';
 
+/// ปุ่มหลักแบบพรีเมียม — Emerald Glow Edition
+/// รองรับ: Liquid Scale, Haptic Feedback, Emerald Glow Shadow
 class PremiumPrimaryButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -27,12 +30,12 @@ class _PremiumPrimaryButtonState extends State<PremiumPrimaryButton>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 120),
     );
     _scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 0.95,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
   }
 
   @override
@@ -72,18 +75,19 @@ class _PremiumPrimaryButtonState extends State<PremiumPrimaryButton>
         builder: (context, child) {
           return Transform.scale(
             scale: _scaleAnimation.value,
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               height: 56,
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                 gradient:
                     isDisabled
                         ? const LinearGradient(
-                          colors: [Color(0xFF1E293B), Color(0xFF1E293B)],
+                          colors: [AppTheme.bgElevated, AppTheme.bgElevated],
                         )
                         : const LinearGradient(
-                          colors: [Color(0xFF00E5FF), Color(0xFF00B8D4)],
+                          colors: [AppTheme.brandPrimary, AppTheme.brandAccent],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -92,9 +96,9 @@ class _PremiumPrimaryButtonState extends State<PremiumPrimaryButton>
                         ? []
                         : [
                           BoxShadow(
-                            color: const Color(
-                              0xFF00E5FF,
-                            ).withValues(alpha: 0.3),
+                            color: AppTheme.brandPrimary.withValues(
+                              alpha: 0.35,
+                            ),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),

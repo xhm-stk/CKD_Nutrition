@@ -2,20 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // === Colors Tokens ===
-  static const Color bgBase = Color(
-    0xFF090E17,
-  ); // Void Navy (Background Layer 0)
-  static const Color bgSurface = Color(
-    0xFF131B2B,
-  ); // Obsidian Blue (Card Layer 1)
-  static const Color bgElevated = Color(
-    0xFF1E293B,
-  ); // Slate Navy (Modal Layer 2)
+  // === Colors Tokens (Emerald Green Edition) ===
+  static const Color bgBase = Color(0xFF06120D); // Deep Forest Night
+  static const Color bgSurface = Color(0xFF0B1A13); // Dark Moss
+  static const Color bgElevated = Color(0xFF132A1F); // Elevated Pine
 
-  static const Color brandPrimary = Color(0xFF00E5FF); // Neon Cyan
+  static const Color brandPrimary = Color(0xFF10B981); // Emerald Green
   static const Color brandSecondary = Color(0xFFF59E0B); // Amber Gold
-  static const Color brandAccent = Color(0xFF10B981); // Emerald Green
+  static const Color brandAccent = Color(0xFF34D399); // Mint Light
 
   static const Color textHighEmphasis =
       Colors.white; // opacity adjusted in theme
@@ -24,6 +18,11 @@ class AppTheme {
 
   // Danger/Warning
   static const Color errorBase = Color(0xFFEF4444); // Ruby Red
+
+  // === Shape Tokens ===
+  static const double radiusSmall = 16.0;
+  static const double radiusMedium = 24.0;
+  static const double radiusLarge = 32.0;
 
   // === Typography Tokens ===
   static TextTheme _buildTextTheme(TextTheme base) {
@@ -79,7 +78,7 @@ class AppTheme {
     );
   }
 
-  // === Ultimate Premium Dark Mode ===
+  // === Ultimate Premium Dark Mode (Emerald Edition) ===
   static final darkColorScheme = ColorScheme.dark(
     primary: brandPrimary,
     secondary: brandSecondary,
@@ -114,7 +113,7 @@ class AppTheme {
         color: bgSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(radiusMedium),
           side: BorderSide(
             color: Colors.white.withValues(alpha: 0.05),
             width: 1,
@@ -130,30 +129,29 @@ class AppTheme {
         ),
         hintStyle: GoogleFonts.prompt(fontSize: 14, color: textLowEmphasis),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(radiusMedium),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(radiusMedium),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(radiusMedium),
           borderSide: const BorderSide(color: brandPrimary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(radiusMedium),
           borderSide: const BorderSide(color: errorBase, width: 1.5),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           minimumSize: const Size.fromHeight(56),
-          backgroundColor:
-              brandPrimary, // Will be overridden by custom widgets with gradients
+          backgroundColor: brandPrimary,
           foregroundColor: Colors.black,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(radiusMedium),
           ),
           textStyle: GoogleFonts.prompt(
             fontSize: 18,
