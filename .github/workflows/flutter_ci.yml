@@ -16,12 +16,15 @@ jobs:
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # สแกนหา Secret Key หรือ Password ที่เผลอ Hardcode ทิ้งไว้ใน Source Code
       - name: 🕵️ Gitleaks - Scan for Secrets
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
         continue-on-error: false
 
       - name: 🐦 Setup Flutter SDK
