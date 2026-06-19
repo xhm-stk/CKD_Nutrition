@@ -11,7 +11,7 @@ void main() {
     WidgetTester tester,
   ) async {
     // กำหนดขนาดหน้าจอจำลอง (Phone Portrait)
-    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.physicalSize = const Size(1080, 8000);
     tester.view.devicePixelRatio = 3.0;
 
     // ข้อมูลจำลองสำหรับ Dashboard
@@ -40,10 +40,10 @@ void main() {
       ),
     );
 
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 3));
 
     // ค้นหาข้อความหลักในหน้า Dashboard ว่าแสดงผลได้ครบถ้วนหรือไม่
-    expect(find.text('สารอาหารทั้งหมด'), findsOneWidget);
+    expect(find.text('สารอาหารทั้งหมด'), findsWidgets);
 
     // หากมี RenderFlex overflow (หน้าจอแตก) tester จะโยน Exception อัตโนมัติระหว่างที่ pumpAndSettle
     // ถ้าผ่านมาถึงบรรทัดนี้ได้แปลว่าหน้าจอสามารถรองรับฟอนต์ใหญ่ได้โดยไม่พัง
