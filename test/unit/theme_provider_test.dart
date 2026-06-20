@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({});
-  
+
   test('ThemeProvider initialization', () {
     final container = ProviderContainer();
     final themeMode = container.read(themeProvider);
