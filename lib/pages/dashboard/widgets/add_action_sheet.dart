@@ -115,7 +115,8 @@ class AddActionSheet extends ConsumerWidget {
                               FoodItem()
                                 ..foodId = 'quick_water'
                                 ..name = 'น้ำเปล่า'
-                                ..waterMl = 100.0 // ตั้งค่าเป็น 100ml ต่อ 100g เพื่อให้คำนวณถูกต้อง
+                                ..waterMl =
+                                    100.0 // ตั้งค่าเป็น 100ml ต่อ 100g เพื่อให้คำนวณถูกต้อง
                                 ..proteinG = 0
                                 ..sodiumMg = 0
                                 ..potassiumMg = 0
@@ -131,10 +132,10 @@ class AddActionSheet extends ConsumerWidget {
                                 mealType: 'snack',
                               );
 
-                          if (context.mounted) {
+                          if (ctx.mounted) {
                             switch (result) {
                               case Success():
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                ScaffoldMessenger.of(ctx).showSnackBar(
                                   SnackBar(
                                     content: Text(
                                       'บันทึกดื่มน้ำ +$ml ml เรียบร้อยแล้ว',
@@ -144,7 +145,7 @@ class AddActionSheet extends ConsumerWidget {
                                 ref.invalidate(dashboardSummaryProvider);
                                 ref.invalidate(todayMealsProvider);
                               case Failure(:final userMessage):
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                ScaffoldMessenger.of(ctx).showSnackBar(
                                   SnackBar(
                                     content: Text(
                                       'บันทึกผิดพลาด: $userMessage',

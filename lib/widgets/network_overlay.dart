@@ -17,7 +17,8 @@ class NetworkOverlay extends ConsumerWidget {
     return connectivityAsync.when(
       data: (results) {
         final isOffline =
-            results.every((r) => r == ConnectivityResult.none) || results.isEmpty;
+            results.every((r) => r == ConnectivityResult.none) ||
+            results.isEmpty;
 
         // ถ้าออนไลน์, ผู้ใช้กดเข้าสู่โหมดออฟไลน์แล้ว, หรือยังไม่ได้ล็อกอิน ให้แสดงแอปปกติ
         if (!isOffline || isOfflineMode || supabase.auth.currentUser == null) {
@@ -106,10 +107,7 @@ class NetworkOverlay extends ConsumerWidget {
           ],
         );
       },
-      loading:
-          () => Stack(
-            children: [child, const Center(child: CircularProgressIndicator())],
-          ),
+      loading: () => child,
       error: (e, st) => child,
     );
   }
