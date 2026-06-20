@@ -7,6 +7,7 @@ import '../../../repositories/auth_repository.dart';
 import '../../../widgets/premium_text_field.dart';
 import '../../../widgets/premium_dropdown_field.dart';
 import '../../../theme/app_theme.dart';
+import '../../../widgets/mesh_gradient_background.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -295,253 +296,264 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body:
-          _isFetching
-              ? const Center(
-                child: CircularProgressIndicator(color: AppTheme.brandPrimary),
-              )
-              : Form(
-                key: _formKey,
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
+      body: MeshGradientBackground(
+        child:
+            _isFetching
+                ? const Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.brandPrimary,
                   ),
-                  children: [
-                    Center(
-                      child: Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: AppTheme.bgElevated,
-                            child: Text(
-                              'A$_avatarId',
-                              style: const TextStyle(
-                                fontSize: 32,
-                                color: AppTheme.brandPrimary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap: _showAvatarPicker,
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: const BoxDecoration(
-                                  color: AppTheme.brandPrimary,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.edit,
-                                  size: 20,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ).animate().scale(
-                      duration: 400.ms,
-                      curve: Curves.easeOutBack,
+                )
+                : Form(
+                  key: _formKey,
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
                     ),
-                    const SizedBox(height: 32),
-                    const Text(
-                      'ข้อมูลสุขภาพ',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ).animate().fade(duration: 400.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 16),
-                    PremiumTextField(
-                      controller: _weightCtrl,
-                      label: 'น้ำหนัก (kg)',
-                      prefixIcon: Icons.monitor_weight_outlined,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                    ).animate().fade(duration: 500.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 16),
-                    PremiumTextField(
-                      controller: _heightCtrl,
-                      label: 'ส่วนสูง (cm)',
-                      prefixIcon: Icons.height_outlined,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                    ).animate().fade(duration: 600.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 16),
-                    PremiumDropdownField<String>(
-                      label: 'เพศ',
-                      value: _selectedGender,
-                      prefixIcon: Icons.person_outline,
-                      items: const [
-                        DropdownMenuItem(value: 'male', child: Text('ชาย')),
-                        DropdownMenuItem(value: 'female', child: Text('หญิง')),
-                      ],
-                      onChanged:
-                          (val) => setState(() => _selectedGender = val!),
-                    ).animate().fade(duration: 700.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 16),
-                    PremiumDropdownField<String>(
-                      label: 'ระยะโรคไต (CKD Stage)',
-                      value: _selectedStage,
-                      prefixIcon: Icons.medical_services_outlined,
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'stage_1',
-                          child: Text('ระยะที่ 1'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'stage_2',
-                          child: Text('ระยะที่ 2'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'stage_3a',
-                          child: Text('ระยะที่ 3a'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'stage_3b',
-                          child: Text('ระยะที่ 3b'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'stage_4',
-                          child: Text('ระยะที่ 4'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'stage_5',
-                          child: Text('ระยะที่ 5 (ฟอกไต)'),
-                        ),
-                      ],
-                      onChanged: (val) => setState(() => _selectedStage = val!),
-                    ).animate().fade(duration: 800.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 32),
-                    _isLoading
-                        ? const Center(
-                          child: CircularProgressIndicator(
-                            color: AppTheme.brandPrimary,
-                          ),
-                        )
-                        : Container(
-                              width: double.infinity,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    AppTheme.brandPrimary,
-                                    AppTheme.brandAccent,
-                                  ],
+                    children: [
+                      Center(
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundColor: AppTheme.bgElevated,
+                              child: Text(
+                                'A$_avatarId',
+                                style: const TextStyle(
+                                  fontSize: 32,
+                                  color: AppTheme.brandPrimary,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppTheme.brandPrimary.withValues(
-                                      alpha: 0.3,
-                                    ),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
                               ),
-                              child: ElevatedButton(
-                                onPressed: _saveProfile,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                onTap: _showAvatarPicker,
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: const BoxDecoration(
+                                    color: AppTheme.brandPrimary,
+                                    shape: BoxShape.circle,
                                   ),
-                                ),
-                                child: const Text(
-                                  'บันทึกข้อมูลสุขภาพ',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                  child: const Icon(
+                                    Icons.edit,
+                                    size: 20,
                                     color: Colors.white,
                                   ),
                                 ),
                               ),
-                            )
-                            .animate()
-                            .fade(duration: 900.ms)
-                            .scale(begin: const Offset(0.95, 0.95)),
-                    const SizedBox(height: 32),
-                    const Divider(
-                      color: Colors.white10,
-                    ).animate().fade(duration: 1000.ms),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'การตั้งค่าบัญชี',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ).animate().fade(duration: 1000.ms),
-                    const SizedBox(height: 16),
-                    OutlinedButton.icon(
-                      onPressed: _changePassword,
-                      icon: const Icon(Icons.lock_reset, color: Colors.white70),
-                      label: const Text(
-                        'เปลี่ยนรหัสผ่าน',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(color: Colors.white24),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                            ),
+                          ],
                         ),
+                      ).animate().scale(
+                        duration: 400.ms,
+                        curve: Curves.easeOutBack,
                       ),
-                    ).animate().fade(duration: 1100.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 16),
-                    OutlinedButton.icon(
-                      onPressed: _confirmLogout,
-                      icon: const Icon(
-                        Icons.logout_rounded,
-                        color: Colors.white,
-                      ),
-                      label: const Text(
-                        'ออกจากระบบ',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.white10,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: BorderSide.none,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                      const SizedBox(height: 32),
+                      const Text(
+                        'ข้อมูลสุขภาพ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
-                      ),
-                    ).animate().fade(duration: 1200.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 16),
-                    OutlinedButton.icon(
-                      onPressed: _confirmDeleteAccount,
-                      icon: const Icon(
-                        Icons.delete_forever,
-                        color: AppTheme.errorBase,
-                      ),
-                      label: const Text(
-                        'ลบบัญชีผู้ใช้',
-                        style: TextStyle(color: AppTheme.errorBase),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(color: AppTheme.errorBase),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                      ).animate().fade(duration: 400.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      PremiumTextField(
+                        controller: _weightCtrl,
+                        label: 'น้ำหนัก (kg)',
+                        prefixIcon: Icons.monitor_weight_outlined,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
                         ),
-                      ),
-                    ).animate().fade(duration: 1300.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 32),
-                  ],
+                      ).animate().fade(duration: 500.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      PremiumTextField(
+                        controller: _heightCtrl,
+                        label: 'ส่วนสูง (cm)',
+                        prefixIcon: Icons.height_outlined,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                      ).animate().fade(duration: 600.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      PremiumDropdownField<String>(
+                        label: 'เพศ',
+                        value: _selectedGender,
+                        prefixIcon: Icons.person_outline,
+                        items: const [
+                          DropdownMenuItem(value: 'male', child: Text('ชาย')),
+                          DropdownMenuItem(
+                            value: 'female',
+                            child: Text('หญิง'),
+                          ),
+                        ],
+                        onChanged:
+                            (val) => setState(() => _selectedGender = val!),
+                      ).animate().fade(duration: 700.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      PremiumDropdownField<String>(
+                        label: 'ระยะโรคไต (CKD Stage)',
+                        value: _selectedStage,
+                        prefixIcon: Icons.medical_services_outlined,
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'stage_1',
+                            child: Text('ระยะที่ 1'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'stage_2',
+                            child: Text('ระยะที่ 2'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'stage_3a',
+                            child: Text('ระยะที่ 3a'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'stage_3b',
+                            child: Text('ระยะที่ 3b'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'stage_4',
+                            child: Text('ระยะที่ 4'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'stage_5',
+                            child: Text('ระยะที่ 5 (ฟอกไต)'),
+                          ),
+                        ],
+                        onChanged:
+                            (val) => setState(() => _selectedStage = val!),
+                      ).animate().fade(duration: 800.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 32),
+                      _isLoading
+                          ? const Center(
+                            child: CircularProgressIndicator(
+                              color: AppTheme.brandPrimary,
+                            ),
+                          )
+                          : Container(
+                                width: double.infinity,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      AppTheme.brandPrimary,
+                                      AppTheme.brandAccent,
+                                    ],
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppTheme.brandPrimary.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: _saveProfile,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'บันทึกข้อมูลสุขภาพ',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .animate()
+                              .fade(duration: 900.ms)
+                              .scale(begin: const Offset(0.95, 0.95)),
+                      const SizedBox(height: 32),
+                      const Divider(
+                        color: Colors.white10,
+                      ).animate().fade(duration: 1000.ms),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'การตั้งค่าบัญชี',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ).animate().fade(duration: 1000.ms),
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: _changePassword,
+                        icon: const Icon(
+                          Icons.lock_reset,
+                          color: Colors.white70,
+                        ),
+                        label: const Text(
+                          'เปลี่ยนรหัสผ่าน',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: const BorderSide(color: Colors.white24),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ).animate().fade(duration: 1100.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: _confirmLogout,
+                        icon: const Icon(
+                          Icons.logout_rounded,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          'ออกจากระบบ',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.white10,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: BorderSide.none,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ).animate().fade(duration: 1200.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: _confirmDeleteAccount,
+                        icon: const Icon(
+                          Icons.delete_forever,
+                          color: AppTheme.errorBase,
+                        ),
+                        label: const Text(
+                          'ลบบัญชีผู้ใช้',
+                          style: TextStyle(color: AppTheme.errorBase),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: const BorderSide(color: AppTheme.errorBase),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ).animate().fade(duration: 1300.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
                 ),
-              ),
+      ),
     );
   }
 }

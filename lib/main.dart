@@ -18,7 +18,7 @@ import 'router/app_router.dart';
 import 'providers/auth_providers.dart';
 import 'services/biometric_service.dart';
 import 'theme/app_theme.dart';
-import 'providers/theme_provider.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // บังคับให้ Flutter สตาร์ท
@@ -166,7 +166,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       locale: const Locale('th'), // ภาษาเริ่มต้นคือไทย
       theme: AppTheme.lightTheme(),
       darkTheme: AppTheme.darkTheme(),
-      themeMode: ref.watch(themeProvider),
+      themeMode: ThemeMode.dark,
       routerConfig: router,
     );
   }

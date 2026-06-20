@@ -8,6 +8,7 @@ import '../../../repositories/auth_repository.dart';
 import '../../../widgets/premium_text_field.dart';
 import '../../../widgets/premium_dropdown_field.dart';
 import '../../../theme/app_theme.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HealthSetupPage extends ConsumerStatefulWidget {
   const HealthSetupPage({super.key});
@@ -17,6 +18,7 @@ class HealthSetupPage extends ConsumerStatefulWidget {
 
 class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
   final _heightCtrl = TextEditingController();
   String _selectedGender = 'male';
@@ -34,12 +36,21 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
     try {
       final data =
           await ref.read(healthProfileServiceProvider).getHealthProfile();
+      final sb = Supabase.instance.client;
+      final user = sb.auth.currentUser;
+      final userName = user?.userMetadata?['name'] ?? '';
+
       if (data != null && mounted) {
         setState(() {
+          _nameCtrl.text = userName;
           _weightCtrl.text = data['weight_kg']?.toString() ?? '';
           _heightCtrl.text = data['height_cm']?.toString() ?? '';
           _selectedGender = data['gender'] ?? 'male';
           _selectedStage = data['ckd_stage'] ?? 'stage_3a';
+        });
+      } else if (mounted) {
+        setState(() {
+          _nameCtrl.text = userName;
         });
       }
     } finally {
@@ -57,6 +68,13 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
     setState(() => _isLoading = true);
 
     try {
+      final newName = _nameCtrl.text.trim();
+      if (newName.isNotEmpty) {
+        await Supabase.instance.client.auth.updateUser(
+          UserAttributes(data: {'name': newName}),
+        );
+      }
+
       await ref
           .read(healthProfileServiceProvider)
           .saveHealthProfile(
@@ -136,6 +154,7 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
 
   @override
   void dispose() {
+    _nameCtrl.dispose();
     _weightCtrl.dispose();
     _heightCtrl.dispose();
     super.dispose();
@@ -153,13 +172,14 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_rounded, color: Colors.white70),
-            tooltip: 'ย้อนกลับ / ออกจากระบบ',
-            onPressed: _confirmLogout,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white70,
           ),
-        ],
+          tooltip: 'ย้อนกลับไปหน้าสร้างบัญชี',
+          onPressed: _confirmLogout,
+        ),
       ),
       body:
           _isFetching
@@ -181,6 +201,13 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                       textAlign: TextAlign.center,
                     ).animate().fade(duration: 400.ms).slideY(begin: 0.2),
                     const SizedBox(height: 32),
+                    PremiumTextField(
+                      controller: _nameCtrl,
+                      label: 'ชื่อของคุณ',
+                      prefixIcon: Icons.person_outline,
+                      keyboardType: TextInputType.name,
+                    ).animate().fade(duration: 450.ms).slideY(begin: 0.2),
+                    const SizedBox(height: 16),
                     PremiumTextField(
                       controller: _weightCtrl,
                       label: 'น้ำหนัก (kg)',
