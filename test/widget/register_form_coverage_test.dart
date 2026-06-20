@@ -19,30 +19,32 @@ class MockGoTrueClient extends Mock implements GoTrueClient {
 
 class MockAuthRepository extends Mock implements AuthRepository {
   @override
-  Future<void> signUpWithEmailAndPassword(String email, String password, {String? name}) async {}
+  Future<void> signUpWithEmailAndPassword(
+    String email,
+    String password, {
+    String? name,
+  }) async {}
 }
 
 void main() {
   testWidgets('RegisterForm Coverage Test', (tester) async {
     final mockSupabase = MockSupabaseClient();
     final mockAuthRepo = MockAuthRepository();
-    
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           supabaseProvider.overrideWith((ref) => mockSupabase),
           authRepositoryProvider.overrideWith((ref) => mockAuthRepo),
         ],
-        child: const MaterialApp(
-          home: Scaffold(body: RegisterForm()),
-        ),
+        child: const MaterialApp(home: Scaffold(body: RegisterForm())),
       ),
     );
-    
+
     await tester.pump(const Duration(seconds: 3));
-    
+
     // expect(find.byType(TextFormField), findsWidgets);
-    
+
     final saveButton = find.text('สร้างบัญชีผู้ใช้');
   });
 }
