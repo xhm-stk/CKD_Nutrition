@@ -19,7 +19,6 @@ import 'providers/auth_providers.dart';
 import 'services/biometric_service.dart';
 import 'theme/app_theme.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // บังคับให้ Flutter สตาร์ท
 
