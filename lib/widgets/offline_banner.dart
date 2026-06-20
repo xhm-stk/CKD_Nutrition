@@ -11,7 +11,7 @@ class OfflineBanner extends StatelessWidget {
       builder: (context, snapshot) {
         final results = snapshot.data ?? [ConnectivityResult.none];
         final isOffline =
-            results.contains(ConnectivityResult.none) || results.isEmpty;
+            results.every((r) => r == ConnectivityResult.none) || results.isEmpty;
 
         if (!isOffline) return const SizedBox.shrink();
 
