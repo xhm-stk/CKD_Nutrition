@@ -32,7 +32,7 @@ void main() {
 
     // Test authStateProvider
     final authStream = container.read(authStateProvider);
-    expect(authStream, isA<Stream<AuthState>>());
+    expect(authStream, isA<AsyncValue<AuthState>>());
 
     // Test sessionUnlockedProvider
     final isUnlocked = container.read(sessionUnlockedProvider);
