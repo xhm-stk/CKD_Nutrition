@@ -127,8 +127,13 @@ class DashboardUseCase {
 
       // ดึงเวลาที่กินจริงมาเช็คกับ todayStr
       final eatenAtStr = p['eaten_at'] as String?;
-      if (eatenAtStr != null && !eatenAtStr.startsWith(todayStr)) {
-        continue; // ข้ามของวันอื่น
+      if (eatenAtStr != null) {
+        final localDateStr = DateTime.tryParse(
+          eatenAtStr,
+        )?.toLocal().toIso8601String().substring(0, 10);
+        if (localDateStr != null && localDateStr != todayStr) {
+          continue; // ข้ามของวันอื่น
+        }
       }
 
       if (action.actionType == 'LOG_MEAL_RPC') {
