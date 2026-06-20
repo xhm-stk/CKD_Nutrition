@@ -109,52 +109,57 @@ class AddActionSheet extends ConsumerWidget {
                     ),
                   ),
                   builder:
-                      (ctx) => WaterEntrySheet(
-                        onSave: (ml) async {
-                          final food =
-                              FoodItem()
-                                ..foodId = 'quick_water'
-                                ..name = 'น้ำเปล่า'
-                                ..waterMl =
-                                    100.0 // ตั้งค่าเป็น 100ml ต่อ 100g เพื่อให้คำนวณถูกต้อง
-                                ..proteinG = 0
-                                ..sodiumMg = 0
-                                ..potassiumMg = 0
-                                ..phosphorusMg = 0
-                                ..sugarG = 0
-                                ..carbG = 0;
+                      (ctx) => Consumer(
+                        builder:
+                            (consumerCtx, sheetRef, _) => WaterEntrySheet(
+                              onSave: (ml) async {
+                                final food =
+                                    FoodItem()
+                                      ..foodId = 'quick_water'
+                                      ..name = 'น้ำเปล่า'
+                                      ..waterMl =
+                                          100.0 // ตั้งค่าเป็น 100ml ต่อ 100g เพื่อให้คำนวณถูกต้อง
+                                      ..proteinG = 0
+                                      ..sodiumMg = 0
+                                      ..potassiumMg = 0
+                                      ..phosphorusMg = 0
+                                      ..sugarG = 0
+                                      ..carbG = 0;
 
-                          final result = await ref
-                              .read(mealControllerProvider)
-                              .logMeal(
-                                food: food,
-                                quantityG: ml.toDouble(),
-                                mealType: 'snack',
-                              );
+                                final result = await sheetRef
+                                    .read(mealControllerProvider)
+                                    .logMeal(
+                                      food: food,
+                                      quantityG: ml.toDouble(),
+                                      mealType: 'snack',
+                                    );
 
-                          if (ctx.mounted) {
-                            switch (result) {
-                              case Success():
-                                ScaffoldMessenger.of(ctx).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'บันทึกดื่มน้ำ +$ml ml เรียบร้อยแล้ว',
-                                    ),
-                                  ),
-                                );
-                                ref.invalidate(dashboardSummaryProvider);
-                                ref.invalidate(todayMealsProvider);
-                              case Failure(:final userMessage):
-                                ScaffoldMessenger.of(ctx).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'บันทึกผิดพลาด: $userMessage',
-                                    ),
-                                  ),
-                                );
-                            }
-                          }
-                        },
+                                if (ctx.mounted) {
+                                  switch (result) {
+                                    case Success():
+                                      ScaffoldMessenger.of(ctx).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'บันทึกดื่มน้ำ +$ml ml เรียบร้อยแล้ว',
+                                          ),
+                                        ),
+                                      );
+                                      sheetRef.invalidate(
+                                        dashboardSummaryProvider,
+                                      );
+                                      sheetRef.invalidate(todayMealsProvider);
+                                    case Failure(:final userMessage):
+                                      ScaffoldMessenger.of(ctx).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'บันทึกผิดพลาด: $userMessage',
+                                          ),
+                                        ),
+                                      );
+                                  }
+                                }
+                              },
+                            ),
                       ),
                 );
               },
