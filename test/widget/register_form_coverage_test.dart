@@ -48,6 +48,6 @@ void main() {
 
     // expect(find.byType(TextFormField), findsWidgets);
 
-    expect(find.text('สร้างบัญชีผู้ใช้'), findsOneWidget);
+    expect(find.text('สร้างบัญชี'), findsOneWidget);
   });
 }
