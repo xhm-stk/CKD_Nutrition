@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ckd_nutrition_app/core/result.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ckd_nutrition_app/pages/auth/widgets/register_form.dart';
@@ -19,11 +20,13 @@ class MockGoTrueClient extends Mock implements GoTrueClient {
 
 class MockAuthRepository extends Mock implements AuthRepository {
   @override
-  Future<void> signUpWithEmailAndPassword(
+  Future<Result<void>> register(
     String email,
     String password, {
     String? name,
-  }) async {}
+  }) async {
+    return Success(null);
+  }
 }
 
 void main() {
@@ -45,6 +48,6 @@ void main() {
 
     // expect(find.byType(TextFormField), findsWidgets);
 
-    final saveButton = find.text('สร้างบัญชีผู้ใช้');
+    expect(find.text('สร้างบัญชีผู้ใช้'), findsOneWidget);
   });
 }

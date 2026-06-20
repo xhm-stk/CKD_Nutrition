@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ckd_nutrition_app/providers/auth_providers.dart';
+import 'package:ckd_nutrition_app/providers/core_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mocktail/mocktail.dart';
@@ -33,9 +34,8 @@ void main() {
     final authStream = container.read(authStateProvider);
     expect(authStream, isA<Stream<AuthState>>());
 
-    // Test currentUserProvider
-    final user = container.read(currentUserProvider);
-    expect(user, isNotNull);
-    expect(user?.id, 'test-user');
+    // Test sessionUnlockedProvider
+    final isUnlocked = container.read(sessionUnlockedProvider);
+    expect(isUnlocked, false);
   });
 }
