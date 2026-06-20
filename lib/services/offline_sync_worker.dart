@@ -144,7 +144,6 @@ class OfflineSyncWorker {
             'p_sugar': payload['sugar'],
             'p_carb': payload['carb'],
             'p_water': payload['water'],
-            'p_eaten_at': payload['eaten_at'], // ส่งเวลาที่กินจริงไป
           };
           await _sb.rpc('log_meal', params: params);
           return _SyncStatus.success;
