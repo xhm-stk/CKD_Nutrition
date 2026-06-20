@@ -115,7 +115,7 @@ class AddActionSheet extends ConsumerWidget {
                               FoodItem()
                                 ..foodId = 'quick_water'
                                 ..name = 'น้ำเปล่า'
-                                ..waterMl = ml.toDouble()
+                                ..waterMl = 100.0 // ตั้งค่าเป็น 100ml ต่อ 100g เพื่อให้คำนวณถูกต้อง
                                 ..proteinG = 0
                                 ..sodiumMg = 0
                                 ..potassiumMg = 0
