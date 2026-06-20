@@ -8,6 +8,7 @@ import '../pages/auth/health_setup_page.dart';
 import '../pages/profile/profile_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
 import '../pages/food/custom_food_page.dart';
+import '../pages/food/food_search_page.dart';
 import '../pages/history/monthly_summary_page.dart';
 import '../pages/planner/meal_planner_page.dart';
 import '../widgets/main_scaffold.dart';
@@ -55,6 +56,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/food-add',
         builder: (context, state) => const CustomFoodPage(),
+      ),
+      GoRoute(
+        path: '/food-search',
+        builder: (context, state) => const FoodSearchPage(),
       ),
       GoRoute(
         path: '/health-setup',
