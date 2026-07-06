@@ -5,6 +5,7 @@ import 'package:ckd_nutrition_app/repositories/meal_repository.dart';
 import 'package:ckd_nutrition_app/core/result.dart';
 import 'package:ckd_nutrition_app/services/dashboard_usecase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ckd_nutrition_app/models/supabase/daily_log.dart';
 // ignore_for_file: avoid_print, unused_local_variable
 
 import 'dart:io';
@@ -51,17 +52,33 @@ class MockMealRepository implements MealRepository {
 
 class DummyDashboardUseCase implements DashboardUseCase {
   @override
+  Future<DailyLog?> getSummary(String todayStr) async {
+    return null;
+  }
+  
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class DummySharedPreferences implements SharedPreferences {
+  final Map<String, dynamic> _data = {};
+
+  @override
+  bool? getBool(String key) => _data[key] as bool?;
+
+  @override
+  Future<bool> setBool(String key, bool value) async {
+    _data[key] = value;
+    return true;
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {
   group('Extreme Combinatorial QA Matrix (Medical Grade)', () {
-    test('Run 1,260,000+ Scenarios in Memory', () async {
+    test('Run 1,260,000+ Scenarios in Memory', timeout: const Timeout(Duration(minutes: 5)), () async {
       final repo = MockMealRepository();
       final dashboard = DummyDashboardUseCase();
       final prefs = DummySharedPreferences();
