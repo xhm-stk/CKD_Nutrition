@@ -110,6 +110,8 @@ class MealRepository {
           'p_sugar': sugar,
           'p_carb': carb,
           'p_water': water,
+          'p_phosphorus': phosphorus,
+          'p_eaten_at': eatenAt.toIso8601String(),
         },
       );
       return Success(null);
