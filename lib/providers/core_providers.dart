@@ -81,3 +81,45 @@ final selectedDateProvider = StateProvider<DateTime>((ref) {
   final now = DateTime.now();
   return DateTime(now.year, now.month, now.day);
 });
+
+// 8. Streak Count Provider (นับจำนวนวันที่บันทึกติดต่อกัน)
+final streakCountProvider = FutureProvider.autoDispose<int>((ref) async {
+  final sb = ref.watch(supabaseProvider);
+  final user = sb.auth.currentUser;
+  if (user == null) return 0;
+
+  try {
+    final data = await sb
+        .from('daily_logs')
+        .select('log_date')
+        .eq('user_id', user.id)
+        .isFilter('deleted_at', null)
+        .order('log_date', ascending: false)
+        .limit(60);
+
+    if (data.isEmpty) return 0;
+
+    final dates =
+        data
+            .map<DateTime>((e) => DateTime.parse(e['log_date'].toString()))
+            .toList();
+
+    int streak = 0;
+    var checkDate = DateTime.now();
+    checkDate = DateTime(checkDate.year, checkDate.month, checkDate.day);
+
+    for (final d in dates) {
+      final logDay = DateTime(d.year, d.month, d.day);
+      if (logDay == checkDate ||
+          logDay == checkDate.subtract(const Duration(days: 1))) {
+        streak++;
+        checkDate = logDay.subtract(const Duration(days: 1));
+      } else {
+        break;
+      }
+    }
+    return streak;
+  } catch (_) {
+    return 0;
+  }
+});

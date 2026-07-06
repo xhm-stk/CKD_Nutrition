@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/core_providers.dart';
 import '../../providers/meal_providers.dart';
-import '../../providers/theme_provider.dart';
+import 'widgets/streak_fire_widget.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/mesh_gradient_background.dart';
 
@@ -97,28 +97,14 @@ class DashboardPage extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: AppTheme.bgSurface,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.08),
-                                ),
-                              ),
-                              child: IconButton(
-                                onPressed: () {
-                                  ref
-                                      .read(themeProvider.notifier)
-                                      .toggleTheme();
-                                },
-                                icon: Icon(
-                                  Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Icons.light_mode_rounded
-                                      : Icons.dark_mode_rounded,
-                                ),
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                            Builder(
+                              builder: (context) {
+                                final streakAsync = ref.watch(
+                                  streakCountProvider,
+                                );
+                                final count = streakAsync.valueOrNull ?? 0;
+                                return StreakFireWidget(streakCount: count);
+                              },
                             ),
                           ],
                         )

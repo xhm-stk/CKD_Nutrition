@@ -10,7 +10,9 @@ import '../pages/dashboard/dashboard_page.dart';
 import '../pages/food/custom_food_page.dart';
 import '../pages/food/food_search_page.dart';
 import '../pages/history/monthly_summary_page.dart';
+import '../pages/history/history_page.dart';
 import '../pages/planner/meal_planner_page.dart';
+import '../pages/onboarding/onboarding_page.dart';
 import '../widgets/main_scaffold.dart';
 
 // เปลี่ยน GoRouter ให้รับค่า ref เพื่อให้มันฟังเสียงจาก Auth State ได้
@@ -40,6 +42,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => const OnboardingPage(),
+      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       GoRoute(
         path: '/register',
@@ -81,7 +87,16 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // Index 1: บัญชี (โปรไฟล์สุขภาพ)
+          // Index 1: ประวัติ
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/history',
+                builder: (context, state) => const HistoryPage(),
+              ),
+            ],
+          ),
+          // Index 2: บัญชี (โปรไฟล์สุขภาพ)
           StatefulShellBranch(
             routes: [
               GoRoute(

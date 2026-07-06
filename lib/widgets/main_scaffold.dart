@@ -69,10 +69,17 @@ class MainScaffold extends ConsumerWidget {
 
             _buildNavItem(
               context,
+              icon: Icons.history_rounded,
+              label: 'ประวัติ',
+              index: 1,
+            ),
+
+            _buildNavItem(
+              context,
               icon: Icons.person_rounded,
               label: 'บัญชี',
-              index: 1,
-            ), // เปลี่ยนจาก index 2 เป็น 1
+              index: 2,
+            ),
           ],
         ),
       ),
