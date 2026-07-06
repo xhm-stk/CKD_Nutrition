@@ -13,7 +13,11 @@ final mealRepositoryProvider = Provider<MealRepository>((ref) {
 });
 
 final mealControllerProvider = Provider<MealController>((ref) {
-  return MealController(ref.watch(mealRepositoryProvider));
+  return MealController(
+    ref.watch(mealRepositoryProvider),
+    ref.watch(dashboardUseCaseProvider),
+    ref.watch(sharedPreferencesProvider),
+  );
 });
 
 final todayMealsProvider = FutureProvider.autoDispose<List<Meal>>((ref) async {

@@ -3,6 +3,8 @@ import 'package:ckd_nutrition_app/models/isar/food_item.dart';
 import 'package:ckd_nutrition_app/controllers/meal_controller.dart';
 import 'package:ckd_nutrition_app/repositories/meal_repository.dart';
 import 'package:ckd_nutrition_app/core/result.dart';
+import 'package:ckd_nutrition_app/services/dashboard_usecase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // ignore_for_file: avoid_print, unused_local_variable
 
 import 'dart:io';
@@ -47,11 +49,23 @@ class MockMealRepository implements MealRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class DummyDashboardUseCase implements DashboardUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class DummySharedPreferences implements SharedPreferences {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 void main() {
   group('Extreme Combinatorial QA Matrix (Medical Grade)', () {
     test('Run 1,260,000+ Scenarios in Memory', () async {
       final repo = MockMealRepository();
-      final controller = MealController(repo);
+      final dashboard = DummyDashboardUseCase();
+      final prefs = DummySharedPreferences();
+      final controller = MealController(repo, dashboard, prefs);
 
       // ==========================================
       // 🔬 กำหนดมิติการทดสอบระดับผู้เชี่ยวชาญ (Expert Dimensions)

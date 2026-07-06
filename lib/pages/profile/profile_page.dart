@@ -8,6 +8,8 @@ import '../../../widgets/premium_text_field.dart';
 import '../../../widgets/premium_dropdown_field.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/mesh_gradient_background.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../services/notification_service.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -25,6 +27,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   int _avatarId = 1;
   bool _isLoading = false;
   bool _isFetching = true;
+  bool _mealRemindersEnabled = false;
 
   @override
   void initState() {
@@ -43,6 +46,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           _selectedGender = data['gender'] ?? 'male';
           _selectedStage = data['ckd_stage'] ?? 'stage_3a';
           _avatarId = data['avatar_id'] ?? 1;
+        });
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      if (mounted) {
+        setState(() {
+          _mealRemindersEnabled =
+              prefs.getBool('meal_reminders_enabled') ?? false;
         });
       }
     } finally {
@@ -482,6 +493,95 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       const Divider(
                         color: Colors.white10,
                       ).animate().fade(duration: 1000.ms),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'การแจ้งเตือน',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ).animate().fade(duration: 1000.ms),
+                      const SizedBox(height: 16),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.05),
+                          ),
+                        ),
+                        child: SwitchListTile(
+                          title: const Text(
+                            'แจ้งเตือนมื้ออาหาร',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'เช้า (08:00), กลางวัน (12:00), เย็น (18:00)',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.6),
+                              fontSize: 12,
+                            ),
+                          ),
+                          value: _mealRemindersEnabled,
+                          activeColor: AppTheme.brandPrimary,
+                          onChanged: (val) async {
+                            final messenger = ScaffoldMessenger.of(context);
+                            setState(() => _mealRemindersEnabled = val);
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setBool('meal_reminders_enabled', val);
+
+                            final notifService = NotificationService();
+                            if (val) {
+                              await notifService.scheduleMealReminder(
+                                id: 101,
+                                title: 'ได้เวลาอาหารเช้า 🍳',
+                                body:
+                                    'อย่าลืมบันทึกอาหารเช้าของคุณ เพื่อติดตามโภชนาการที่ถูกต้อง',
+                                hour: 8,
+                                minute: 0,
+                              );
+                              await notifService.scheduleMealReminder(
+                                id: 102,
+                                title: 'ได้เวลาอาหารกลางวัน 🍱',
+                                body:
+                                    'บันทึกมื้อเที่ยงกันเถอะ ควบคุมโซเดียมและโปรตีนให้อยู่ในเกณฑ์นะ',
+                                hour: 12,
+                                minute: 0,
+                              );
+                              await notifService.scheduleMealReminder(
+                                id: 103,
+                                title: 'ได้เวลาอาหารเย็น 🥗',
+                                body:
+                                    'มื้อเย็นมาแล้ว บันทึกข้อมูลเพื่อสรุปโภชนาการประจำวันของคุณ',
+                                hour: 18,
+                                minute: 0,
+                              );
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text('เปิดแจ้งเตือนมื้ออาหารแล้ว'),
+                                ),
+                              );
+                            } else {
+                              await notifService.cancelReminder(101);
+                              await notifService.cancelReminder(102);
+                              await notifService.cancelReminder(103);
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text('ปิดแจ้งเตือนมื้ออาหารแล้ว'),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ).animate().fade(duration: 1050.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 32),
+                      const Divider(
+                        color: Colors.white10,
+                      ).animate().fade(duration: 1100.ms),
                       const SizedBox(height: 16),
                       const Text(
                         'การตั้งค่าบัญชี',

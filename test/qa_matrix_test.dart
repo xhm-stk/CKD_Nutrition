@@ -5,6 +5,8 @@ import 'package:ckd_nutrition_app/models/supabase/daily_log.dart';
 import 'package:ckd_nutrition_app/models/isar/food_item.dart';
 import 'package:ckd_nutrition_app/repositories/meal_repository.dart';
 import 'package:ckd_nutrition_app/core/result.dart';
+import 'package:ckd_nutrition_app/services/dashboard_usecase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ckd_nutrition_app/models/supabase/meal.dart';
 
 class FakeMealRepository implements MealRepository {
@@ -37,13 +39,17 @@ class FakeMealRepository implements MealRepository {
   }
 
   @override
-  Future<List<Meal>> getMealsWithProjection(
-    dynamic isar,
-    dynamic prefs,
-    String dateStr,
-  ) async {
-    return [];
-  }
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class DummyDashboardUseCase implements DashboardUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class DummySharedPreferences implements SharedPreferences {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {
@@ -53,7 +59,11 @@ void main() {
 
     setUp(() {
       fakeRepo = FakeMealRepository();
-      mealController = MealController(fakeRepo);
+      mealController = MealController(
+        fakeRepo,
+        DummyDashboardUseCase(),
+        DummySharedPreferences(),
+      );
     });
 
     test(

@@ -1,5 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:ui';
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -85,6 +87,85 @@ class NotificationService {
       platformChannelSpecifics,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
     );
+  }
+
+  Future<void> scheduleMealReminder({
+    required int id,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+  }) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+          'meal_reminder_channel',
+          'แจ้งเตือนมื้ออาหาร',
+          channelDescription: 'เตือนให้รับประทานอาหารตรงเวลา',
+          importance: Importance.max,
+          priority: Priority.high,
+        );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: DarwinNotificationDetails(),
+    );
+
+    await flutterLocalNotificationsPlugin.cancel(id);
+
+    // Schedule for daily at specific time
+    var now = tz.TZDateTime.now(tz.local);
+    var scheduledDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      id,
+      title,
+      body,
+      scheduledDate,
+      platformChannelSpecifics,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  Future<void> showHighNutrientAlert(
+    String nutrientName,
+    int percentage,
+  ) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+          'alert_channel',
+          'แจ้งเตือนสารอาหารเกินกำหนด',
+          channelDescription: 'เตือนเมื่อบริโภคสารอาหารเข้าใกล้ขีดจำกัด',
+          importance: Importance.high,
+          priority: Priority.high,
+          color: Color(0xFFFF5252), // Red alert
+        );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: DarwinNotificationDetails(),
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      200, // Fixed ID for alerts
+      '⚠️ ระวัง! $nutrientName สูง',
+      'คุณบริโภค $nutrientName ไปแล้ว $percentage% ของโควต้าวันนี้',
+      platformChannelSpecifics,
+    );
+  }
+
+  Future<void> cancelReminder(int id) async {
+    await flutterLocalNotificationsPlugin.cancel(id);
   }
 
   Future<void> cancelAllReminders() async {
