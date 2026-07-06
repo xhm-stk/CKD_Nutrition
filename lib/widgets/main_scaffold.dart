@@ -5,6 +5,7 @@ import '../pages/dashboard/widgets/add_action_sheet.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/core_providers.dart';
+import '../l10n/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class MainScaffold extends ConsumerWidget {
@@ -35,7 +36,7 @@ class MainScaffold extends ConsumerWidget {
             _buildNavItem(
               context,
               icon: Icons.home_rounded,
-              label: 'แดชบอร์ด',
+              label: AppLocalizations.of(context)!.navDashboard,
               index: 0,
             ),
 
@@ -70,14 +71,14 @@ class MainScaffold extends ConsumerWidget {
             _buildNavItem(
               context,
               icon: Icons.history_rounded,
-              label: 'ประวัติ',
+              label: AppLocalizations.of(context)!.navHistory,
               index: 1,
             ),
 
             _buildNavItem(
               context,
               icon: Icons.person_rounded,
-              label: 'บัญชี',
+              label: AppLocalizations.of(context)!.navProfile,
               index: 2,
             ),
           ],

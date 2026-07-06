@@ -43,4 +43,13 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get orLoginWith => 'หรือล็อกอินด้วย';
+
+  @override
+  String get navDashboard => 'แดชบอร์ด';
+
+  @override
+  String get navHistory => 'ประวัติ';
+
+  @override
+  String get navProfile => 'บัญชี';
 }

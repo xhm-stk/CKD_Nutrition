@@ -584,6 +584,55 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ).animate().fade(duration: 1100.ms),
                       const SizedBox(height: 16),
                       const Text(
+                        'ภาษา (Language)',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ).animate().fade(duration: 1000.ms),
+                      const SizedBox(height: 16),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.05),
+                          ),
+                        ),
+                        child: SwitchListTile(
+                          title: const Text(
+                            'English Mode',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            ref.watch(localeProvider).languageCode == 'th'
+                                ? 'ปัจจุบัน: ไทย'
+                                : 'Current: English',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.6),
+                              fontSize: 12,
+                            ),
+                          ),
+                          value: ref.watch(localeProvider).languageCode == 'en',
+                          activeColor: AppTheme.brandPrimary,
+                          onChanged: (val) {
+                            final code = val ? 'en' : 'th';
+                            ref
+                                .read(localeProvider.notifier)
+                                .changeLocale(code);
+                          },
+                        ),
+                      ).animate().fade(duration: 1050.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 32),
+                      const Divider(
+                        color: Colors.white10,
+                      ).animate().fade(duration: 1100.ms),
+                      const SizedBox(height: 16),
+                      const Text(
                         'การตั้งค่าบัญชี',
                         style: TextStyle(
                           fontSize: 18,

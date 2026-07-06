@@ -44,4 +44,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orLoginWith => 'Or sign in with';
+
+  @override
+  String get navDashboard => 'Dashboard';
+
+  @override
+  String get navHistory => 'History';
+
+  @override
+  String get navProfile => 'Profile';
 }

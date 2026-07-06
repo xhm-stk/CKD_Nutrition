@@ -10,5 +10,8 @@
   "forgotPassword": "Forgot Password?",
   "dontHaveAccount": "Don't have an account? ",
   "alreadyHaveAccount": "Already have an account? ",
-  "orLoginWith": "Or sign in with"
+  "orLoginWith": "Or sign in with",
+  "navDashboard": "Dashboard",
+  "navHistory": "History",
+  "navProfile": "Profile"
 }

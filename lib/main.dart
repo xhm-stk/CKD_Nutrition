@@ -162,7 +162,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('th'), // ภาษาเริ่มต้นคือไทย
+      locale: ref.watch(localeProvider),
       theme: AppTheme.lightTheme(),
       darkTheme: AppTheme.darkTheme(),
       themeMode: ThemeMode.dark,

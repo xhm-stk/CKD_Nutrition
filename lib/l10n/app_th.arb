@@ -10,5 +10,8 @@
   "forgotPassword": "ลืมรหัสผ่าน?",
   "dontHaveAccount": "ยังไม่มีบัญชีผู้ใช้งาน? ",
   "alreadyHaveAccount": "มีบัญชีผู้ใช้งานอยู่แล้ว? ",
-  "orLoginWith": "หรือล็อกอินด้วย"
+  "orLoginWith": "หรือล็อกอินด้วย",
+  "navDashboard": "แดชบอร์ด",
+  "navHistory": "ประวัติ",
+  "navProfile": "บัญชี"
 }

@@ -10,6 +10,7 @@ import '../repositories/food_repository.dart';
 import '../services/ckd_rule_service.dart';
 import '../services/dashboard_usecase.dart';
 import '../core/utils/date_utils.dart';
+import 'package:flutter/material.dart';
 import '../models/supabase/daily_log.dart';
 
 // 0. Provider สำหรับ SharedPreferences
@@ -123,3 +124,25 @@ final streakCountProvider = FutureProvider.autoDispose<int>((ref) async {
     return 0;
   }
 });
+
+// 9. Locale Provider (สำหรับเปลี่ยนภาษาแบบ Real-time)
+final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return LocaleNotifier(prefs);
+});
+
+class LocaleNotifier extends StateNotifier<Locale> {
+  final SharedPreferences _prefs;
+
+  LocaleNotifier(this._prefs) : super(_loadLocale(_prefs));
+
+  static Locale _loadLocale(SharedPreferences prefs) {
+    final langCode = prefs.getString('language_code') ?? 'th';
+    return Locale(langCode);
+  }
+
+  Future<void> changeLocale(String languageCode) async {
+    await _prefs.setString('language_code', languageCode);
+    state = Locale(languageCode);
+  }
+}

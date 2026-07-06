@@ -169,6 +169,24 @@ abstract class AppLocalizations {
   /// In th, this message translates to:
   /// **'หรือล็อกอินด้วย'**
   String get orLoginWith;
+
+  /// No description provided for @navDashboard.
+  ///
+  /// In th, this message translates to:
+  /// **'แดชบอร์ด'**
+  String get navDashboard;
+
+  /// No description provided for @navHistory.
+  ///
+  /// In th, this message translates to:
+  /// **'ประวัติ'**
+  String get navHistory;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In th, this message translates to:
+  /// **'บัญชี'**
+  String get navProfile;
 }
 
 class _AppLocalizationsDelegate
