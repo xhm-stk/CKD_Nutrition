@@ -7,7 +7,6 @@ import 'package:ckd_nutrition_app/repositories/meal_repository.dart';
 import 'package:ckd_nutrition_app/core/result.dart';
 import 'package:ckd_nutrition_app/services/dashboard_usecase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ckd_nutrition_app/models/supabase/daily_log.dart';
 import 'package:ckd_nutrition_app/models/supabase/meal.dart';
 
 class FakeMealRepository implements MealRepository {

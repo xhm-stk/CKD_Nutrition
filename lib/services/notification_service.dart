@@ -156,8 +156,10 @@ class NotificationService {
       iOS: DarwinNotificationDetails(),
     );
 
+    final int alertId = 200 + (nutrientName.hashCode % 100).abs();
+
     await flutterLocalNotificationsPlugin.show(
-      200, // Fixed ID for alerts
+      alertId, // Unique ID per nutrient
       '⚠️ ระวัง! $nutrientName สูง',
       'คุณบริโภค $nutrientName ไปแล้ว $percentage% ของโควต้าวันนี้',
       platformChannelSpecifics,

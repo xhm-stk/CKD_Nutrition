@@ -70,9 +70,18 @@ void main() async {
   // 5. โหลด SharedPreferences
   final prefs = await SharedPreferences.getInstance();
 
-  // 6. เปิดระบบการแจ้งเตือนดื่มน้ำ (Task 12)
-  await NotificationService().init();
-  await NotificationService().scheduleWaterReminder();
+  // 6. เปิดระบบการแจ้งเตือนดื่มน้ำ และมื้ออาหาร (Task 6)
+  final notifService = NotificationService();
+  await notifService.init();
+  await notifService.scheduleWaterReminder();
+
+  // Re-schedule meal reminders on app start (especially for iOS where boot receivers don't exist)
+  final mealRemindersEnabled = prefs.getBool('meal_reminders_enabled') ?? false;
+  if (mealRemindersEnabled) {
+    notifService.scheduleMealReminder(id: 101, title: 'ได้เวลาอาหารเช้า', body: 'อย่าลืมทานอาหารให้ตรงเวลาและบันทึกโภชนาการนะครับ', hour: 8, minute: 0);
+    notifService.scheduleMealReminder(id: 102, title: 'ได้เวลาอาหารเที่ยง', body: 'พักเที่ยงแล้ว ทานอาหารที่เหมาะสมกับสุขภาพไตด้วยนะครับ', hour: 12, minute: 0);
+    notifService.scheduleMealReminder(id: 103, title: 'ได้เวลาอาหารเย็น', body: 'ทานอาหารเย็นแต่พอดี และอย่าลืมบันทึกข้อมูลนะครับ', hour: 18, minute: 0);
+  }
 
   // 6. เปิดระบบดักจับ Error ด้วย Sentry
   await SentryFlutter.init(

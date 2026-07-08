@@ -96,5 +96,23 @@ class MealController {
       summary.customPotassium ?? 0,
       'potassium',
     );
+    checkAndAlert(
+      'ฟอสฟอรัส',
+      summary.totalPhosphorusMg,
+      summary.customPhosphorus ?? 0,
+      'phosphorus',
+    );
+    checkAndAlert(
+      'น้ำตาล',
+      summary.totalSugarG,
+      summary.customSugar ?? 0,
+      'sugar',
+    );
+    checkAndAlert(
+      'คาร์โบไฮเดรต',
+      summary.totalCarbG,
+      summary.customCarb ?? 0,
+      'carb',
+    );
   }
 }
