@@ -252,16 +252,18 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                         ),
                         validator: (val) {
                           final l10n = AppLocalizations.of(context)!;
-                          if (val == null || val.trim().isEmpty)
+                          if (val == null || val.trim().isEmpty) {
                             return l10n.weightValidationEmpty;
+                          }
                           final clean =
                               val
                                   .replaceAll(',', '.')
                                   .replaceAll(RegExp(r'[^0-9\.]'), '')
                                   .trim();
                           final n = double.tryParse(clean);
-                          if (n == null || n < 20 || n > 300)
+                          if (n == null || n < 20 || n > 300) {
                             return l10n.weightValidationInvalid;
+                          }
                           return null;
                         },
                       ).animate().fade(duration: 500.ms).slideY(begin: 0.2),
@@ -275,16 +277,18 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                         ),
                         validator: (val) {
                           final l10n = AppLocalizations.of(context)!;
-                          if (val == null || val.trim().isEmpty)
+                          if (val == null || val.trim().isEmpty) {
                             return l10n.heightValidationEmpty;
+                          }
                           final clean =
                               val
                                   .replaceAll(',', '.')
                                   .replaceAll(RegExp(r'[^0-9\.]'), '')
                                   .trim();
                           final n = double.tryParse(clean);
-                          if (n == null || n < 100 || n > 250)
+                          if (n == null || n < 100 || n > 250) {
                             return l10n.heightValidationInvalid;
+                          }
                           return null;
                         },
                       ).animate().fade(duration: 600.ms).slideY(begin: 0.2),
