@@ -155,6 +155,20 @@ class OfflineSyncWorker {
           );
           return _SyncStatus.success;
 
+        case 'LOG_URINE_RPC':
+          await _sb.rpc(
+            'log_urine',
+            params: {'p_amount_ml': payload['amount_ml']},
+          );
+          return _SyncStatus.success;
+
+        case 'DELETE_URINE_RPC':
+          await _sb.rpc(
+            'delete_urine',
+            params: {'p_urine_id': payload['urine_id']},
+          );
+          return _SyncStatus.success;
+
         case 'ADD_CUSTOM_FOOD':
           final user = _sb.auth.currentUser;
           if (user != null) {

@@ -1,3 +1,8 @@
 {
-    "cmake.ignoreCMakeListsMissing": true
+    "cmake.ignoreCMakeListsMissing": true,
+    "java.enabled": false,
+    "java.import.gradle.enabled": false,
+    "java.import.exclusions": [
+        "**"
+    ]
 }

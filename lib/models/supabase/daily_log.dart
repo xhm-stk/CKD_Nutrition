@@ -16,10 +16,7 @@ class DailyLog with _$DailyLog {
     @JsonKey(name: 'total_sugar_g') @Default(0.0) double totalSugarG,
     @JsonKey(name: 'total_carb_g') @Default(0.0) double totalCarbG,
     @JsonKey(name: 'total_water_ml') @Default(0.0) double totalWaterMl,
-    @JsonKey(name: 'total_phosphorus_mg')
-    @Default(0.0)
-    double totalPhosphorusMg,
-
+    @JsonKey(name: 'total_urine_ml') @Default(0.0) double totalUrineMl,
     // Custom Limits
     double? customProtein,
     double? customPotassium,
@@ -27,7 +24,6 @@ class DailyLog with _$DailyLog {
     double? customSugar,
     double? customCarb,
     double? customWater,
-    double? customPhosphorus,
   }) = _DailyLog;
 
   const DailyLog._();
@@ -54,8 +50,6 @@ class DailyLog with _$DailyLog {
           (healthProfile['custom_carb_limit_g'] as num?)?.toDouble();
       combined['customWater'] =
           (healthProfile['custom_water_limit_ml'] as num?)?.toDouble();
-      combined['customPhosphorus'] =
-          (healthProfile['custom_phosphorus_limit_mg'] as num?)?.toDouble();
     }
     return DailyLog.fromJson(combined);
   }

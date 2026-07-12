@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controllers/register_controller.dart';
+import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 import '../../../widgets/premium_primary_button.dart';
 import '../../../widgets/premium_text_field.dart';
+import '../../../theme/app_theme.dart';
 
 class RegisterForm extends ConsumerStatefulWidget {
   const RegisterForm({super.key});
@@ -44,20 +46,23 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
 
   void _validateAll() {
     setState(() {
-      _nameError = _nameCtrl.text.trim().isEmpty ? 'กรุณากรอกชื่อ' : null;
+      _nameError =
+          _nameCtrl.text.trim().isEmpty
+              ? AppLocalizations.of(context)!.enterName
+              : null;
 
       final email = _emailCtrl.text.trim();
       if (email.isEmpty) {
-        _emailError = 'กรุณากรอกอีเมล';
+        _emailError = AppLocalizations.of(context)!.enterEmail;
       } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
-        _emailError = 'รูปแบบอีเมลไม่ถูกต้อง';
+        _emailError = AppLocalizations.of(context)!.invalidEmail;
       } else {
         _emailError = null;
       }
 
       final pass = _passCtrl.text;
       if (pass.isEmpty) {
-        _passError = 'กรุณากรอกรหัสผ่าน';
+        _passError = AppLocalizations.of(context)!.enterPassword;
       } else if (_calculatePasswordStrength(pass) < 4) {
         _passError = 'รหัสผ่านยังไม่แข็งแกร่งพอ';
       } else {
@@ -88,6 +93,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
   }
 
   void _register() {
+    FocusManager.instance.primaryFocus?.unfocus();
     _validateAll();
     if (!_isFormValid()) return;
 
@@ -128,7 +134,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
               Container(
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: Colors.black.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -161,25 +167,27 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: AppTheme.getElevated(context),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.privacy_tip_outlined,
-                color: Color(0xFF00E5FF),
+                color: AppTheme.brandPrimary,
                 size: 28,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'นโยบายความเป็นส่วนตัว',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ],
           ),
-          content: const SingleChildScrollView(
+          content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -188,10 +196,10 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Text(
                   '1. การรวบรวมข้อมูลสุขภาพ\n'
                   'แอปพลิเคชัน CKD Nutrition จำเป็นต้องรวบรวมข้อมูลสุขภาพส่วนบุคคลของคุณ เพื่อใช้ในการคำนวณโควต้าที่เหมาะสม\n\n'
@@ -202,7 +210,9 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.4,
-                    color: Colors.white70,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -213,7 +223,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
               onPressed: () => Navigator.pop(context),
               child: const Text(
                 'รับทราบ',
-                style: TextStyle(color: Color(0xFF00E5FF)),
+                style: TextStyle(color: AppTheme.brandPrimary),
               ),
             ),
           ],
@@ -224,6 +234,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final registerState = ref.watch(registerControllerProvider);
     final isValid = _isFormValid();
 
@@ -241,7 +252,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
         ),
         const SizedBox(height: 16),
         PremiumTextField(
-          label: 'อีเมล',
+          label: l10n.email,
           controller: _emailCtrl,
           prefixIcon: Icons.mail_outline_rounded,
           keyboardType: TextInputType.emailAddress,
@@ -253,7 +264,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
         ),
         const SizedBox(height: 16),
         PremiumTextField(
-          label: 'รหัสผ่าน',
+          label: l10n.password,
           controller: _passCtrl,
           prefixIcon: Icons.lock_outline_rounded,
           isPassword: true,
@@ -269,7 +280,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
         _buildPasswordStrengthIndicator(),
         const SizedBox(height: 16),
         PremiumTextField(
-          label: 'ยืนยันรหัสผ่าน',
+          label: l10n.confirmPassword,
           controller: _confirmPassCtrl,
           prefixIcon: Icons.lock_outline_rounded,
           isPassword: true,
@@ -303,9 +314,13 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                     onChanged: (val) {
                       setState(() => _acceptPrivacyPolicy = val ?? false);
                     },
-                    activeColor: const Color(0xFF00E5FF),
-                    checkColor: Colors.black,
-                    side: const BorderSide(color: Colors.white54),
+                    activeColor: AppTheme.brandPrimary,
+                    checkColor: Colors.white,
+                    side: BorderSide(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6),
                     ),
@@ -315,9 +330,14 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                 Expanded(
                   child: Wrap(
                     children: [
-                      const Text(
+                      Text(
                         'ฉันยอมรับ ',
-                        style: TextStyle(fontSize: 14, color: Colors.white70),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
                       ),
                       GestureDetector(
                         onTap: _showPrivacyPolicyDialog,
@@ -325,7 +345,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                           'เงื่อนไขและนโยบายความเป็นส่วนตัว',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Color(0xFF00E5FF),
+                            color: AppTheme.brandPrimary,
                             decoration: TextDecoration.underline,
                           ),
                         ),
@@ -339,7 +359,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
         ),
         const SizedBox(height: 32),
         PremiumPrimaryButton(
-          text: 'สร้างบัญชี',
+          text: l10n.register,
           isLoading: registerState.isLoading,
           onPressed: isValid ? _register : null,
         ),

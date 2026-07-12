@@ -5,6 +5,7 @@ import '../../../repositories/auth_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../widgets/premium_primary_button.dart';
 import '../../../widgets/premium_text_field.dart';
+import '../../../theme/app_theme.dart';
 
 class LoginForm extends ConsumerStatefulWidget {
   const LoginForm({super.key});
@@ -29,6 +30,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
   }
 
   void _validateAndLogin() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       _emailError = null;
       _passError = null;
@@ -39,15 +41,15 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     bool isValid = true;
 
     if (email.isEmpty) {
-      _emailError = 'กรุณากรอกอีเมล';
+      _emailError = AppLocalizations.of(context)!.enterEmail;
       isValid = false;
     } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
-      _emailError = 'รูปแบบอีเมลไม่ถูกต้อง';
+      _emailError = AppLocalizations.of(context)!.invalidEmail;
       isValid = false;
     }
 
     if (pass.isEmpty) {
-      _passError = 'กรุณากรอกรหัสผ่าน';
+      _passError = AppLocalizations.of(context)!.enterPassword;
       isValid = false;
     }
 
@@ -71,19 +73,24 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF1E293B), // bgElevated
+              backgroundColor: AppTheme.getElevated(context),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              title: const Row(
+              title: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.lock_reset_rounded,
-                    color: Color(0xFF00E5FF),
+                    color: AppTheme.brandPrimary,
                     size: 28,
                   ),
-                  SizedBox(width: 8),
-                  Text('รีเซ็ตรหัสผ่าน', style: TextStyle(color: Colors.white)),
+                  const SizedBox(width: 8),
+                  Text(
+                    AppLocalizations.of(context)!.forgotPassword,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
                 ],
               ),
               content: Form(
@@ -91,17 +98,19 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
+                    Text(
                       'กรุณากรอกอีเมลที่ใช้สมัครบัญชีของคุณ ระบบจะส่งลิงก์ตั้งรหัสผ่านใหม่ไปให้ที่กล่องจดหมายของคุณ',
                       style: TextStyle(
                         fontSize: 14,
                         height: 1.4,
-                        color: Colors.white70,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 16),
                     PremiumTextField(
-                      label: 'อีเมลของคุณ',
+                      label: AppLocalizations.of(context)!.email,
                       hint: 'example@gmail.com',
                       controller: emailCtrl,
                       prefixIcon: Icons.mail_outline_rounded,
@@ -114,9 +123,13 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 TextButton(
                   onPressed:
                       isDialogLoading ? null : () => Navigator.pop(context),
-                  child: const Text(
-                    'ยกเลิก',
-                    style: TextStyle(color: Colors.white54),
+                  child: Text(
+                    AppLocalizations.of(context)!.cancel,
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
                   ),
                 ),
                 isDialogLoading
@@ -127,14 +140,14 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Color(0xFF00E5FF),
+                          color: AppTheme.brandPrimary,
                         ),
                       ),
                     )
                     : ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00E5FF),
-                        foregroundColor: Colors.black,
+                        backgroundColor: AppTheme.brandPrimary,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -149,17 +162,19 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                         setDialogState(() => isDialogLoading = false);
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text(
-                              'หากอีเมลถูกต้อง ระบบได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว กรุณาตรวจสอบกล่องจดหมาย',
-                              style: TextStyle(color: Colors.black),
+                              AppLocalizations.of(
+                                context,
+                              )!.resetPasswordLinkSent,
+                              style: const TextStyle(color: Colors.white),
                             ),
-                            backgroundColor: Color(0xFF00E5FF),
-                            duration: Duration(seconds: 5),
+                            backgroundColor: AppTheme.brandPrimary,
+                            duration: const Duration(seconds: 5),
                           ),
                         );
                       },
-                      child: const Text('ส่งลิงก์'),
+                      child: Text(AppLocalizations.of(context)!.confirm),
                     ),
               ],
             );
@@ -210,10 +225,10 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 minimumSize: const Size(50, 30),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text(
-                'ลืมรหัสผ่าน?',
-                style: TextStyle(
-                  color: Color(0xFF00E5FF),
+              child: Text(
+                l10n.forgotPassword,
+                style: const TextStyle(
+                  color: AppTheme.brandPrimary,
                   fontWeight: FontWeight.w400,
                   fontSize: 14,
                 ),

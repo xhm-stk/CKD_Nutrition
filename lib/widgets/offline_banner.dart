@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import '../l10n/app_localizations.dart';
 
 class OfflineBanner extends StatelessWidget {
   const OfflineBanner({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return StreamBuilder<List<ConnectivityResult>>(
       stream: Connectivity().onConnectivityChanged,
       builder: (context, snapshot) {
@@ -18,26 +20,33 @@ class OfflineBanner extends StatelessWidget {
 
         if (!isOffline) return const SizedBox.shrink();
 
-        return Container(
-          color: Colors.amber.shade800,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.wifi_off_rounded, color: Colors.white, size: 20),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'คุณกำลังอยู่ในโหมดออฟไลน์ ข้อมูลจะถูกซิงก์ภายหลัง',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
+        return SafeArea(
+          bottom: false,
+          child: Container(
+            color: Colors.amber.shade800,
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.wifi_off_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.offlineModeMessage,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

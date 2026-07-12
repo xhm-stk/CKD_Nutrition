@@ -9,6 +9,8 @@ import '../../../widgets/premium_text_field.dart';
 import '../../../widgets/premium_dropdown_field.dart';
 import '../../../theme/app_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
+import '../../../widgets/mesh_gradient_background.dart';
 
 class HealthSetupPage extends ConsumerStatefulWidget {
   const HealthSetupPage({super.key});
@@ -65,21 +67,38 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
   void _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // Dismiss keyboard
+    FocusManager.instance.primaryFocus?.unfocus();
+
     setState(() => _isLoading = true);
 
     try {
       final newName = _nameCtrl.text.trim();
       if (newName.isNotEmpty) {
-        await Supabase.instance.client.auth.updateUser(
-          UserAttributes(data: {'name': newName}),
-        );
+        try {
+          await Supabase.instance.client.auth.updateUser(
+            UserAttributes(data: {'name': newName}),
+          );
+        } catch (e) {
+          debugPrint('🚨 Failed to update auth name metadata: $e');
+        }
       }
 
+      final weightClean =
+          _weightCtrl.text
+              .replaceAll(',', '.')
+              .replaceAll(RegExp(r'[^0-9\.]'), '')
+              .trim();
+      final heightClean =
+          _heightCtrl.text
+              .replaceAll(',', '.')
+              .replaceAll(RegExp(r'[^0-9\.]'), '')
+              .trim();
       await ref
           .read(healthProfileServiceProvider)
           .saveHealthProfile(
-            weightKg: double.parse(_weightCtrl.text.trim()),
-            heightCm: double.parse(_heightCtrl.text.trim()),
+            weightKg: double.parse(weightClean),
+            heightCm: double.parse(heightClean),
             gender: _selectedGender,
             ckdStage: _selectedStage,
           );
@@ -90,8 +109,8 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
       ref.invalidate(dashboardSummaryProvider);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('บันทึกข้อมูลเรียบร้อยแล้ว'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.saveSuccess),
           backgroundColor: AppTheme.brandPrimary,
         ),
       );
@@ -103,8 +122,8 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
 
       debugPrint('Setup Profile Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('บันทึกโปรไฟล์สุขภาพล้มเหลว กรุณาลองใหม่อีกครั้ง'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.saveFailed),
           backgroundColor: AppTheme.errorBase,
         ),
       );
@@ -116,24 +135,32 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
       context: context,
       builder:
           (context) => AlertDialog(
-            backgroundColor: AppTheme.bgElevated,
+            backgroundColor: AppTheme.getElevated(context),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
             ),
-            title: const Text(
-              'ยืนยันออกจากระบบ',
-              style: TextStyle(color: Colors.white),
+            title: Text(
+              AppLocalizations.of(context)!.confirmLogout,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
-            content: const Text(
-              'คุณต้องการออกจากระบบใช่หรือไม่?',
-              style: TextStyle(color: Colors.white70),
+            content: Text(
+              AppLocalizations.of(context)!.confirmLogoutDesc,
+              style: TextStyle(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'ยกเลิก',
-                  style: TextStyle(color: Colors.white54),
+                child: Text(
+                  AppLocalizations.of(context)!.cancel,
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
                 ),
               ),
               ElevatedButton(
@@ -145,7 +172,7 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                   Navigator.pop(context);
                   await ref.read(authRepositoryProvider).logout();
                 },
-                child: const Text('ออกจากระบบ'),
+                child: Text(AppLocalizations.of(context)!.logout),
               ),
             ],
           ),
@@ -163,11 +190,13 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.bgBase,
       appBar: AppBar(
-        title: const Text(
-          'ตั้งค่าข้อมูลสุขภาพ',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.healthData,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF0F172A),
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -175,155 +204,199 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.white70,
+            color: Color(0xFF0F172A),
           ),
           tooltip: 'ย้อนกลับไปหน้าสร้างบัญชี',
           onPressed: _confirmLogout,
         ),
       ),
-      body:
-          _isFetching
-              ? const Center(
-                child: CircularProgressIndicator(color: AppTheme.brandPrimary),
-              )
-              : Form(
-                key: _formKey,
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
+      body: MeshGradientBackground(
+        child:
+            _isFetching
+                ? const Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.brandPrimary,
                   ),
-                  children: [
-                    const SizedBox(height: 16),
-                    const Text(
-                      'กรุณากรอกข้อมูลเพื่อปรับแต่งการแนะนำอาหาร',
-                      style: TextStyle(fontSize: 16, color: Colors.white70),
-                      textAlign: TextAlign.center,
-                    ).animate().fade(duration: 400.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 32),
-                    PremiumTextField(
-                      controller: _nameCtrl,
-                      label: 'ชื่อของคุณ',
-                      prefixIcon: Icons.person_outline,
-                      keyboardType: TextInputType.name,
-                    ).animate().fade(duration: 450.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 16),
-                    PremiumTextField(
-                      controller: _weightCtrl,
-                      label: 'น้ำหนัก (kg)',
-                      prefixIcon: Icons.monitor_weight_outlined,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                    ).animate().fade(duration: 500.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 16),
-                    PremiumTextField(
-                      controller: _heightCtrl,
-                      label: 'ส่วนสูง (cm)',
-                      prefixIcon: Icons.height_outlined,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                    ).animate().fade(duration: 600.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 16),
-                    PremiumDropdownField<String>(
-                      label: 'เพศ',
-                      value: _selectedGender,
-                      prefixIcon: Icons.person_outline,
-                      items: const [
-                        DropdownMenuItem(value: 'male', child: Text('ชาย')),
-                        DropdownMenuItem(value: 'female', child: Text('หญิง')),
-                      ],
-                      onChanged:
-                          (val) => setState(() => _selectedGender = val!),
-                    ).animate().fade(duration: 700.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 16),
-                    PremiumDropdownField<String>(
-                      label: 'ระยะโรคไต (CKD Stage)',
-                      value: _selectedStage,
-                      prefixIcon: Icons.medical_services_outlined,
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'stage_1',
-                          child: Text('ระยะที่ 1'),
+                )
+                : Form(
+                  key: _formKey,
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
+                    children: [
+                      const SizedBox(height: 16),
+                      Text(
+                        AppLocalizations.of(context)!.pleaseEnterHealthData,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF475569),
                         ),
-                        DropdownMenuItem(
-                          value: 'stage_2',
-                          child: Text('ระยะที่ 2'),
+                        textAlign: TextAlign.center,
+                      ).animate().fade(duration: 400.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 32),
+                      PremiumTextField(
+                        controller: _nameCtrl,
+                        label: AppLocalizations.of(context)!.enterName,
+                        prefixIcon: Icons.person_outline,
+                        keyboardType: TextInputType.name,
+                      ).animate().fade(duration: 450.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      PremiumTextField(
+                        controller: _weightCtrl,
+                        label: AppLocalizations.of(context)!.weightKg,
+                        prefixIcon: Icons.monitor_weight_outlined,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
                         ),
-                        DropdownMenuItem(
-                          value: 'stage_3a',
-                          child: Text('ระยะที่ 3a'),
+                        validator: (val) {
+                          final l10n = AppLocalizations.of(context)!;
+                          if (val == null || val.trim().isEmpty)
+                            return l10n.weightValidationEmpty;
+                          final clean =
+                              val
+                                  .replaceAll(',', '.')
+                                  .replaceAll(RegExp(r'[^0-9\.]'), '')
+                                  .trim();
+                          final n = double.tryParse(clean);
+                          if (n == null || n < 20 || n > 300)
+                            return l10n.weightValidationInvalid;
+                          return null;
+                        },
+                      ).animate().fade(duration: 500.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      PremiumTextField(
+                        controller: _heightCtrl,
+                        label: AppLocalizations.of(context)!.heightCm,
+                        prefixIcon: Icons.height_outlined,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
                         ),
-                        DropdownMenuItem(
-                          value: 'stage_3b',
-                          child: Text('ระยะที่ 3b'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'stage_4',
-                          child: Text('ระยะที่ 4'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'stage_5',
-                          child: Text('ระยะที่ 5 (ฟอกไต)'),
-                        ),
-                      ],
-                      onChanged: (val) => setState(() => _selectedStage = val!),
-                    ).animate().fade(duration: 800.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 48),
-                    _isLoading
-                        ? const Center(
-                          child: CircularProgressIndicator(
-                            color: AppTheme.brandPrimary,
+                        validator: (val) {
+                          final l10n = AppLocalizations.of(context)!;
+                          if (val == null || val.trim().isEmpty)
+                            return l10n.heightValidationEmpty;
+                          final clean =
+                              val
+                                  .replaceAll(',', '.')
+                                  .replaceAll(RegExp(r'[^0-9\.]'), '')
+                                  .trim();
+                          final n = double.tryParse(clean);
+                          if (n == null || n < 100 || n > 250)
+                            return l10n.heightValidationInvalid;
+                          return null;
+                        },
+                      ).animate().fade(duration: 600.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      PremiumDropdownField<String>(
+                        label: AppLocalizations.of(context)!.gender,
+                        value: _selectedGender,
+                        prefixIcon: Icons.person_outline,
+                        items: [
+                          DropdownMenuItem(
+                            value: 'male',
+                            child: Text(AppLocalizations.of(context)!.male),
                           ),
-                        )
-                        : Container(
-                              width: double.infinity,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    AppTheme.brandPrimary,
-                                    AppTheme.brandAccent,
+                          DropdownMenuItem(
+                            value: 'female',
+                            child: Text(AppLocalizations.of(context)!.female),
+                          ),
+                        ],
+                        onChanged:
+                            (val) => setState(() => _selectedGender = val!),
+                      ).animate().fade(duration: 700.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      PremiumDropdownField<String>(
+                        label: AppLocalizations.of(context)!.ckdStage,
+                        value: _selectedStage,
+                        prefixIcon: Icons.medical_services_outlined,
+                        items: [
+                          DropdownMenuItem(
+                            value: 'stage_1',
+                            child: Text(AppLocalizations.of(context)!.stage1),
+                          ),
+                          DropdownMenuItem(
+                            value: 'stage_2',
+                            child: Text(AppLocalizations.of(context)!.stage2),
+                          ),
+                          DropdownMenuItem(
+                            value: 'stage_3a',
+                            child: Text(AppLocalizations.of(context)!.stage3a),
+                          ),
+                          DropdownMenuItem(
+                            value: 'stage_3b',
+                            child: Text(AppLocalizations.of(context)!.stage3b),
+                          ),
+                          DropdownMenuItem(
+                            value: 'stage_4',
+                            child: Text(AppLocalizations.of(context)!.stage4),
+                          ),
+                          DropdownMenuItem(
+                            value: 'stage_5',
+                            child: Text(AppLocalizations.of(context)!.stage5),
+                          ),
+                        ],
+                        onChanged:
+                            (val) => setState(() => _selectedStage = val!),
+                      ).animate().fade(duration: 800.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 48),
+                      _isLoading
+                          ? const Center(
+                            child: CircularProgressIndicator(
+                              color: AppTheme.brandPrimary,
+                            ),
+                          )
+                          : Container(
+                                width: double.infinity,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      AppTheme.brandPrimary,
+                                      AppTheme.brandAccent,
+                                    ],
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppTheme.brandPrimary.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
                                   ],
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppTheme.brandPrimary.withValues(
-                                      alpha: 0.3,
+                                child: ElevatedButton(
+                                  onPressed: _saveProfile,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
                                     ),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
                                   ),
-                                ],
-                              ),
-                              child: ElevatedButton(
-                                onPressed: _saveProfile,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
+                                  child: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.saveHealthData,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
-                                child: const Text(
-                                  'เริ่มต้นใช้งานแอป',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            )
-                            .animate()
-                            .fade(duration: 900.ms)
-                            .scale(begin: const Offset(0.95, 0.95)),
-                    const SizedBox(height: 32),
-                  ],
+                              )
+                              .animate()
+                              .fade(duration: 900.ms)
+                              .scale(begin: const Offset(0.95, 0.95)),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
                 ),
-              ),
+      ),
     );
   }
 }

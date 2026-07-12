@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // === Colors Tokens (Emerald Green Edition) ===
-  static const Color bgBase = Color(0xFF06120D); // Deep Forest Night
-  static const Color bgSurface = Color(0xFF0B1A13); // Dark Moss
-  static const Color bgElevated = Color(0xFF132A1F); // Elevated Pine
+  // === Colors Tokens (White-Blue Theme Edition) ===
+  static const Color bgBase = Color(0xFF030712); // Deep Ocean Night
+  static const Color bgSurface = Color(0xFF0F172A); // Dark Slate Blue
+  static const Color bgElevated = Color(0xFF1E293B); // Elevated Slate
 
-  static const Color brandPrimary = Color(0xFF10B981); // Emerald Green
+  static const Color brandPrimary = Color(0xFF0284C7); // Sky Blue / Ocean Blue
   static const Color brandSecondary = Color(0xFFF59E0B); // Amber Gold
-  static const Color brandAccent = Color(0xFF34D399); // Mint Light
+  static const Color brandAccent = Color(0xFF38BDF8); // Light Sky Accent
 
   static const Color textHighEmphasis =
       Colors.white; // opacity adjusted in theme
@@ -23,6 +23,17 @@ class AppTheme {
   static const double radiusSmall = 16.0;
   static const double radiusMedium = 24.0;
   static const double radiusLarge = 32.0;
+
+  static Color getBase(BuildContext context) =>
+      Theme.of(context).scaffoldBackgroundColor;
+  static Color getSurface(BuildContext context) =>
+      Theme.of(context).cardTheme.color ??
+      Theme.of(context).colorScheme.surface;
+  static Color getElevated(BuildContext context) =>
+      Theme.of(context).dialogTheme.backgroundColor ??
+      Theme.of(context).colorScheme.surface;
+  static Color getBorderColor(BuildContext context) =>
+      Colors.black.withValues(alpha: 0.05);
 
   // === Typography Tokens ===
   static TextTheme _buildTextTheme(
@@ -64,14 +75,15 @@ class AppTheme {
 
   // === Light Theme ===
   static final lightColorScheme = ColorScheme.light(
-    primary: brandPrimary, // Use Emerald Green
+    primary: brandPrimary,
     secondary: brandSecondary,
-    surface: const Color(0xFFF8FAFC),
+    surface: const Color(0xFFFFFFFF),
     onSurface: const Color(0xFF0F172A),
-    errorContainer: Colors.red.shade50,
-    onErrorContainer: Colors.red.shade900,
-    tertiaryContainer: Colors.orange.shade50,
-    onTertiaryContainer: Colors.orange.shade900,
+    error: errorBase,
+    errorContainer: errorBase.withValues(alpha: 0.1),
+    onErrorContainer: errorBase,
+    tertiaryContainer: brandSecondary.withValues(alpha: 0.1),
+    onTertiaryContainer: brandSecondary,
   );
 
   static ThemeData lightTheme() {
@@ -79,87 +91,54 @@ class AppTheme {
     return base.copyWith(
       colorScheme: lightColorScheme,
       scaffoldBackgroundColor: const Color(
-        0xFFF1F5F9,
-      ), // Slate 100 for light bg
+        0xFFF0F9FF,
+      ), // Extremely light blue background (Sky 50)
       textTheme: _buildTextTheme(
         base.textTheme,
         const Color(0xFF0F172A), // Slate 900 for high emphasis
         const Color(0xFF475569), // Slate 600 for medium emphasis
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFFF8FAFC),
+        backgroundColor: Color(0xFFF0F9FF),
         foregroundColor: Color(0xFF0F172A),
-        elevation: 0,
-      ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(0xFFF8FAFC),
-        selectedItemColor: brandPrimary,
-        unselectedItemColor: Color(0xFF94A3B8),
-      ),
-    );
-  }
-
-  // === Ultimate Premium Dark Mode (Emerald Edition) ===
-  static final darkColorScheme = ColorScheme.dark(
-    primary: brandPrimary,
-    secondary: brandSecondary,
-    surface: bgSurface,
-    onSurface: textHighEmphasis.withValues(alpha: 0.92),
-    error: errorBase,
-    errorContainer: errorBase.withValues(alpha: 0.15),
-    onErrorContainer: errorBase,
-    tertiaryContainer: brandSecondary.withValues(alpha: 0.15),
-    onTertiaryContainer: brandSecondary,
-  );
-
-  static ThemeData darkTheme() {
-    final base = ThemeData.dark(useMaterial3: true);
-    return base.copyWith(
-      colorScheme: darkColorScheme,
-      scaffoldBackgroundColor: bgBase,
-      textTheme: _buildTextTheme(
-        base.textTheme,
-        textHighEmphasis.withValues(alpha: 0.92),
-        textMediumEmphasis,
-      ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: bgBase,
-        foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: bgElevated,
+        backgroundColor: Colors.white,
         selectedItemColor: brandPrimary,
-        unselectedItemColor: Colors.white38,
+        unselectedItemColor: Color(0xFF94A3B8),
         elevation: 10,
       ),
       cardTheme: CardTheme(
-        color: bgSurface,
+        color: Colors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusMedium),
           side: BorderSide(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.04),
             width: 1,
           ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: bgSurface,
+        fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
         ),
-        hintStyle: GoogleFonts.prompt(fontSize: 14, color: textLowEmphasis),
+        hintStyle: GoogleFonts.prompt(
+          fontSize: 14,
+          color: const Color(0xFF94A3B8),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMedium),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.08)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMedium),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.08)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMedium),
@@ -174,7 +153,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           minimumSize: const Size.fromHeight(56),
           backgroundColor: brandPrimary,
-          foregroundColor: Colors.black,
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusMedium),
           ),
@@ -182,10 +161,11 @@ class AppTheme {
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
+          elevation: 0,
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: bgElevated,
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),

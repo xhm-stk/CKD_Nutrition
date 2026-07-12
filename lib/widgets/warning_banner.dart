@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/quota_engine.dart';
+import '../l10n/app_localizations.dart';
 
 class WarningBanner extends StatelessWidget {
   final List<NutrientQuota> quotas;
@@ -7,15 +8,15 @@ class WarningBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // กรองหาชื่อสารอาหารที่เกินกำหนด
-    final over = quotas
-        .where((q) => q.isOverLimit)
-        .map((q) => q.label)
-        .join(', ');
-    final near = quotas
-        .where((q) => q.isNearLimit)
-        .map((q) => q.label)
-        .join(', ');
+    final l10n = AppLocalizations.of(context)!;
+
+    // แปลง English key → localized label ก่อน join
+    String localizeLabels(Iterable<NutrientQuota> items) {
+      return items.map((q) => _getLocalLabel(l10n, q.label)).join(', ');
+    }
+
+    final over = localizeLabels(quotas.where((q) => q.isOverLimit));
+    final near = localizeLabels(quotas.where((q) => q.isNearLimit));
 
     // ถ้าไม่มีอะไรน่าเป็นห่วง ไม่ต้องโชว์ป้ายนี้ (หดตัวหายไปเลย)
     if (over.isEmpty && near.isEmpty) return const SizedBox.shrink();
@@ -38,13 +39,33 @@ class WarningBanner extends StatelessWidget {
           Expanded(
             child: Text(
               over.isNotEmpty
-                  ? 'ระวัง! คุณทาน $over เกินโควต้าแล้ว'
-                  : 'แจ้งเตือน: ปริมาณ $near ใกล้เกินกำหนด (เกิน 80%)',
+                  ? l10n.warningOverLimit(over)
+                  : l10n.warningNearLimit(near),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],
       ),
     );
+  }
+
+  /// แปลง English key → localized label
+  String _getLocalLabel(AppLocalizations l10n, String label) {
+    switch (label) {
+      case 'protein':
+        return l10n.protein;
+      case 'sugar':
+        return l10n.sugar;
+      case 'potassium':
+        return l10n.potassium;
+      case 'sodium':
+        return l10n.sodium;
+      case 'water':
+        return l10n.water;
+      case 'carb':
+        return l10n.carbs;
+      default:
+        return label;
+    }
   }
 }

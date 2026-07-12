@@ -28,14 +28,15 @@ void main() {
     );
 
     expect(find.text('Test Dropdown'), findsOneWidget);
-    expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+    expect(find.text('Option A'), findsOneWidget);
 
-    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.tap(find.text('Option A'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Option A').last);
+    expect(find.text('Option B'), findsOneWidget);
+    await tester.tap(find.text('Option B'));
     await tester.pumpAndSettle();
 
-    expect(selectedValue, 'A');
+    expect(selectedValue, 'B');
   });
 }

@@ -84,7 +84,7 @@ class _PremiumPrimaryButtonState extends State<PremiumPrimaryButton>
                 gradient:
                     isDisabled
                         ? const LinearGradient(
-                          colors: [AppTheme.bgElevated, AppTheme.bgElevated],
+                          colors: [Color(0xFFE2E8F0), Color(0xFFE2E8F0)],
                         )
                         : const LinearGradient(
                           colors: [AppTheme.brandPrimary, AppTheme.brandAccent],

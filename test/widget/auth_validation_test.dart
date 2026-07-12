@@ -29,6 +29,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: [Locale('en', ''), Locale('th', '')],
+          locale: Locale('th', ''),
           home: LoginPage(),
         ),
       );

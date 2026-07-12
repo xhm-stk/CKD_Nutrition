@@ -12,6 +12,8 @@ class PremiumTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final String? errorText;
   final ValueChanged<String>? onChanged;
+  final String? Function(String?)?
+  validator; // เพิ่ม validator เพื่อรองรับ Form
 
   const PremiumTextField({
     super.key,
@@ -23,6 +25,7 @@ class PremiumTextField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.errorText,
     this.onChanged,
+    this.validator,
   });
 
   @override
@@ -76,7 +79,9 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
             color:
                 _isFocused
                     ? AppTheme.brandPrimary
-                    : Colors.white.withValues(alpha: 0.6),
+                    : Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           child: Text(widget.label),
         ),
@@ -87,7 +92,7 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
-            color: AppTheme.bgSurface,
+            color: AppTheme.getSurface(context),
             borderRadius: BorderRadius.circular(30.0),
             border: Border.all(
               color: borderColor,
@@ -106,17 +111,23 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30.0),
-            child: TextField(
+            child: TextFormField(
               controller: widget.controller,
               focusNode: _focusNode,
               obscureText: _obscureText,
               keyboardType: widget.keyboardType,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 16,
+              ),
               onChanged: widget.onChanged,
+              validator: widget.validator,
               decoration: InputDecoration(
                 hintText: widget.hint,
                 hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.3),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
@@ -150,7 +161,9 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
                     color:
                         _isFocused
                             ? AppTheme.brandPrimary
-                            : Colors.white.withValues(alpha: 0.4),
+                            : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                 ),
                 suffixIcon:
@@ -160,7 +173,9 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
                             _obscureText
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
-                            color: Colors.white.withValues(alpha: 0.4),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.4),
                           ),
                           onPressed: () {
                             setState(() {

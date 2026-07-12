@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../theme/app_theme.dart';
 import '../../widgets/mesh_gradient_background.dart';
+import '../../l10n/app_localizations.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -17,36 +18,35 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<_OnboardingSlide> _slides = const [
-    _OnboardingSlide(
-      icon: Icons.water_drop_rounded,
-      title: 'จัดการโภชนาการ',
-      titleEn: 'Nutrition Management',
-      description:
-          'ติดตามสารอาหารสำคัญทุกชนิด ทั้ง โปรตีน โซเดียม โพแทสเซียม และฟอสฟอรัส ได้แบบเรียลไทม์',
-    ),
-    _OnboardingSlide(
-      icon: Icons.offline_bolt_rounded,
-      title: 'ใช้งานได้แม้ไม่มีเน็ต',
-      titleEn: 'Offline-First',
-      description:
-          'บันทึกอาหารได้ทุกที่ทุกเวลา ข้อมูลจะถูกซิงค์ขึ้น Cloud อัตโนมัติเมื่ออินเทอร์เน็ตกลับมา',
-    ),
-    _OnboardingSlide(
-      icon: Icons.shield_rounded,
-      title: 'ปลอดภัยสูงสุด',
-      titleEn: 'Military-Grade Security',
-      description:
-          'ข้อมูลสุขภาพของคุณถูกเข้ารหัสและป้องกันด้วยระบบสแกนนิ้ว / ใบหน้า',
-    ),
-    _OnboardingSlide(
-      icon: Icons.local_fire_department_rounded,
-      title: 'เริ่มต้นใช้งาน!',
-      titleEn: 'Let\'s Get Started!',
-      description:
-          'กรอกข้อมูลสุขภาพเบื้องต้นของคุณ แล้วเริ่มควบคุมอาหารอย่างมืออาชีพ',
-    ),
-  ];
+  List<_OnboardingSlide> _getSlides(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      _OnboardingSlide(
+        icon: Icons.water_drop_rounded,
+        title: l10n.onboardingTitle1,
+        titleEn: 'Nutrition Management',
+        description: l10n.onboardingDesc1,
+      ),
+      _OnboardingSlide(
+        icon: Icons.offline_bolt_rounded,
+        title: l10n.onboardingTitle2,
+        titleEn: 'Offline-First',
+        description: l10n.onboardingDesc2,
+      ),
+      _OnboardingSlide(
+        icon: Icons.shield_rounded,
+        title: l10n.onboardingTitle3,
+        titleEn: 'Military-Grade Security',
+        description: l10n.onboardingDesc3,
+      ),
+      _OnboardingSlide(
+        icon: Icons.local_fire_department_rounded,
+        title: l10n.onboardingTitle4,
+        titleEn: 'Let\'s Get Started!',
+        description: l10n.onboardingDesc4,
+      ),
+    ];
+  }
 
   Future<void> _completeOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
@@ -77,7 +77,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   child: TextButton(
                     onPressed: _completeOnboarding,
                     child: Text(
-                      'ข้าม',
+                      AppLocalizations.of(context)!.skip,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.6),
                         fontSize: 16,
@@ -91,11 +91,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
               Expanded(
                 child: PageView.builder(
                   controller: _pageController,
-                  itemCount: _slides.length,
+                  itemCount: _getSlides(context).length,
                   onPageChanged:
                       (index) => setState(() => _currentPage = index),
                   itemBuilder: (context, index) {
-                    final slide = _slides[index];
+                    final slide = _getSlides(context)[index];
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Column(
@@ -192,7 +192,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     // Page dots
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(_slides.length, (index) {
+                      children: List.generate(_getSlides(context).length, (
+                        index,
+                      ) {
                         final isActive = index == _currentPage;
                         return AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
@@ -226,7 +228,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           elevation: 0,
                         ),
                         onPressed: () {
-                          if (_currentPage == _slides.length - 1) {
+                          if (_currentPage == _getSlides(context).length - 1) {
                             _completeOnboarding();
                           } else {
                             _pageController.nextPage(
@@ -236,9 +238,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           }
                         },
                         child: Text(
-                          _currentPage == _slides.length - 1
-                              ? 'เริ่มต้นใช้งาน'
-                              : 'ถัดไป',
+                          _currentPage == _getSlides(context).length - 1
+                              ? AppLocalizations.of(context)!.getStarted
+                              : AppLocalizations.of(context)!.next,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

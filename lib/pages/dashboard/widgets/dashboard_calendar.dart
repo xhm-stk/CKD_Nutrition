@@ -9,6 +9,8 @@ class DashboardCalendar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedDate = ref.watch(selectedDateProvider);
+    final loggedDatesAsync = ref.watch(loggedDatesProvider);
+    final loggedDates = loggedDatesAsync.valueOrNull ?? [];
 
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
@@ -17,9 +19,36 @@ class DashboardCalendar extends ConsumerWidget {
         borderRadius: BorderRadius.circular(
           24,
         ), // ลดลงถ้าตามแผนข้อ 16 แต่ Dashboard อาจจะต้องการความโค้งมนแยกกัน (ใช้ 16 ก็พอ)
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: TableCalendar(
+        locale: Localizations.localeOf(context).toString(),
+        calendarBuilders: CalendarBuilders(
+          markerBuilder: (context, date, events) {
+            final hasLog = loggedDates.any((d) => isSameDay(d, date));
+            if (hasLog) {
+              return Positioned(
+                bottom: 4,
+                child: Container(
+                  width: 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              );
+            }
+            return null;
+          },
+        ),
         firstDay: DateTime(2023, 1, 1),
         lastDay: DateTime.now().add(
           const Duration(days: 365),

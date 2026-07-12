@@ -23,7 +23,6 @@ class CkdRuleService {
             ..sugarLimitG = (data['sugar_limit_g'] ?? 0).toDouble()
             ..carbLimitG = (data['carb_limit_g'] ?? 0).toDouble()
             ..waterLimitMl = (data['water_limit_ml'] ?? 0).toDouble()
-            ..phosphorusLimitMg = (data['phosphorus_limit_mg'] ?? 0).toDouble()
             ..syncedAt = DateTime.now().toIso8601String();
 
       await _isar.writeTxn(() async => await _isar.ckdRuleCaches.put(cache));

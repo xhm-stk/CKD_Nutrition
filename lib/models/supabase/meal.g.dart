@@ -19,7 +19,6 @@ _$MealImpl _$$MealImplFromJson(Map<String, dynamic> json) => _$MealImpl(
   sugarG: (json['sugar_g'] as num).toDouble(),
   carbG: (json['carb_g'] as num).toDouble(),
   waterMl: (json['water_ml'] as num).toDouble(),
-  phosphorusMg: (json['phosphorus_mg'] as num).toDouble(),
   eatenAt: DateTime.parse(json['eaten_at'] as String),
 );
 
@@ -37,6 +36,5 @@ Map<String, dynamic> _$$MealImplToJson(_$MealImpl instance) =>
       'sugar_g': instance.sugarG,
       'carb_g': instance.carbG,
       'water_ml': instance.waterMl,
-      'phosphorus_mg': instance.phosphorusMg,
       'eaten_at': instance.eatenAt.toIso8601String(),
     };

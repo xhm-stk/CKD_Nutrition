@@ -6,6 +6,7 @@ import '../../../controllers/auth_controller.dart';
 import '../../../providers/auth_providers.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/mesh_gradient_background.dart';
+import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 import 'widgets/login_form.dart';
 import 'widgets/social_auth_buttons.dart';
 
@@ -77,7 +78,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Color(0xFF0F172A),
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -99,8 +100,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                   // Header Texts
                   Text(
-                        'ยินดีต้อนรับกลับ',
-                        style: Theme.of(context).textTheme.displayLarge,
+                        AppLocalizations.of(context)!.welcomeTitle,
+                        style: Theme.of(context).textTheme.displayLarge
+                            ?.copyWith(color: const Color(0xFF0F172A)),
                         textAlign: TextAlign.center,
                       )
                       .animate()
@@ -108,8 +110,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       .slideY(begin: 0.1),
                   const SizedBox(height: 8),
                   Text(
-                    'เข้าสู่ระบบเพื่อจัดการโภชนาการของคุณต่อ',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    AppLocalizations.of(context)!.welcomeSubtitle,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: const Color(0xFF475569),
+                    ),
                     textAlign: TextAlign.center,
                   ).animate().fade(delay: 300.ms, duration: 500.ms),
                   const SizedBox(height: 48),
@@ -126,22 +130,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     children: [
                       Expanded(
                         child: Divider(
-                          color: Colors.white.withValues(alpha: 0.15),
+                          color: Colors.black.withValues(alpha: 0.08),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'หรือเข้าใช้งานผ่าน',
+                          AppLocalizations.of(context)!.orLoginWith,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.4),
+                            color: Colors.black.withValues(alpha: 0.4),
                             fontSize: 14,
                           ),
                         ),
                       ),
                       Expanded(
                         child: Divider(
-                          color: Colors.white.withValues(alpha: 0.15),
+                          color: Colors.black.withValues(alpha: 0.08),
                         ),
                       ),
                     ],
@@ -160,9 +164,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'ยังไม่มีบัญชีใช่ไหม? ',
+                        AppLocalizations.of(context)!.dontHaveAccount,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.6),
+                          color: Colors.black.withValues(alpha: 0.6),
                           fontSize: 14,
                         ),
                       ),
@@ -170,9 +174,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         onTap: () {
                           context.push('/register');
                         },
-                        child: const Text(
-                          'สร้างบัญชีใหม่',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.register,
+                          style: const TextStyle(
                             color: AppTheme.brandPrimary,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,

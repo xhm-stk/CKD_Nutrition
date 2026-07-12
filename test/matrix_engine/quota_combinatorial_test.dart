@@ -27,7 +27,6 @@ class MockMealRepository implements MealRepository {
     required double sugar,
     required double carb,
     required double water,
-    required double phosphorus,
     required DateTime eatenAt,
   }) async {
     callCount++;
@@ -40,7 +39,6 @@ class MockMealRepository implements MealRepository {
       'sugar': sugar,
       'carb': carb,
       'water': water,
-      'phosphorus': phosphorus,
       'eatenAt': eatenAt,
     };
     return Success(null);
@@ -55,7 +53,7 @@ class DummyDashboardUseCase implements DashboardUseCase {
   Future<DailyLog?> getSummary(String todayStr) async {
     return null;
   }
-  
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -78,163 +76,167 @@ class DummySharedPreferences implements SharedPreferences {
 
 void main() {
   group('Extreme Combinatorial QA Matrix (Medical Grade)', () {
-    test('Run 1,260,000+ Scenarios in Memory', timeout: const Timeout(Duration(minutes: 5)), () async {
-      final repo = MockMealRepository();
-      final dashboard = DummyDashboardUseCase();
-      final prefs = DummySharedPreferences();
-      final controller = MealController(repo, dashboard, prefs);
+    test(
+      'Run 1,260,000+ Scenarios in Memory',
+      timeout: const Timeout(Duration(minutes: 5)),
+      () async {
+        final repo = MockMealRepository();
+        final dashboard = DummyDashboardUseCase();
+        final prefs = DummySharedPreferences();
+        final controller = MealController(repo, dashboard, prefs);
 
-      // ==========================================
-      // 🔬 กำหนดมิติการทดสอบระดับผู้เชี่ยวชาญ (Expert Dimensions)
-      // ==========================================
-      final stages = [
-        'Stage 1',
-        'Stage 2',
-        'Stage 3a',
-        'Stage 3b',
-        'Stage 4',
-        'Stage 5',
-        'Dialysis',
-      ];
-      final weights = [40.0, 60.0, 80.0, 100.0, 120.0];
-      final comorbidities = [
-        'None',
-        'Diabetes',
-        'Hypertension',
-        'Gout',
-        'All Comorbidities',
-      ];
-      final densities = [0.1, 1.0, 5.0, 10.0]; // 4 ระดับ
-      final quantities = [0.0, 10.0, 100.0, 1000.0]; // 4 ระดับ
-      final dataIntegrities = [
-        'Valid',
-        'Zero',
-        'Negative',
-        'Extreme Overdose',
-      ]; // 4 ชนิด
-      final timeBoundaries = [
-        'Morning',
-        'Evening',
-        'Midnight 00:00:00',
-        'Edge 23:59:59',
-      ]; // 4 คาบเวลา
-      final quotaUsedLevels = [
-        0.0,
-        0.5,
-        0.9,
-        1.1,
-      ]; // 4 ระดับ (จำลองการตรวจสอบโควต้า)
-      final networkStates = [
-        'Online Fast',
-        'Online Slow',
-        'Offline',
-        'Flaky',
-      ]; // 4 สถานะ
-      final userActions = [
-        'Single Click',
-        'Spam Click',
-        'Delete Sync',
-      ]; // 3 พฤติกรรม
+        // ==========================================
+        // 🔬 กำหนดมิติการทดสอบระดับผู้เชี่ยวชาญ (Expert Dimensions)
+        // ==========================================
+        final stages = [
+          'Stage 1',
+          'Stage 2',
+          'Stage 3a',
+          'Stage 3b',
+          'Stage 4',
+          'Stage 5',
+          'Dialysis',
+        ];
+        final weights = [40.0, 60.0, 80.0, 100.0, 120.0];
+        final comorbidities = [
+          'None',
+          'Diabetes',
+          'Hypertension',
+          'Gout',
+          'All Comorbidities',
+        ];
+        final densities = [0.1, 1.0, 5.0, 10.0]; // 4 ระดับ
+        final quantities = [0.0, 10.0, 100.0, 1000.0]; // 4 ระดับ
+        final dataIntegrities = [
+          'Valid',
+          'Zero',
+          'Negative',
+          'Extreme Overdose',
+        ]; // 4 ชนิด
+        final timeBoundaries = [
+          'Morning',
+          'Evening',
+          'Midnight 00:00:00',
+          'Edge 23:59:59',
+        ]; // 4 คาบเวลา
+        final quotaUsedLevels = [
+          0.0,
+          0.5,
+          0.9,
+          1.1,
+        ]; // 4 ระดับ (จำลองการตรวจสอบโควต้า)
+        final networkStates = [
+          'Online Fast',
+          'Online Slow',
+          'Offline',
+          'Flaky',
+        ]; // 4 สถานะ
+        final userActions = [
+          'Single Click',
+          'Spam Click',
+          'Delete Sync',
+        ]; // 3 พฤติกรรม
 
-      int totalCases = 0;
-      int passedCases = 0;
-      int failedCases = 0;
+        int totalCases = 0;
+        int passedCases = 0;
+        int failedCases = 0;
 
-      final stopwatch = Stopwatch()..start();
+        final stopwatch = Stopwatch()..start();
 
-      for (var stage in stages) {
-        // 7
-        for (var weight in weights) {
-          // 5
-          for (var disease in comorbidities) {
+        for (var stage in stages) {
+          // 7
+          for (var weight in weights) {
             // 5
-            for (var density in densities) {
-              // 4
-              for (var qty in quantities) {
+            for (var disease in comorbidities) {
+              // 5
+              for (var density in densities) {
                 // 4
-                for (var quota in quotaUsedLevels) {
+                for (var qty in quantities) {
                   // 4
-                  for (var timeBoundary in timeBoundaries) {
+                  for (var quota in quotaUsedLevels) {
                     // 4
-                    for (var integrity in dataIntegrities) {
+                    for (var timeBoundary in timeBoundaries) {
                       // 4
-                      for (var net in networkStates) {
+                      for (var integrity in dataIntegrities) {
                         // 4
-                        for (var action in userActions) {
-                          // 3
-                          totalCases++;
+                        for (var net in networkStates) {
+                          // 4
+                          for (var action in userActions) {
+                            // 3
+                            totalCases++;
 
-                          // 1. จำลองข้อมูล (Data Injection)
-                          double testQty = qty;
-                          if (integrity == 'Negative') testQty = -50.0;
-                          if (integrity == 'Extreme Overdose') {
-                            testQty = 9999999.0;
-                          }
-
-                          final baseFood =
-                              FoodItem()
-                                ..foodId = 'F_TEST'
-                                ..name =
-                                    'Simulated Food [\$disease] [\$net] [\$action]'
-                                ..proteinG = 10.0 * density
-                                ..potassiumMg = 200.0 * density
-                                ..sodiumMg = 300.0 * density
-                                ..sugarG = 5.0 * density
-                                ..carbG = 20.0 * density
-                                ..waterMl = 50.0 * density
-                                ..phosphorusMg = 100.0 * density;
-
-                          repo.lastPayload = null;
-
-                          // 2. จำลองการทำงาน (Execution)
-                          final result = await controller.logMeal(
-                            food: baseFood,
-                            quantityG: testQty,
-                            mealType: 'breakfast',
-                          );
-
-                          // 3. ระบบผู้เชี่ยวชาญตรวจสอบความปลอดภัย (Medical Safety Asserts)
-                          bool isCasePassed = true;
-
-                          if (testQty <= 0) {
-                            if (result is Success) {
-                              isCasePassed = false;
+                            // 1. จำลองข้อมูล (Data Injection)
+                            double testQty = qty;
+                            if (integrity == 'Negative') testQty = -50.0;
+                            if (integrity == 'Extreme Overdose') {
+                              testQty = 9999999.0;
                             }
-                            if (repo.lastPayload != null) {
-                              isCasePassed = false;
-                            }
-                          } else if (integrity == 'Extreme Overdose') {
-                            if (result is Failure) {
-                              isCasePassed = false;
-                            }
-                            if (repo.lastPayload == null) {
-                              isCasePassed = false;
-                            } else if ((repo.lastPayload!['protein'] as double)
-                                .isNaN) {
-                              isCasePassed = false;
-                            }
-                          } else {
-                            if (result is Failure) isCasePassed = false;
-                            if (repo.lastPayload != null) {
-                              final p = repo.lastPayload!;
-                              final expectedRatio = testQty / 100.0;
-                              final expectedProtein =
-                                  10.0 * density * expectedRatio;
 
-                              if (((p['protein'] as double) - expectedProtein)
-                                      .abs() >
-                                  0.01) {
+                            final baseFood =
+                                FoodItem()
+                                  ..foodId = 'F_TEST'
+                                  ..name =
+                                      'Simulated Food [\$disease] [\$net] [\$action]'
+                                  ..proteinG = 10.0 * density
+                                  ..potassiumMg = 200.0 * density
+                                  ..sodiumMg = 300.0 * density
+                                  ..sugarG = 5.0 * density
+                                  ..carbG = 20.0 * density
+                                  ..waterMl = 50.0 * density;
+
+                            repo.lastPayload = null;
+
+                            // 2. จำลองการทำงาน (Execution)
+                            final result = await controller.logMeal(
+                              food: baseFood,
+                              quantityG: testQty,
+                              mealType: 'breakfast',
+                            );
+
+                            // 3. ระบบผู้เชี่ยวชาญตรวจสอบความปลอดภัย (Medical Safety Asserts)
+                            bool isCasePassed = true;
+
+                            if (testQty <= 0) {
+                              if (result is Success) {
+                                isCasePassed = false;
+                              }
+                              if (repo.lastPayload != null) {
+                                isCasePassed = false;
+                              }
+                            } else if (integrity == 'Extreme Overdose') {
+                              if (result is Failure) {
+                                isCasePassed = false;
+                              }
+                              if (repo.lastPayload == null) {
+                                isCasePassed = false;
+                              } else if ((repo.lastPayload!['protein']
+                                      as double)
+                                  .isNaN) {
                                 isCasePassed = false;
                               }
                             } else {
-                              isCasePassed = false;
-                            }
-                          }
+                              if (result is Failure) isCasePassed = false;
+                              if (repo.lastPayload != null) {
+                                final p = repo.lastPayload!;
+                                final expectedRatio = testQty / 100.0;
+                                final expectedProtein =
+                                    10.0 * density * expectedRatio;
 
-                          if (isCasePassed) {
-                            passedCases++;
-                          } else {
-                            failedCases++;
+                                if (((p['protein'] as double) - expectedProtein)
+                                        .abs() >
+                                    0.01) {
+                                  isCasePassed = false;
+                                }
+                              } else {
+                                isCasePassed = false;
+                              }
+                            }
+
+                            if (isCasePassed) {
+                              passedCases++;
+                            } else {
+                              failedCases++;
+                            }
                           }
                         }
                       }
@@ -245,19 +247,18 @@ void main() {
             }
           }
         }
-      }
 
-      stopwatch.stop();
+        stopwatch.stop();
 
-      // ==========================================
-      // 📊 สร้างรายงานภาพรวม (Overview Report)
-      // ==========================================
-      final formattedTotal = totalCases.toString().replaceAllMapped(
-        RegExp(r'\B(?=(\d{3})+(?!\d))'),
-        (match) => ',',
-      );
+        // ==========================================
+        // 📊 สร้างรายงานภาพรวม (Overview Report)
+        // ==========================================
+        final formattedTotal = totalCases.toString().replaceAllMapped(
+          RegExp(r'\B(?=(\d{3})+(?!\d))'),
+          (match) => ',',
+        );
 
-      final report = '''
+        final report = '''
 # 🧪 QA Execution Report: Extreme Combinatorial Matrix
 
 | 📊 Metric | ข้อมูล (Value) |
@@ -290,23 +291,24 @@ void main() {
 *This report was automatically generated by the QA Bot on ${DateTime.now().toLocal()}.*
 ''';
 
-      // บันทึก Report เป็น Markdown ให้อ่านง่ายๆ
-      final file = File(
-        'C:/Users/satit/.gemini/antigravity/brain/014ac2ce-6237-4ce7-abd1-db2a3766f0a5/qa_execution_report.md',
-      );
-      await file.writeAsString(report);
+        // บันทึก Report เป็น Markdown ให้อ่านง่ายๆ
+        final file = File(
+          'C:/Users/satit/.gemini/antigravity/brain/014ac2ce-6237-4ce7-abd1-db2a3766f0a5/qa_execution_report.md',
+        );
+        await file.writeAsString(report);
 
-      print(
-        '✅ Extreme Matrix Execution Complete: $totalCases scenarios run in ${stopwatch.elapsedMilliseconds}ms',
-      );
-      print('📄 Report generated at: ${file.absolute.path}');
+        print(
+          '✅ Extreme Matrix Execution Complete: $totalCases scenarios run in ${stopwatch.elapsedMilliseconds}ms',
+        );
+        print('📄 Report generated at: ${file.absolute.path}');
 
-      // บังคับให้ Test พังถ้ามี Failed Cases หลุดมา
-      expect(
-        failedCases,
-        0,
-        reason: 'ตรวจพบช่องโหว่ในระบบ! มีบางเคสหลุดลอดการป้องกัน',
-      );
-    });
+        // บังคับให้ Test พังถ้ามี Failed Cases หลุดมา
+        expect(
+          failedCases,
+          0,
+          reason: 'ตรวจพบช่องโหว่ในระบบ! มีบางเคสหลุดลอดการป้องกัน',
+        );
+      },
+    );
   });
 }

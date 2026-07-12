@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../pages/dashboard/widgets/add_action_sheet.dart';
+import 'offline_banner.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/core_providers.dart';
@@ -25,7 +26,9 @@ class MainScaffold extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // ปรับโครงสร้างเพื่อรองรับปุ่มใหญ่ตรงกลาง
     return Scaffold(
-      body: navigationShell,
+      body: Column(
+        children: [const OfflineBanner(), Expanded(child: navigationShell)],
+      ),
       bottomNavigationBar: BottomAppBar(
         elevation: 0, // ลบเงา
         color: Theme.of(context).scaffoldBackgroundColor, // สีเดียวกับพื้นหลัง
@@ -40,15 +43,15 @@ class MainScaffold extends ConsumerWidget {
               index: 0,
             ),
 
-            // ปุ่มบวกตรงกลาง (อยู่ระดับเดียวกับเมนูอื่นๆ)
+            // ปุ่มบวกตรงกลาง (จัดรูปแบบให้เข้ากับเมนูอื่นๆ)
             InkWell(
               onTap: () {
                 final selectedDate = ref.read(selectedDateProvider);
                 if (!isSameDay(selectedDate, DateTime.now())) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
-                        'คุณสามารถบันทึกอาหารได้เฉพาะวันที่ปัจจุบันเท่านั้น',
+                        AppLocalizations.of(context)!.canOnlyLogTodayMeals,
                       ),
                     ),
                   );
@@ -56,15 +59,41 @@ class MainScaffold extends ConsumerWidget {
                 }
                 AddActionSheet.show(context);
               },
-              customBorder: const CircleBorder(),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color:
-                      Theme.of(context).colorScheme.primary, // สีเดียวกับธีมแอป
-                  shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 4.0,
                 ),
-                child: const Icon(Icons.add, color: Colors.white, size: 28),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.add_circle,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      AppLocalizations.of(context)!.navAddMeal,
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 

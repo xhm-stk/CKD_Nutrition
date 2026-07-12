@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
 
 /// Widget ฉากหลังเรืองแสงสีเขียวมรกต (Emerald Mesh Gradient)
 /// ใช้ร่วมกันในหน้า Login, Register และ Dashboard
@@ -12,16 +11,23 @@ class MeshGradientBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseBgColor = theme.scaffoldBackgroundColor;
+    final primaryColor = theme.colorScheme.primary;
+    final accentColor =
+        isDark ? const Color(0xFF00B4D8) : const Color(0xFF38BDF8);
+
     return Stack(
       children: [
         // Base color layer
-        Container(color: AppTheme.bgBase),
+        Container(color: baseBgColor),
 
-        // Mesh gradient orbs — cached by RepaintBoundary (1 layer only)
+        // Mesh gradient orbs — cached by RepaintBoundary
         RepaintBoundary(
           child: Stack(
             children: [
-              // Emerald orb (top-left)
+              // Primary orb (top-left)
               Positioned(
                 top: -80,
                 left: -80,
@@ -30,11 +36,11 @@ class MeshGradientBackground extends StatelessWidget {
                   height: 300,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.brandPrimary.withValues(alpha: 0.15),
+                    color: primaryColor.withValues(alpha: isDark ? 0.15 : 0.08),
                   ),
                 ),
               ),
-              // Mint orb (bottom-right)
+              // Accent orb (bottom-right)
               Positioned(
                 bottom: -100,
                 right: -60,
@@ -43,7 +49,7 @@ class MeshGradientBackground extends StatelessWidget {
                   height: 350,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.brandAccent.withValues(alpha: 0.10),
+                    color: accentColor.withValues(alpha: isDark ? 0.10 : 0.08),
                   ),
                 ),
               ),

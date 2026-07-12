@@ -9,6 +9,9 @@ import 'package:ckd_nutrition_app/models/supabase/meal.dart';
 import 'package:ckd_nutrition_app/repositories/meal_repository.dart';
 import 'package:ckd_nutrition_app/core/result.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
+
 class MockMealRepository extends Mock implements MealRepository {}
 
 class FakeMeal extends Fake implements Meal {}
@@ -32,6 +35,14 @@ void main() {
           dashboardSummaryProvider.overrideWith((ref) async => null),
         ],
         child: const MaterialApp(
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [Locale('en', ''), Locale('th', '')],
+          locale: Locale('th', ''),
           home: Scaffold(
             body: CustomScrollView(
               slivers: [SliverToBoxAdapter(child: MealsListWidget())],
@@ -67,7 +78,6 @@ void main() {
         sugarG: 0,
         carbG: 20,
         waterMl: 250,
-        phosphorusMg: 0,
         eatenAt: now,
       );
 
@@ -80,7 +90,22 @@ void main() {
 
       expect(find.text('Rice'), findsOneWidget);
       expect(find.text('มื้อเที่ยง'), findsOneWidget);
-      expect(find.textContaining('โปรตีน 2.0g | โซเดียม 1mg'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is RichText &&
+              widget.text.toPlainText().contains('โปรตีน 2.0กรัม'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is RichText &&
+              widget.text.toPlainText().contains('โซเดียม 1มก.'),
+        ),
+        findsOneWidget,
+      );
     });
   });
 }

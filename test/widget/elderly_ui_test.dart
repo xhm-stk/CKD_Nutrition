@@ -6,6 +6,9 @@ import 'package:ckd_nutrition_app/providers/core_providers.dart';
 import 'package:ckd_nutrition_app/providers/meal_providers.dart';
 import 'package:ckd_nutrition_app/models/supabase/daily_log.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
+
 void main() {
   testWidgets('DashboardPage rendering with Elderly Font Scale (200%)', (
     WidgetTester tester,
@@ -35,7 +38,17 @@ void main() {
         child: const MediaQuery(
           // จำลองการตั้งค่า Text Scale บนเครื่องผู้สูงอายุเป็น 200%
           data: MediaQueryData(textScaler: TextScaler.linear(2.0)),
-          child: MaterialApp(home: DashboardPage()),
+          child: MaterialApp(
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [Locale('en', ''), Locale('th', '')],
+            locale: Locale('th', ''),
+            home: DashboardPage(),
+          ),
         ),
       ),
     );

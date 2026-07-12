@@ -7,6 +7,7 @@ import '../../../controllers/register_controller.dart';
 import '../../../providers/auth_providers.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/mesh_gradient_background.dart';
+import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 import 'widgets/register_form.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
@@ -41,7 +42,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             const SnackBar(
               content: Text(
                 'สมัครสมาชิกสำเร็จ! กรุณาเปิดกล่องจดหมายของคุณและคลิกลิงก์ยืนยันตัวตนในอีเมลก่อนเริ่มใช้งาน',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white),
               ),
               backgroundColor: AppTheme.brandSecondary,
               duration: Duration(seconds: 8),
@@ -53,7 +54,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             const SnackBar(
               content: Text(
                 'สมัครสมาชิกสำเร็จแล้ว! กำลังนำคุณไปยังขั้นตอนตั้งค่าสุขภาพ',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white),
               ),
               backgroundColor: AppTheme.brandPrimary,
             ),
@@ -101,7 +102,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Color(0xFF0F172A),
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -123,8 +124,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                   // Header Texts
                   Text(
-                        'เริ่มต้นดูแลสุขภาพไต',
-                        style: Theme.of(context).textTheme.displayLarge,
+                        AppLocalizations.of(context)!.register,
+                        style: Theme.of(context).textTheme.displayLarge
+                            ?.copyWith(color: const Color(0xFF0F172A)),
                         textAlign: TextAlign.center,
                       )
                       .animate()
@@ -132,8 +134,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       .slideY(begin: 0.1),
                   const SizedBox(height: 8),
                   Text(
-                    'สร้างบัญชีใหม่เพื่อรับแผนการกินอาหารที่ออกแบบมาเพื่อคุณโดยเฉพาะ',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    AppLocalizations.of(context)!.welcomeSubtitle,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: const Color(0xFF475569),
+                    ),
                     textAlign: TextAlign.center,
                   ).animate().fade(delay: 300.ms, duration: 500.ms),
                   const SizedBox(height: 48),
@@ -150,9 +154,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'มีบัญชีอยู่แล้ว? ',
+                        AppLocalizations.of(context)!.alreadyHaveAccount,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.6),
+                          color: Colors.black.withValues(alpha: 0.6),
                           fontSize: 14,
                         ),
                       ),
@@ -160,9 +164,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         onTap: () {
                           context.pop();
                         },
-                        child: const Text(
-                          'เข้าสู่ระบบ',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.login,
+                          style: const TextStyle(
                             color: AppTheme.brandPrimary,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,

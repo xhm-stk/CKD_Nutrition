@@ -39,52 +39,45 @@ class QuotaEngine {
     final sugarLimit = log?.customSugar ?? rule?.sugarLimitG ?? 0;
     final carbLimit = log?.customCarb ?? rule?.carbLimitG ?? 0;
     final waterLimit = log?.customWater ?? rule?.waterLimitMl ?? 0;
-    final phosphorusLimit =
-        log?.customPhosphorus ?? rule?.phosphorusLimitMg ?? 0;
 
     if (proteinLimit == 0 && potassiumLimit == 0) {
       return []; // ไม่มีข้อมูล rule และ profile
     }
 
+    // ใช้ English key เป็น label เพื่อให้แปลภาษาได้ที่ UI layer
     return [
       NutrientQuota(
-        label: 'โปรตีน',
+        label: 'protein',
         unit: 'g',
         consumed: log?.totalProteinG ?? 0,
         limit: proteinLimit,
       ),
       NutrientQuota(
-        label: 'โพแทสเซียม',
+        label: 'potassium',
         unit: 'mg',
         consumed: log?.totalPotassiumMg ?? 0,
         limit: potassiumLimit,
       ),
       NutrientQuota(
-        label: 'ฟอสฟอรัส',
-        unit: 'mg',
-        consumed: log?.totalPhosphorusMg ?? 0,
-        limit: phosphorusLimit,
-      ),
-      NutrientQuota(
-        label: 'โซเดียม',
+        label: 'sodium',
         unit: 'mg',
         consumed: log?.totalSodiumMg ?? 0,
         limit: sodiumLimit,
       ),
       NutrientQuota(
-        label: 'น้ำตาล',
+        label: 'sugar',
         unit: 'g',
         consumed: log?.totalSugarG ?? 0,
         limit: sugarLimit,
       ),
       NutrientQuota(
-        label: 'คาร์บ',
+        label: 'carb',
         unit: 'g',
         consumed: log?.totalCarbG ?? 0,
         limit: carbLimit,
       ),
       NutrientQuota(
-        label: 'น้ำ',
+        label: 'water',
         unit: 'ml',
         consumed: log?.totalWaterMl ?? 0,
         limit: waterLimit,

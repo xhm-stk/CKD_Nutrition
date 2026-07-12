@@ -18,9 +18,11 @@ import 'router/app_router.dart';
 import 'providers/auth_providers.dart';
 import 'services/biometric_service.dart';
 import 'theme/app_theme.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // บังคับให้ Flutter สตาร์ท
+  await initializeDateFormatting();
 
   // บังคับให้แอปเป็นแนวตั้งเท่านั้น เพื่อป้องกัน Layout พัง
   await SystemChrome.setPreferredOrientations([
@@ -78,9 +80,27 @@ void main() async {
   // Re-schedule meal reminders on app start (especially for iOS where boot receivers don't exist)
   final mealRemindersEnabled = prefs.getBool('meal_reminders_enabled') ?? false;
   if (mealRemindersEnabled) {
-    notifService.scheduleMealReminder(id: 101, title: 'ได้เวลาอาหารเช้า', body: 'อย่าลืมทานอาหารให้ตรงเวลาและบันทึกโภชนาการนะครับ', hour: 8, minute: 0);
-    notifService.scheduleMealReminder(id: 102, title: 'ได้เวลาอาหารเที่ยง', body: 'พักเที่ยงแล้ว ทานอาหารที่เหมาะสมกับสุขภาพไตด้วยนะครับ', hour: 12, minute: 0);
-    notifService.scheduleMealReminder(id: 103, title: 'ได้เวลาอาหารเย็น', body: 'ทานอาหารเย็นแต่พอดี และอย่าลืมบันทึกข้อมูลนะครับ', hour: 18, minute: 0);
+    notifService.scheduleMealReminder(
+      id: 101,
+      title: 'ได้เวลาอาหารเช้า',
+      body: 'อย่าลืมทานอาหารให้ตรงเวลาและบันทึกโภชนาการนะครับ',
+      hour: 8,
+      minute: 0,
+    );
+    notifService.scheduleMealReminder(
+      id: 102,
+      title: 'ได้เวลาอาหารเที่ยง',
+      body: 'พักเที่ยงแล้ว ทานอาหารที่เหมาะสมกับสุขภาพไตด้วยนะครับ',
+      hour: 12,
+      minute: 0,
+    );
+    notifService.scheduleMealReminder(
+      id: 103,
+      title: 'ได้เวลาอาหารเย็น',
+      body: 'ทานอาหารเย็นแต่พอดี และอย่าลืมบันทึกข้อมูลนะครับ',
+      hour: 18,
+      minute: 0,
+    );
   }
 
   // 6. เปิดระบบดักจับ Error ด้วย Sentry
@@ -173,8 +193,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       supportedLocales: AppLocalizations.supportedLocales,
       locale: ref.watch(localeProvider),
       theme: AppTheme.lightTheme(),
-      darkTheme: AppTheme.darkTheme(),
-      themeMode: ThemeMode.dark,
+      darkTheme:
+          AppTheme.lightTheme(), // Force light theme even if OS is in dark mode
+      themeMode: ThemeMode.light, // Strictly enforce light mode
       routerConfig: router,
     );
   }

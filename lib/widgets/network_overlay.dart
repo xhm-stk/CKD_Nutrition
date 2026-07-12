@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import '../providers/core_providers.dart';
+import '../l10n/app_localizations.dart';
 
 class NetworkOverlay extends ConsumerWidget {
   final Widget child;
@@ -10,6 +11,7 @@ class NetworkOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final connectivityAsync = ref.watch(connectivityProvider);
     final isOfflineMode = ref.watch(offlineModeProvider);
     final supabase = ref.watch(supabaseProvider);
@@ -30,9 +32,7 @@ class NetworkOverlay extends ConsumerWidget {
             child, // พื้นหลังคือแอปเดิม
             // ตัวบล็อกหน้าจอ
             Container(
-              color: Colors.black.withValues(
-                alpha: 0.8,
-              ), // จำลองสีพื้นหลังตอนขึ้น Dialog
+              color: Colors.black.withValues(alpha: 0.8),
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -54,14 +54,14 @@ class NetworkOverlay extends ConsumerWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'ไม่มีการเชื่อมต่ออินเทอร์เน็ต',
+                            l10n.noInternetTitle,
                             style: Theme.of(context).textTheme.titleLarge
                                 ?.copyWith(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'กรุณาตรวจสอบอินเทอร์เน็ตของคุณ\nหากต้องการดูข้อมูลเดิมสามารถเข้าสู่โหมดออฟไลน์ได้',
+                            l10n.noInternetDesc,
                             style: Theme.of(
                               context,
                             ).textTheme.bodyMedium?.copyWith(
@@ -78,10 +78,9 @@ class NetworkOverlay extends ConsumerWidget {
                             height: 48,
                             child: FilledButton(
                               onPressed: () {
-                                // กดแล้วระบบจะประเมิน stream connectivity ใหม่อัตโนมัติถาวร
-                                // ใส่เพื่อให้ผู้ใช้รู้สึกได้กด
+                                // กดแล้วระบบจะประเมิน stream connectivity ใหม่อัตโนมัติ
                               },
-                              child: const Text('ลองอีกครั้ง'),
+                              child: Text(l10n.retry),
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -94,7 +93,7 @@ class NetworkOverlay extends ConsumerWidget {
                                 ref.read(offlineModeProvider.notifier).state =
                                     true;
                               },
-                              child: const Text('ทำงานแบบออฟไลน์'),
+                              child: Text(l10n.workOffline),
                             ),
                           ),
                         ],

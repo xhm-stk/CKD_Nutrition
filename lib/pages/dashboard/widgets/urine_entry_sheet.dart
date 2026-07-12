@@ -5,16 +5,16 @@ import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/premium_text_field.dart';
 
-class WaterEntrySheet extends ConsumerStatefulWidget {
+class UrineEntrySheet extends ConsumerStatefulWidget {
   final Future<void> Function(int ml) onSave;
 
-  const WaterEntrySheet({super.key, required this.onSave});
+  const UrineEntrySheet({super.key, required this.onSave});
 
   @override
-  ConsumerState<WaterEntrySheet> createState() => _WaterEntrySheetState();
+  ConsumerState<UrineEntrySheet> createState() => _UrineEntrySheetState();
 }
 
-class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
+class _UrineEntrySheetState extends ConsumerState<UrineEntrySheet> {
   final TextEditingController _customMlCtrl = TextEditingController();
   bool _isLoading = false;
 
@@ -36,6 +36,7 @@ class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       child: Stack(
@@ -65,7 +66,7 @@ class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
                     height: 350,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppTheme.brandAccent.withValues(alpha: 0.10),
+                      color: Colors.amber.withValues(alpha: 0.08),
                     ),
                   ),
                 ),
@@ -107,7 +108,7 @@ class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      AppLocalizations.of(context)!.logWater,
+                      l10n.logUrine,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.onSurface,
@@ -131,8 +132,9 @@ class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
                   runSpacing: 12,
                   alignment: WrapAlignment.center,
                   children: [
-                    _buildQuickButton(100),
+                    _buildQuickButton(150),
                     _buildQuickButton(250),
+                    _buildQuickButton(350),
                     _buildQuickButton(500),
                   ],
                 ),
@@ -147,7 +149,9 @@ class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'หรือระบุเอง (ml)',
+                        l10n.localeName == 'th'
+                            ? 'หรือระบุเอง (มล.)'
+                            : 'Or specify (ml)',
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -165,51 +169,51 @@ class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
                 const SizedBox(height: 16),
                 PremiumTextField(
                   controller: _customMlCtrl,
-                  label: 'ระบุปริมาณน้ำ (ml)',
-                  hint: 'เช่น 150',
-                  prefixIcon: Icons.water_drop_rounded,
+                  label:
+                      l10n.localeName == 'th'
+                          ? 'ระบุปริมาณปัสสาวะ (มล.)'
+                          : 'Specify urine volume (ml)',
+                  hint: 'เช่น 250',
                   keyboardType: TextInputType.number,
+                  prefixIcon: Icons.opacity_rounded,
                 ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.brandPrimary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      elevation: 0,
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed:
+                      _isLoading
+                          ? null
+                          : () {
+                            final ml = int.tryParse(_customMlCtrl.text);
+                            if (ml != null && ml > 0) {
+                              _submit(ml);
+                            }
+                          },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.brandPrimary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                    onPressed:
-                        _isLoading
-                            ? null
-                            : () {
-                              final val = int.tryParse(_customMlCtrl.text);
-                              if (val != null && val > 0) {
-                                _submit(val);
-                              }
-                            },
-                    child:
-                        _isLoading
-                            ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                            : Text(
-                              AppLocalizations.of(context)!.save,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                    elevation: 0,
                   ),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                            ),
+                          )
+                          : Text(
+                            l10n.save,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                 ),
               ],
             ),
@@ -220,29 +224,30 @@ class _WaterEntrySheetState extends ConsumerState<WaterEntrySheet> {
   }
 
   Widget _buildQuickButton(int ml) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: _isLoading ? null : () => _submit(ml),
-        borderRadius: BorderRadius.circular(24),
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          decoration: BoxDecoration(
-            color: AppTheme.brandPrimary.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: AppTheme.brandPrimary.withValues(alpha: 0.2),
-              width: 1.5,
+    return InkWell(
+      onTap: _isLoading ? null : () => _submit(ml),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: 100,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.02),
+          border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          children: [
+            const Icon(Icons.opacity_rounded, color: Colors.amber, size: 24),
+            const SizedBox(height: 4),
+            Text(
+              '$ml ml',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
             ),
-          ),
-          child: Text(
-            '+ $ml ml',
-            style: const TextStyle(
-              color: AppTheme.brandPrimary,
-              fontWeight: FontWeight.w800,
-              fontSize: 14,
-            ),
-          ),
+          ],
         ),
       ),
     );

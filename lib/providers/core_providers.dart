@@ -125,6 +125,29 @@ final streakCountProvider = FutureProvider.autoDispose<int>((ref) async {
   }
 });
 
+// 8.1 Logged Dates Provider (สำหรับแสดงจุดบนปฏิทินในวันที่มีการบันทึก)
+final loggedDatesProvider = FutureProvider.autoDispose<List<DateTime>>((
+  ref,
+) async {
+  final sb = ref.watch(supabaseProvider);
+  final user = sb.auth.currentUser;
+  if (user == null) return [];
+
+  try {
+    final data = await sb
+        .from('daily_logs')
+        .select('log_date')
+        .eq('user_id', user.id)
+        .isFilter('deleted_at', null);
+
+    return data
+        .map<DateTime>((e) => DateTime.parse(e['log_date'].toString()))
+        .toList();
+  } catch (_) {
+    return [];
+  }
+});
+
 // 9. Locale Provider (สำหรับเปลี่ยนภาษาแบบ Real-time)
 final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);

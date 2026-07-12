@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:ui';
+import 'dart:io';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -12,50 +13,64 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
-    tz.initializeTimeZones();
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    try {
+      tz.initializeTimeZones();
+      try {
+        // Set local location to Bangkok timezone (GMT+7) for Thai users
+        tz.setLocalLocation(tz.getLocation('Asia/Bangkok'));
+      } catch (e) {
+        // Fallback to UTC if Bangkok is not found
+        tz.setLocalLocation(tz.UTC);
+      }
 
-    // Android Initialization
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+      // Android Initialization
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    // iOS Initialization
-    const DarwinInitializationSettings initializationSettingsDarwin =
-        DarwinInitializationSettings(
-          requestSoundPermission: true,
-          requestBadgePermission: true,
-          requestAlertPermission: true,
-        );
+      // iOS Initialization
+      const DarwinInitializationSettings initializationSettingsDarwin =
+          DarwinInitializationSettings(
+            requestSoundPermission: true,
+            requestBadgePermission: true,
+            requestAlertPermission: true,
+          );
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-          android: initializationSettingsAndroid,
-          iOS: initializationSettingsDarwin,
-        );
+      const InitializationSettings initializationSettings =
+          InitializationSettings(
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsDarwin,
+          );
 
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (
-        NotificationResponse notificationResponse,
-      ) async {
-        // Handle notification tapped logic here if needed
-      },
-    );
+      await flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: (
+          NotificationResponse notificationResponse,
+        ) async {
+          // Handle notification tapped logic here if needed
+        },
+      );
 
-    // Request permissions for Android 13+ and iOS
-    flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestNotificationsPermission();
+      // Request permissions for Android 13+ and iOS
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.requestNotificationsPermission();
 
-    flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin
-        >()
-        ?.requestPermissions(alert: true, badge: true, sound: true);
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
+    } catch (e, stack) {
+      // ignore: avoid_print
+      print('NotificationService init error: $e\n$stack');
+    }
   }
 
   Future<void> scheduleWaterReminder() async {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
           'water_reminder_channel',
@@ -96,6 +111,7 @@ class NotificationService {
     required int hour,
     required int minute,
   }) async {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
           'meal_reminder_channel',
@@ -141,6 +157,7 @@ class NotificationService {
     String nutrientName,
     int percentage,
   ) async {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
           'alert_channel',
@@ -163,6 +180,41 @@ class NotificationService {
       '⚠️ ระวัง! $nutrientName สูง',
       'คุณบริโภค $nutrientName ไปแล้ว $percentage% ของโควต้าวันนี้',
       platformChannelSpecifics,
+    );
+  }
+
+  Future<void> showInstantReminderTest({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+          'reminder_test_channel',
+          'ทดสอบแจ้งเตือน (BETA)',
+          channelDescription: 'ใช้สำหรับทดสอบการทำงานของระบบแจ้งเตือน',
+          importance: Importance.max,
+          priority: Priority.high,
+        );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: DarwinNotificationDetails(),
+    );
+
+    final scheduledDate = tz.TZDateTime.now(
+      tz.local,
+    ).add(const Duration(seconds: 3));
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      id + 99999,
+      title,
+      body,
+      scheduledDate,
+      platformChannelSpecifics,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
   }
 

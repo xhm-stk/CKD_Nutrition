@@ -67,8 +67,6 @@ class IsarSeedService {
                   double.tryParse(parseString(j['คาโบไฮเดต(กรัม)'])) ?? 0.0
               ..waterMl =
                   double.tryParse(parseString(j['นํ้า(มิลลิลิตร)'])) ?? 0.0
-              ..phosphorusMg =
-                  double.tryParse(parseString(j['ฟอสฟอรัส(มิลลิกรัม)'])) ?? 0.0
               ..cookingMethod = parseString(j['วิธีปรุงอาหาร'])
               ..source = parseString(j['source'])
               ..sourceUrl = parseString(j['source_url'])

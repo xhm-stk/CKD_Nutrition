@@ -3,7 +3,9 @@
 -- คำสั่งสำหรับสร้าง View เพื่อใช้ดึงข้อมูล Dashboard ใน 1 Query
 -- ==============================================================================
 
-CREATE OR REPLACE VIEW public.dashboard_summary AS
+CREATE OR REPLACE VIEW public.dashboard_summary
+WITH (security_invoker = true)
+AS
 SELECT
   dl.id,
   dl.user_id,

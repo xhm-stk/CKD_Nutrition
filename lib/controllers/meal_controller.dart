@@ -17,21 +17,49 @@ class MealController {
     required FoodItem food,
     required double quantityG,
     required String mealType,
+    DateTime? eatenAt,
   }) async {
     if (quantityG <= 0) {
       return Failure('ปริมาณอาหารต้องมากกว่า 0 กรัม');
     }
 
     // 1. Business Logic: Calculate ratio and nutrition values based on quantity consumed
-    final ratio = quantityG / 100.0;
+    // Try to parse the weight from the servingSize (e.g. "440g" or "440 g" -> 440.0)
+    // If the database stores values already calculated for a specific portion size (like 440g),
+    // then ratio should be quantityG / portionSize instead of quantityG / 100.0.
+    double divisor = 100.0;
+    try {
+      final sizeStr = food.servingSize;
+      if (sizeStr.isNotEmpty) {
+        final regExp = RegExp(r'(\d+)\s*g');
+        final match = regExp.firstMatch(sizeStr.toLowerCase());
+        if (match != null) {
+          final weight = double.tryParse(match.group(1) ?? '');
+          if (weight != null && weight > 0) {
+            divisor = weight;
+          }
+        }
+      }
+    } catch (_) {
+      // In case servingSize is not initialized (e.g. in some unit tests)
+    }
+
+    final ratio = quantityG / divisor;
 
     final protein = food.proteinG * ratio;
     final potassium = food.potassiumMg * ratio;
     final sodium = food.sodiumMg * ratio;
     final sugar = food.sugarG * ratio;
     final carb = food.carbG * ratio;
-    final water = food.waterMl * ratio;
-    final phosphorus = food.phosphorusMg * ratio;
+    // Only count water if it is a pure water beverage (quick water, or items containing "น้ำดื่ม", "น้ำแร่", "น้ำเปล่า", "น้ำสะอาด")
+    // This prevents the water content of food recipes (like soup in แกงจืด) from showing up on the dashboard daily water target.
+    final isWaterBeverage =
+        food.foodId == 'quick_water' ||
+        food.name.contains('น้ำดื่ม') ||
+        food.name.contains('น้ำแร่') ||
+        food.name.contains('น้ำเปล่า') ||
+        food.name.contains('น้ำสะอาด');
+    final water = isWaterBeverage ? (food.waterMl * ratio) : 0.0;
 
     // 2. Delegate to repository for persistence
     final result = await _repository.logMealData(
@@ -45,8 +73,7 @@ class MealController {
       sugar: sugar,
       carb: carb,
       water: water,
-      phosphorus: phosphorus,
-      eatenAt: DateTime.now(),
+      eatenAt: eatenAt ?? DateTime.now(),
     );
 
     // 3. Check for high nutrient limit (>= 80%) after logging
@@ -55,6 +82,13 @@ class MealController {
     }
 
     return result;
+  }
+
+  Future<Result<void>> logUrine(double amountMl) async {
+    if (amountMl <= 0) {
+      return Failure('ปริมาณปัสสาวะต้องมากกว่า 0 มล.');
+    }
+    return _repository.logUrine(amountMl);
   }
 
   Future<void> _checkNutrientLimits() async {
@@ -95,12 +129,6 @@ class MealController {
       summary.totalPotassiumMg,
       summary.customPotassium ?? 0,
       'potassium',
-    );
-    checkAndAlert(
-      'ฟอสฟอรัส',
-      summary.totalPhosphorusMg,
-      summary.customPhosphorus ?? 0,
-      'phosphorus',
     );
     checkAndAlert(
       'น้ำตาล',

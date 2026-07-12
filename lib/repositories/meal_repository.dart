@@ -14,8 +14,9 @@ import '../core/result.dart';
 class MealRepository {
   final SupabaseClient _sb;
   final OfflineSyncWorker _syncWorker;
+  final Isar _isar;
 
-  MealRepository(this._sb, this._syncWorker);
+  MealRepository(this._sb, this._syncWorker, this._isar);
 
   Future<Result<List<Meal>>> getMealsByDate(String dateStr) async {
     try {
@@ -55,6 +56,21 @@ class MealRepository {
   }
 
   Future<Result<void>> deleteMeal(Meal meal) async {
+    if (meal.id.startsWith('offline_')) {
+      try {
+        final actionIdStr = meal.id.replaceFirst('offline_', '');
+        final actionId = int.tryParse(actionIdStr);
+        if (actionId != null) {
+          await _isar.writeTxn(() async {
+            await _isar.offlineActions.delete(actionId);
+          });
+        }
+        return Success(null);
+      } catch (e) {
+        return Failure('ไม่สามารถลบมื้ออาหารออฟไลน์ได้', e);
+      }
+    }
+
     try {
       // เรียกใช้ RPC เพื่อให้มันหักลบยอดโภชนาการใน daily_logs ด้วย
       await _sb.rpc('delete_meal', params: {'p_meal_id': meal.id});
@@ -74,7 +90,6 @@ class MealRepository {
         'sugar': meal.sugarG,
         'carb': meal.carbG,
         'water': meal.waterMl,
-        'phosphorus': meal.phosphorusMg,
         'eaten_at': meal.eatenAt.toIso8601String(),
       });
 
@@ -93,7 +108,6 @@ class MealRepository {
     required double sugar,
     required double carb,
     required double water,
-    required double phosphorus,
     required DateTime eatenAt,
   }) async {
     try {
@@ -110,8 +124,6 @@ class MealRepository {
           'p_sugar': sugar,
           'p_carb': carb,
           'p_water': water,
-          'p_phosphorus': phosphorus,
-          'p_eaten_at': eatenAt.toIso8601String(),
         },
       );
       return Success(null);
@@ -132,7 +144,6 @@ class MealRepository {
         'sugar': sugar,
         'carb': carb,
         'water': water,
-        'phosphorus': phosphorus,
         'eaten_at': eatenAt.toUtc().toIso8601String(),
       };
 
@@ -140,6 +151,45 @@ class MealRepository {
 
       // คืนค่าบอก UI ว่าบันทึกสำเร็จ (แบบออฟไลน์)
       return Success(null); // หรืออาจสร้างคลาส SuccessOffline แยกต่างหาก
+    }
+  }
+
+  Future<Result<void>> logUrine(double amountMl) async {
+    try {
+      await _sb.rpc('log_urine', params: {'p_amount_ml': amountMl});
+      return Success(null);
+    } catch (e) {
+      debugPrint(
+        '🚨 [MealRepository] logUrine Supabase failed: $e, Falling back to Offline Queue...',
+      );
+
+      final payload = {
+        'amount_ml': amountMl,
+        'logged_at': DateTime.now().toUtc().toIso8601String(),
+      };
+
+      await _syncWorker.enqueueAction('LOG_URINE_RPC', payload);
+      return Success(null);
+    }
+  }
+
+  Future<Result<void>> deleteUrine(String urineId, double amountMl) async {
+    try {
+      await _sb.rpc('delete_urine', params: {'p_urine_id': urineId});
+      return Success(null);
+    } catch (e) {
+      debugPrint(
+        '🚨 [MealRepository] deleteUrine Supabase failed: $e, Falling back to Offline Queue...',
+      );
+
+      final payload = {
+        'urine_id': urineId,
+        'amount_ml': amountMl,
+        'logged_at': DateTime.now().toUtc().toIso8601String(),
+      };
+
+      await _syncWorker.enqueueAction('DELETE_URINE_RPC', payload);
+      return Success(null);
     }
   }
 
@@ -195,7 +245,6 @@ class MealRepository {
             sugarG: (p['sugar'] as num).toDouble(),
             carbG: (p['carb'] as num).toDouble(),
             waterMl: (p['water'] as num).toDouble(),
-            phosphorusMg: (p['phosphorus'] as num?)?.toDouble() ?? 0.0,
             eatenAt: DateTime.parse(p['eaten_at']),
           ),
         );

@@ -84,6 +84,27 @@ class DashboardUseCase {
     final weightKg = (profile['weight_kg'] ?? 60.0).toDouble();
     final proteinMultiplier = (rules['protein_multiplier'] ?? 0.8).toDouble();
 
+    // คำนวณ limit แบบ Dynamic จาก weight × multiplier เสมอ (ไม่ใช้ค่า static จาก View)
+    // ทำให้เปลี่ยน CKD Stage หรือน้ำหนักแล้ว Dashboard อัปเดตทันที
+    final dynamicProtein = weightKg * proteinMultiplier;
+    final dynamicPotassium = (rules['potassium_limit_mg'] ?? 2000.0).toDouble();
+    final dynamicSodium = (rules['sodium_limit_mg'] ?? 2000.0).toDouble();
+    final dynamicSugar = (rules['sugar_limit_g'] ?? 24.0).toDouble();
+    final dynamicCarb = (rules['carb_limit_g'] ?? 150.0).toDouble();
+    final dynamicWater = (rules['water_limit_ml'] ?? 1500.0).toDouble();
+
+    // ใช้ค่าที่คำนวณ dynamic เป็น limit เสมอ (override ค่าจาก View)
+    if (baseLog != null) {
+      baseLog = baseLog.copyWith(
+        customProtein: dynamicProtein,
+        customPotassium: dynamicPotassium,
+        customSodium: dynamicSodium,
+        customSugar: dynamicSugar,
+        customCarb: dynamicCarb,
+        customWater: dynamicWater,
+      );
+    }
+
     baseLog ??= DailyLog(
       id: 'empty_log',
       userId: user.id,
@@ -94,42 +115,24 @@ class DashboardUseCase {
       totalSugarG: 0,
       totalCarbG: 0,
       totalWaterMl: 0,
-      customProtein:
-          (profile['custom_protein_limit_g'] != null)
-              ? profile['custom_protein_limit_g'].toDouble()
-              : weightKg * proteinMultiplier,
-      customPotassium:
-          (profile['custom_potassium_limit_mg'] ??
-                  rules['potassium_limit_mg'] ??
-                  2000.0)
-              ?.toDouble(),
-      customSodium:
-          (profile['custom_sodium_limit_mg'] ??
-                  rules['sodium_limit_mg'] ??
-                  2000.0)
-              ?.toDouble(),
-      customSugar:
-          (profile['custom_sugar_limit_g'] ?? rules['sugar_limit_g'] ?? 24.0)
-              ?.toDouble(),
-      customCarb:
-          (profile['custom_carb_limit_g'] ?? rules['carb_limit_g'] ?? 150.0)
-              ?.toDouble(),
-      customWater:
-          (profile['custom_water_limit_ml'] ??
-                  rules['water_limit_ml'] ??
-                  1500.0)
-              ?.toDouble(),
+      totalUrineMl: 0,
+      customProtein: dynamicProtein,
+      customPotassium: dynamicPotassium,
+      customSodium: dynamicSodium,
+      customSugar: dynamicSugar,
+      customCarb: dynamicCarb,
+      customWater: dynamicWater,
     );
 
     final offlineActions = await _isar.offlineActions.where().findAll();
     for (final action in offlineActions) {
       final p = jsonDecode(action.payloadJson);
 
-      // ดึงเวลาที่กินจริงมาเช็คกับ todayStr
-      final eatenAtStr = p['eaten_at'] as String?;
-      if (eatenAtStr != null) {
+      // ดึงเวลาที่กิน/บันทึกจริงมาเช็คกับ todayStr
+      final dateStr = (p['eaten_at'] ?? p['logged_at']) as String?;
+      if (dateStr != null) {
         final localDateStr = DateTime.tryParse(
-          eatenAtStr,
+          dateStr,
         )?.toLocal().toIso8601String().substring(0, 10);
         if (localDateStr != null && localDateStr != todayStr) {
           continue; // ข้ามของวันอื่น
@@ -151,9 +154,6 @@ class DashboardUseCase {
               baseLog.totalCarbG + ((p['carb'] as num?)?.toDouble() ?? 0),
           totalWaterMl:
               baseLog.totalWaterMl + ((p['water'] as num?)?.toDouble() ?? 0),
-          totalPhosphorusMg:
-              baseLog.totalPhosphorusMg +
-              ((p['phosphorus'] as num?)?.toDouble() ?? 0),
         );
       } else if (action.actionType == 'DELETE_MEAL_RPC') {
         baseLog = baseLog!.copyWith(
@@ -183,9 +183,18 @@ class DashboardUseCase {
               (baseLog.totalWaterMl - ((p['water'] as num?)?.toDouble() ?? 0))
                   .clamp(0, double.infinity)
                   .toDouble(),
-          totalPhosphorusMg:
-              (baseLog.totalPhosphorusMg -
-                      ((p['phosphorus'] as num?)?.toDouble() ?? 0))
+        );
+      } else if (action.actionType == 'LOG_URINE_RPC') {
+        baseLog = baseLog!.copyWith(
+          totalUrineMl:
+              baseLog.totalUrineMl +
+              ((p['amount_ml'] as num?)?.toDouble() ?? 0),
+        );
+      } else if (action.actionType == 'DELETE_URINE_RPC') {
+        baseLog = baseLog!.copyWith(
+          totalUrineMl:
+              (baseLog.totalUrineMl -
+                      ((p['amount_ml'] as num?)?.toDouble() ?? 0))
                   .clamp(0, double.infinity)
                   .toDouble(),
         );

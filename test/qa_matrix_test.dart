@@ -22,7 +22,6 @@ class FakeMealRepository implements MealRepository {
     required double sugar,
     required double carb,
     required double water,
-    required double phosphorus,
     required DateTime eatenAt,
   }) async {
     return Success(null);
@@ -47,7 +46,7 @@ class DummyDashboardUseCase implements DashboardUseCase {
   Future<DailyLog?> getSummary(String todayStr) async {
     return null;
   }
-  
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -110,7 +109,6 @@ void main() {
                   ..proteinLimitG = weight * 0.8
                   ..potassiumLimitMg = 2000.0
                   ..sodiumLimitMg = 2000.0
-                  ..phosphorusLimitMg = 800.0
                   ..sugarLimitG = 25.0
                   ..carbLimitG = 150.0
                   ..waterLimitMl = weight * 30.0;
@@ -132,7 +130,6 @@ void main() {
                     ..proteinG = 5.0 * mult
                     ..potassiumMg = 200.0 * mult
                     ..sodiumMg = 200.0 * mult
-                    ..phosphorusMg = 100.0 * mult
                     ..sugarG = 2.0 * mult
                     ..carbG = 15.0 * mult
                     ..waterMl = 50.0 * mult;
@@ -163,8 +160,8 @@ void main() {
                   final quotas = QuotaEngine.calculate(log: log, rule: rule);
                   expect(
                     quotas.length,
-                    7,
-                    reason: 'Should return 7 nutrient quotas',
+                    6,
+                    reason: 'Should return 6 nutrient quotas',
                   );
                   for (final quota in quotas) {
                     expect(quota.consumed, greaterThanOrEqualTo(0));

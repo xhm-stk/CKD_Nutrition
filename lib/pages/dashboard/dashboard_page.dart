@@ -4,26 +4,29 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/core_providers.dart';
 import '../../providers/meal_providers.dart';
-import 'widgets/streak_fire_widget.dart';
-import '../../theme/app_theme.dart';
 import '../../widgets/mesh_gradient_background.dart';
 
 import '../../services/quota_engine.dart';
 
 import '../../widgets/meals_list.dart';
-import '../../widgets/offline_banner.dart';
 import '../../models/supabase/daily_log.dart';
 import 'package:intl/intl.dart';
 import 'widgets/dashboard_nutrients.dart';
-import 'widgets/ai_planner_card.dart';
+import 'widgets/fluid_balance.dart';
 import 'widgets/dashboard_warnings.dart';
 import 'widgets/dashboard_calendar.dart';
+import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Dismiss keyboard on dashboard entry to prevent keyboard sticking from auth/setup pages
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    });
+
     ref.listen<AsyncValue<DailyLog?>>(dashboardSummaryProvider, (
       previous,
       next,
@@ -36,7 +39,7 @@ class DashboardPage extends ConsumerWidget {
     final dashboardAsync = ref.watch(dashboardSummaryProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.bgBase,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: MeshGradientBackground(
         child: SafeArea(
           child: dashboardAsync.when(
@@ -71,6 +74,9 @@ class DashboardPage extends ConsumerWidget {
                                   Text(
                                     DateFormat(
                                       'dd / MM / yyyy',
+                                      Localizations.localeOf(
+                                        context,
+                                      ).toString(),
                                     ).format(DateTime.now()),
                                     style: TextStyle(
                                       fontSize: 16,
@@ -83,7 +89,7 @@ class DashboardPage extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'แดชบอร์ด',
+                                    AppLocalizations.of(context)!.navDashboard,
                                     style: TextStyle(
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold,
@@ -96,15 +102,6 @@ class DashboardPage extends ConsumerWidget {
                                   ),
                                 ],
                               ),
-                            ),
-                            Builder(
-                              builder: (context) {
-                                final streakAsync = ref.watch(
-                                  streakCountProvider,
-                                );
-                                final count = streakAsync.valueOrNull ?? 0;
-                                return StreakFireWidget(streakCount: count);
-                              },
                             ),
                           ],
                         )
@@ -119,8 +116,6 @@ class DashboardPage extends ConsumerWidget {
                         .slideY(begin: -0.05),
                     const SizedBox(height: 16),
 
-                    const OfflineBanner(),
-
                     // Nutrients card — staggered
                     DashboardNutrientsWidget(quotas: quotas)
                         .animate()
@@ -128,10 +123,10 @@ class DashboardPage extends ConsumerWidget {
                         .slideY(begin: 0.08),
                     const SizedBox(height: 24),
 
-                    // AI Planner — staggered
-                    const AiPlannerCardWidget()
+                    // Fluid Balance card — staggered
+                    FluidBalanceWidget(log: log)
                         .animate()
-                        .fade(delay: 400.ms, duration: 500.ms)
+                        .fade(delay: 300.ms, duration: 500.ms)
                         .slideY(begin: 0.08),
                     const SizedBox(height: 24),
 
@@ -145,7 +140,7 @@ class DashboardPage extends ConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
-                        'รายการมื้ออาหารวันนี้',
+                        AppLocalizations.of(context)!.todaysMeals,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -166,7 +161,10 @@ class DashboardPage extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, st) => Center(child: Text('เกิดข้อผิดพลาด: $e')),
+            error:
+                (e, st) => Center(
+                  child: Text('${AppLocalizations.of(context)!.error}: $e'),
+                ),
           ),
         ),
       ),

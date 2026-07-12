@@ -7,7 +7,9 @@
 DROP VIEW IF EXISTS public.dashboard_summary CASCADE;
 
 -- 2. สร้าง View ใหม่พร้อมคอลัมน์ dl.id เพื่อส่งรหัสไอดีให้กับแอป Flutter
-CREATE VIEW public.dashboard_summary AS
+CREATE VIEW public.dashboard_summary
+WITH (security_invoker = true)
+AS
 SELECT
   dl.id,
   dl.user_id,

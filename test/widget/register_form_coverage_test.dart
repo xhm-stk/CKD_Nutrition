@@ -7,6 +7,8 @@ import 'package:ckd_nutrition_app/repositories/auth_repository.dart';
 import 'package:ckd_nutrition_app/providers/core_providers.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {
   @override
@@ -40,7 +42,17 @@ void main() {
           supabaseProvider.overrideWith((ref) => mockSupabase),
           authRepositoryProvider.overrideWith((ref) => mockAuthRepo),
         ],
-        child: const MaterialApp(home: Scaffold(body: RegisterForm())),
+        child: const MaterialApp(
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [Locale('en', ''), Locale('th', '')],
+          locale: Locale('th', ''),
+          home: Scaffold(body: RegisterForm()),
+        ),
       ),
     );
 
@@ -48,6 +60,6 @@ void main() {
 
     // expect(find.byType(TextFormField), findsWidgets);
 
-    expect(find.text('สร้างบัญชี'), findsOneWidget);
+    expect(find.text('สมัครสมาชิกใหม่'), findsOneWidget);
   });
 }

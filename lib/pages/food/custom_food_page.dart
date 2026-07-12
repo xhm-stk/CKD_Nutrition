@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../../providers/core_providers.dart';
 import '../../providers/meal_providers.dart';
 import '../../core/result.dart';
+import '../../widgets/mesh_gradient_background.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/premium_text_field.dart';
+import '../../widgets/premium_primary_button.dart';
 
 class CustomFoodPage extends ConsumerStatefulWidget {
   const CustomFoodPage({super.key});
@@ -113,7 +117,6 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
       sugar: double.parse(_sugarCtrl.text),
       carb: double.parse(_carbCtrl.text),
       water: double.parse(_waterCtrl.text),
-      phosphorus: 0,
       eatenAt: DateTime.now(),
     );
 
@@ -134,171 +137,188 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
 
   Widget _buildNumberField(
     TextEditingController ctrl,
-    String label, {
+    String label,
+    IconData icon, {
     Key? key,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: TextFormField(
-        key: key,
-        controller: ctrl,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 8,
-          ),
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) return 'กรุณากรอกข้อมูล';
-          final num = double.tryParse(value);
-          if (num == null || num < 0) return 'ตัวเลขไม่ถูกต้อง';
-          return null;
-        },
-      ),
+    return PremiumTextField(
+      key: key,
+      controller: ctrl,
+      label: label,
+      prefixIcon: icon,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) return 'กรุณากรอกข้อมูล';
+        final num = double.tryParse(value.trim());
+        if (num == null || num < 0) return 'ตัวเลขไม่ถูกต้อง';
+        return null;
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('➕ เพิ่มเมนูอาหารส่วนตัว')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                key: const Key('custom_food_name'),
-                controller: _nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'ชื่อเมนูอาหาร',
-                  border: OutlineInputBorder(),
-                ),
-                validator:
-                    (val) =>
-                        val == null || val.trim().isEmpty
-                            ? 'กรุณากรอกชื่ออาหาร'
-                            : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                key: const Key('custom_food_serving'),
-                controller: _servingCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'ปริมาณ (เช่น 1 จาน, 100g)',
-                  border: OutlineInputBorder(),
-                ),
-                validator:
-                    (val) =>
-                        val == null || val.trim().isEmpty
-                            ? 'กรุณากรอกปริมาณ'
-                            : null,
-              ),
-              const SizedBox(height: 16),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'คุณค่าทางโภชนาการ',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('เพิ่มเมนูอาหารส่วนตัว'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: MeshGradientBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 16.0,
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: _buildNumberField(
-                      _proteinCtrl,
-                      'โปรตีน (g)',
-                      key: const Key('custom_food_protein'),
+                  PremiumTextField(
+                    key: const Key('custom_food_name'),
+                    controller: _nameCtrl,
+                    label: 'ชื่อเมนูอาหาร',
+                    prefixIcon: Icons.restaurant_menu_rounded,
+                    validator:
+                        (val) =>
+                            val == null || val.trim().isEmpty
+                                ? 'กรุณากรอกชื่ออาหาร'
+                                : null,
+                  ),
+                  const SizedBox(height: 16),
+                  PremiumTextField(
+                    key: const Key('custom_food_serving'),
+                    controller: _servingCtrl,
+                    label: 'ปริมาณ (เช่น 1 จาน, 100g)',
+                    prefixIcon: Icons.scale_rounded,
+                    validator:
+                        (val) =>
+                            val == null || val.trim().isEmpty
+                                ? 'กรุณากรอกปริมาณ'
+                                : null,
+                  ),
+                  const SizedBox(height: 24),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'คุณค่าทางโภชนาการ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildNumberField(
-                      _potassiumCtrl,
-                      'โพแทสเซียม (mg)',
-                      key: const Key('custom_food_potassium'),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildNumberField(
+                          _proteinCtrl,
+                          'โปรตีน (g)',
+                          Icons.egg_outlined,
+                          key: const Key('custom_food_protein'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildNumberField(
+                          _potassiumCtrl,
+                          'โพแทสเซียม (mg)',
+                          Icons.eco_outlined,
+                          key: const Key('custom_food_potassium'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildNumberField(
+                          _sodiumCtrl,
+                          'โซเดียม (mg)',
+                          Icons.soup_kitchen_outlined,
+                          key: const Key('custom_food_sodium'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildNumberField(
+                          _sugarCtrl,
+                          'น้ำตาล (g)',
+                          Icons.cookie_outlined,
+                          key: const Key('custom_food_sugar'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildNumberField(
+                          _carbCtrl,
+                          'คาร์โบไฮเดรต (g)',
+                          Icons.breakfast_dining_outlined,
+                          key: const Key('custom_food_carb'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildNumberField(
+                          _waterCtrl,
+                          'น้ำ (ml)',
+                          Icons.water_drop_outlined,
+                          key: const Key('custom_food_water'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  PremiumPrimaryButton(
+                    text: 'บันทึกและรับประทานทันที',
+                    isLoading: _isLoading,
+                    onPressed: _isLoading ? null : _saveAndEatCustomFood,
+                  ),
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    key: const Key('btn_save_custom_food'),
+                    onPressed: _isLoading ? null : _saveCustomFood,
+                    icon: const Icon(
+                      Icons.restaurant_menu_rounded,
+                      color: AppTheme.brandPrimary,
+                    ),
+                    label: const Text(
+                      'บันทึกเก็บไว้ในประวัติเมนูส่วนตัว',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.brandPrimary,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: const BorderSide(
+                        color: AppTheme.brandPrimary,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 24),
                 ],
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildNumberField(
-                      _sodiumCtrl,
-                      'โซเดียม (mg)',
-                      key: const Key('custom_food_sodium'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildNumberField(
-                      _sugarCtrl,
-                      'น้ำตาล (g)',
-                      key: const Key('custom_food_sugar'),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildNumberField(
-                      _carbCtrl,
-                      'คาร์โบไฮเดรต (g)',
-                      key: const Key('custom_food_carb'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildNumberField(
-                      _waterCtrl,
-                      'น้ำ (ml)',
-                      key: const Key('custom_food_water'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                  ),
-                  onPressed: _isLoading ? null : _saveAndEatCustomFood,
-                  child:
-                      _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                            '🍽️ บันทึกและกินทันที! (ขึ้น Dashboard)',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: OutlinedButton(
-                  key: const Key('btn_save_custom_food'),
-                  onPressed: _isLoading ? null : _saveCustomFood,
-                  child:
-                      _isLoading
-                          ? const CircularProgressIndicator()
-                          : const Text(
-                            '💾 แค่บันทึกเก็บไว้ในสมุดเมนู',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

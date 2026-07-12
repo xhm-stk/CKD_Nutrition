@@ -65,8 +65,7 @@ class FoodRepository {
                         ..sodiumMg = (e['sodium_mg'] as num).toDouble()
                         ..sugarG = (e['sugar_g'] as num).toDouble()
                         ..carbG = (e['carb_g'] as num).toDouble()
-                        ..waterMl = (e['water_ml'] as num).toDouble()
-                        ..phosphorusMg = 0.0,
+                        ..waterMl = (e['water_ml'] as num).toDouble(),
                 )
                 .toList();
       }

@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
 import '../../providers/meal_providers.dart';
+import '../../l10n/app_localizations.dart';
 
 class MonthlySummaryPage extends ConsumerStatefulWidget {
   const MonthlySummaryPage({super.key});
@@ -17,11 +18,12 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final summaryAsync = ref.watch(monthlySummaryProvider(_currentMonth));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('📊 สรุปผลรายเดือน'),
+        title: Text('📊 ${l10n.monthlySummary}'),
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_back_ios, size: 16),
@@ -53,9 +55,7 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
       body: summaryAsync.when(
         data: (data) {
           if (data.isEmpty) {
-            return const Center(
-              child: Text('ไม่มีประวัติการกินอาหารในเดือนนี้'),
-            );
+            return Center(child: Text(l10n.noHistoryThisMonth));
           }
 
           // เตรียมข้อมูลจุดกราฟของโปรตีน
@@ -71,9 +71,12 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'กราฟปริมาณโปรตีนที่รับประทาน (g)',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Text(
+                  l10n.proteinIntakeGraph,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Expanded(
@@ -127,9 +130,12 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'สรุปผล (เฉลี่ยรายเดือน)',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Text(
+                  l10n.monthlySummary,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Card(
@@ -138,19 +144,19 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
                     child: Column(
                       children: [
                         _buildStatRow(
-                          'โปรตีนเฉลี่ย',
+                          l10n.avgProtein,
                           _calculateAvg(data, 'total_protein_g'),
                           'g',
                           Colors.blue,
                         ),
                         _buildStatRow(
-                          'โซเดียมเฉลี่ย',
+                          l10n.avgSodium,
                           _calculateAvg(data, 'total_sodium_mg'),
                           'mg',
                           Colors.orange,
                         ),
                         _buildStatRow(
-                          'โพแทสเซียมเฉลี่ย',
+                          l10n.avgPotassium,
                           _calculateAvg(data, 'total_potassium_mg'),
                           'mg',
                           Colors.purple,
@@ -164,7 +170,7 @@ class _MonthlySummaryPageState extends ConsumerState<MonthlySummaryPage> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, st) => Center(child: Text('เกิดข้อผิดพลาด: $err')),
+        error: (err, st) => Center(child: Text('${l10n.error}: $err')),
       ),
     );
   }

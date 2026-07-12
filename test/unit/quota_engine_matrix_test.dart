@@ -48,7 +48,7 @@ void main() {
           );
 
           final quotas = QuotaEngine.calculate(log: mockLog, rule: null);
-          final proteinQuota = quotas.firstWhere((q) => q.label == 'โปรตีน');
+          final proteinQuota = quotas.firstWhere((q) => q.label == 'protein');
 
           expect(proteinQuota.limit, equals(scenario['expected'] as double));
         },
@@ -67,7 +67,7 @@ void main() {
       );
 
       final quotas = QuotaEngine.calculate(log: mockLog, rule: null);
-      final proteinQuota = quotas.firstWhere((q) => q.label == 'โปรตีน');
+      final proteinQuota = quotas.firstWhere((q) => q.label == 'protein');
 
       expect(proteinQuota.isOverLimit, isTrue);
       expect(

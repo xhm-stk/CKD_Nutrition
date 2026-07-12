@@ -9,6 +9,7 @@ final mealRepositoryProvider = Provider<MealRepository>((ref) {
   return MealRepository(
     ref.watch(supabaseProvider),
     ref.watch(offlineSyncWorkerProvider),
+    ref.watch(isarProvider),
   );
 });
 

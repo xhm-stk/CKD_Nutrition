@@ -10,6 +10,9 @@ import 'package:ckd_nutrition_app/providers/core_providers.dart';
 import 'package:ckd_nutrition_app/providers/meal_providers.dart';
 import 'package:ckd_nutrition_app/models/isar/food_item.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
+
 class MockIsar extends Mock implements Isar {}
 
 class MockFoodRepository extends Mock implements FoodRepository {}
@@ -32,7 +35,17 @@ void main() {
           foodRepositoryProvider.overrideWithValue(mockFoodRepo),
           mealControllerProvider.overrideWithValue(mockMealCtrl),
         ],
-        child: const MaterialApp(home: FoodSearchPage()),
+        child: const MaterialApp(
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [Locale('en', ''), Locale('th', '')],
+          locale: Locale('th', ''),
+          home: FoodSearchPage(),
+        ),
       );
     }
 
@@ -66,7 +79,22 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Apple'), findsOneWidget);
-      expect(find.text('โปรตีน: 0.5g | โซเดียม: 1.0mg'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is RichText &&
+              widget.text.toPlainText().contains('โปรตีน 0.5g'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is RichText &&
+              widget.text.toPlainText().contains('โซเดียม 1mg'),
+        ),
+        findsOneWidget,
+      );
 
       // Tap to open bottom sheet
       await tester.tap(find.text('Apple'));

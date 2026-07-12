@@ -18,14 +18,13 @@ class FoodItem {
   late String ingredients;
   late String servingSize;
 
-  // สารอาหาร 7 ชนิด (รวมฟอสฟอรัส)
+  // สารอาหาร 6 ชนิด (ลบฟอสฟอรัสตาม Master Data)
   double proteinG = 0.0;
   double potassiumMg = 0.0;
   double sodiumMg = 0.0;
   double sugarG = 0.0;
   double carbG = 0.0;
   double waterMl = 0.0;
-  double phosphorusMg = 0.0;
 
   late String cookingMethod;
   late String source;
@@ -44,7 +43,6 @@ class CkdRuleCache {
   double sugarLimitG = 0.0;
   double carbLimitG = 0.0;
   double waterLimitMl = 0.0;
-  double phosphorusLimitMg = 0.0;
 
   late String syncedAt;
 }

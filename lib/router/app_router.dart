@@ -11,9 +11,10 @@ import '../pages/food/custom_food_page.dart';
 import '../pages/food/food_search_page.dart';
 import '../pages/history/monthly_summary_page.dart';
 import '../pages/history/history_page.dart';
-import '../pages/planner/meal_planner_page.dart';
 import '../pages/onboarding/onboarding_page.dart';
 import '../widgets/main_scaffold.dart';
+import '../pages/auth/biometrics_lock_screen.dart';
+import '../pages/profile/reminders_page.dart';
 
 // เปลี่ยน GoRouter ให้รับค่า ref เพื่อให้มันฟังเสียงจาก Auth State ได้
 final routerProvider = Provider<GoRouter>((ref) {
@@ -56,10 +57,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const MonthlySummaryPage(),
       ),
       GoRoute(
-        path: '/meal-planner',
-        builder: (context, state) => const MealPlannerPage(),
-      ),
-      GoRoute(
         path: '/food-add',
         builder: (context, state) => const CustomFoodPage(),
       ),
@@ -70,6 +67,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/health-setup',
         builder: (context, state) => const HealthSetupPage(),
+      ),
+      GoRoute(
+        path: '/lock',
+        builder: (context, state) => const BiometricsLockScreen(),
+      ),
+      GoRoute(
+        path: '/reminders',
+        builder: (context, state) => const RemindersPage(),
       ),
       // --- ระบบ Bottom Navigation Bar ---
       StatefulShellRoute.indexedStack(

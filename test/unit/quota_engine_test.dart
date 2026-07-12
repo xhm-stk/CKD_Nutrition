@@ -26,13 +26,12 @@ void main() {
             ..sodiumLimitMg = 2000.0
             ..sugarLimitG = 24.0
             ..carbLimitG = 150.0
-            ..waterLimitMl = 1500.0
-            ..phosphorusLimitMg = 800.0;
+            ..waterLimitMl = 1500.0;
 
       final quotas = QuotaEngine.calculate(log: log, rule: rule);
 
       expect(quotas, isNotEmpty);
-      final proteinQuota = quotas.firstWhere((q) => q.label == 'โปรตีน');
+      final proteinQuota = quotas.firstWhere((q) => q.label == 'protein');
       expect(proteinQuota.limit, 40.0);
       expect(proteinQuota.consumed, 20.0);
       expect(proteinQuota.remaining, 20.0);
@@ -54,12 +53,11 @@ void main() {
             ..sodiumLimitMg = 2000.0
             ..sugarLimitG = 24.0
             ..carbLimitG = 150.0
-            ..waterLimitMl = 1500.0
-            ..phosphorusLimitMg = 800.0;
+            ..waterLimitMl = 1500.0;
 
       final quotas = QuotaEngine.calculate(log: log, rule: rule);
 
-      final potassiumQuota = quotas.firstWhere((q) => q.label == 'โพแทสเซียม');
+      final potassiumQuota = quotas.firstWhere((q) => q.label == 'potassium');
       expect(potassiumQuota.limit, 2000.0);
       expect(potassiumQuota.consumed, 1500.0);
       expect(potassiumQuota.percent, 0.75);
@@ -79,7 +77,7 @@ void main() {
       );
 
       final quotas = QuotaEngine.calculate(log: log, rule: null);
-      final sodiumQuota = quotas.firstWhere((q) => q.label == 'โซเดียม');
+      final sodiumQuota = quotas.firstWhere((q) => q.label == 'sodium');
 
       expect(sodiumQuota.percent, 1900.0 / 2000.0);
       expect(sodiumQuota.isNearLimit, isTrue);
@@ -96,9 +94,7 @@ void main() {
       );
 
       final quotasOver = QuotaEngine.calculate(log: logOver, rule: null);
-      final sodiumQuotaOver = quotasOver.firstWhere(
-        (q) => q.label == 'โซเดียม',
-      );
+      final sodiumQuotaOver = quotasOver.firstWhere((q) => q.label == 'sodium');
 
       expect(
         sodiumQuotaOver.isNearLimit,
