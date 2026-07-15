@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --font-family-title: 'Outfit', sans-serif;
+  --font-family-body: 'Inter', sans-serif;
+
+  /* Premium White-Blue Theme Palette */
+  --bg-primary: #f0f7ff;
+  --bg-secondary: #ffffff;
+  --color-primary: #0284c7;      /* Bright Blue */
+  --color-primary-dark: #0369a1;
+  --color-primary-light: #e0f2fe;
+  --color-accent: #38bdf8;
+  --color-accent-light: #f0f9ff;
+  --color-on-surface: #0f172a;   /* Slate 900 */
+  --color-muted: #64748b;        /* Slate 500 */
+  --color-border: #e2e8f0;       /* Slate 200 */
+
+  /* Nutrient Alert Colors */
+  --color-success: #10b981;      /* Emerald 500 */
+  --color-warning: #f59e0b;      /* Amber 500 */
+  --color-error: #ef4444;        /* Red 500 */
+  
+  --shadow-sm: 0 2px 8px rgba(2, 132, 199, 0.05);
+  --shadow-md: 0 8px 30px rgba(2, 132, 199, 0.08);
+  --shadow-lg: 0 16px 40px rgba(2, 132, 199, 0.12);
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-round: 30px;
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-body);
+  background-color: var(--bg-primary);
+  color: var(--color-on-surface);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Glassmorphism Mock Scaffold */
+.app-container {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  background-color: #ffffff;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.03);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-title);
+  font-weight: 700;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}

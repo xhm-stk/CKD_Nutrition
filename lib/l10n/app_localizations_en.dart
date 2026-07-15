@@ -15,8 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeTitle => 'Welcome to CKD Nutrition';
 
   @override
-  String get welcomeSubtitle =>
-      'Track your nutrition to care for your kidney health';
+  String get welcomeSubtitle => 'Track your nutrition to care for your kidney health';
 
   @override
   String get login => 'Sign In';
@@ -112,8 +111,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmDeleteAcc => 'Confirm Delete Account';
 
   @override
-  String get confirmDeleteAccDesc =>
-      'All your data will be permanently deleted and cannot be recovered. Are you sure?';
+  String get confirmDeleteAccDesc => 'All your data will be permanently deleted and cannot be recovered. Are you sure?';
 
   @override
   String get permanentlyDelete => 'Permanently Delete';
@@ -176,8 +174,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealReminders => 'Meal Reminders';
 
   @override
-  String get mealRemindersDesc =>
-      'Breakfast (08:00), Lunch (12:00), Dinner (18:00)';
+  String get mealRemindersDesc => 'Breakfast (08:00), Lunch (12:00), Dinner (18:00)';
 
   @override
   String get mealRemindersOn => 'Meal reminders turned on';
@@ -195,8 +192,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectAvatar => 'Select your avatar';
 
   @override
-  String get resetPasswordLinkSent =>
-      'Password reset link has been sent to your email.';
+  String get resetPasswordLinkSent => 'Password reset link has been sent to your email.';
 
   @override
   String get resetPasswordLinkFailed => 'Failed to send password reset link.';
@@ -244,8 +240,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get days => 'days';
 
   @override
-  String get onlyLogCurrentDay =>
-      'You can only log meals for the current date.';
+  String get onlyLogCurrentDay => 'You can only log meals for the current date.';
 
   @override
   String get waterVolumeMl => 'Volume (ml)';
@@ -347,29 +342,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingTitle1 => 'Nutrition Management';
 
   @override
-  String get onboardingDesc1 =>
-      'Track all essential nutrients like Protein, Sodium, and Potassium in real-time';
+  String get onboardingDesc1 => 'Track all essential nutrients like Protein, Sodium, and Potassium in real-time';
 
   @override
   String get onboardingTitle2 => 'Offline-First';
 
   @override
-  String get onboardingDesc2 =>
-      'Log meals anywhere, anytime. Data automatically syncs to the Cloud when internet is available';
+  String get onboardingDesc2 => 'Log meals anywhere, anytime. Data automatically syncs to the Cloud when internet is available';
 
   @override
   String get onboardingTitle3 => 'Military-Grade Security';
 
   @override
-  String get onboardingDesc3 =>
-      'Your health data is encrypted and protected with biometric authentication';
+  String get onboardingDesc3 => 'Your health data is encrypted and protected with biometric authentication';
 
   @override
   String get onboardingTitle4 => 'Let\'s Get Started!';
 
   @override
-  String get onboardingDesc4 =>
-      'Enter your basic health data and start controlling your diet like a pro';
+  String get onboardingDesc4 => 'Enter your basic health data and start controlling your diet like a pro';
 
   @override
   String get skip => 'Skip';
@@ -414,8 +405,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterName => 'Please enter your name';
 
   @override
-  String get noMealsToday =>
-      'No meals today yet\nTap + to log your first meal!';
+  String get noMealsToday => 'No meals today yet\nTap + to log your first meal!';
 
   @override
   String get requiredField => 'Required field';
@@ -463,15 +453,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noName => 'No name';
 
   @override
-  String get offlineModeMessage =>
-      'You are offline. Data will sync when connected.';
+  String get offlineModeMessage => 'You are offline. Data will sync when connected.';
 
   @override
   String get noInternetTitle => 'No Internet Connection';
 
   @override
-  String get noInternetDesc =>
-      'Please check your connection.\nYou can use offline mode to view existing data.';
+  String get noInternetDesc => 'Please check your connection.\nYou can use offline mode to view existing data.';
 
   @override
   String get retry => 'Try Again';
@@ -550,12 +538,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get millilitersUnit => 'ml';
 
   @override
-  String get fluidBalanceSubtitle =>
-      'Balance between fluid intake and urine output';
+  String get fluidBalanceSubtitle => 'Balance between fluid intake and urine output';
 
   @override
-  String get fluidBalanceDoctorTip =>
-      'Target net fluid balance should be guided by your doctor';
+  String get fluidBalanceDoctorTip => 'Target net fluid balance should be guided by your doctor';
 
   @override
   String get remindersTitle => 'Custom Reminders';
