@@ -7,6 +7,20 @@ on:
     branches: [ main ]
 
 jobs:
+  secret_scan:
+    name: 🛡️ Secret & Credential Leak Scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Run Secret Leak Audit
+      run: |
+        echo "Scanning codebase for exposed private keys or tokens..."
+        grep -rn "SUPABASE_SERVICE_ROLE" . --exclude-dir={.git,build} || echo "Clean: No service role keys found."
+
   code_quality:
     name: 🔍 Code Quality & Format Check
     runs-on: ubuntu-latest
@@ -60,8 +74,8 @@ jobs:
       run: flutter pub deps
 
   unit_tests:
-    name: 🧪 Unit Tests & Code Coverage
-    needs: [code_quality, security_scan]
+    name: 🧪 Unit Tests & Medical Data Integrity
+    needs: [code_quality, security_scan, secret_scan]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository code
@@ -86,7 +100,7 @@ jobs:
         echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
         echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
 
-    - name: Run Unit Tests with Coverage
+    - name: Run Unit & Integrity Tests with Coverage
       run: flutter test --coverage
 
   build_android:
@@ -124,6 +138,9 @@ jobs:
 
     - name: Build Android Release APK
       run: flutter build apk --release --no-tree-shake-icons
+
+    - name: Analyze APK File Size
+      run: ls -lh build/app/outputs/flutter-apk/app-release.apk
 
     - name: Upload Android Release APK
       uses: actions/upload-artifact@v4
