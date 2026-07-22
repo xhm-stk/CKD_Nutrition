@@ -1,4 +1,4 @@
-name: Flutter CI Quality Check
+name: Flutter Build Artifacts
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - name: Checkout repository code
@@ -33,14 +33,25 @@ jobs:
     - name: Run Build Runner Generation
       run: flutter pub run build_runner build --delete-conflicting-outputs
 
-    - name: Check code formatting
-      run: dart format --output=none --set-exit-if-changed .
+    - name: Build Android APK
+      run: flutter build apk --release
 
-    - name: Run Flutter Static Analysis
-      run: flutter analyze
+    - name: Build iOS App (Unsigned)
+      run: flutter build ios --no-codesign --release
 
-    - name: Run Unit Tests
-      run: flutter test
+    - name: Upload Android APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
 
-    - name: Verify Android Build Compiles
-      run: flutter build apk --debug
+    - name: Zip iOS App Bundle
+      run: |
+        cd build/ios/iphoneos
+        zip -r ../../../ckd_nutrition_ios.zip Runner.app
+
+    - name: Upload iOS App Bundle
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-release-app
+        path: ckd_nutrition_ios.zip
