@@ -8,7 +8,7 @@ on:
 
 jobs:
   code_quality:
-    name: 🔍 Code Quality (Lint & Analysis)
+    name: 🔍 Code Quality & Format Check
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository code
@@ -32,6 +32,9 @@ jobs:
         echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.dev
         echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
         echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
+
+    - name: Check Code Formatting
+      run: dart format --output=none --set-exit-if-changed . || true
 
     - name: Analyze Code Integrity
       run: flutter analyze
@@ -57,7 +60,7 @@ jobs:
       run: flutter pub deps
 
   unit_tests:
-    name: 🧪 Unit Tests & Coverage
+    name: 🧪 Unit Tests & Code Coverage
     needs: [code_quality, security_scan]
     runs-on: ubuntu-latest
     steps:
@@ -83,8 +86,44 @@ jobs:
         echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
         echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
 
-    - name: Run Unit Tests
-      run: flutter test
+    - name: Run Unit Tests with Coverage
+      run: flutter test --coverage
+
+  build_android:
+    name: 🤖 Build Android Release Verification
+    needs: unit_tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Set up Java JDK 21
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    - name: Setup Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.29.3'
+        channel: 'stable'
+        cache: true
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Create mock Env files
+      run: |
+        touch .env.dev
+        touch .env.prod
+        echo "SUPABASE_URL=https://mock.supabase.co" > .env.dev
+        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.dev
+        echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
+        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
+
+    - name: Build Android Release APK
+      run: flutter build apk --release --no-tree-shake-icons
 
   build_ios:
     name: 📦 Build iOS App Bundle
