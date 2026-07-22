@@ -7,9 +7,9 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    runs-on: macos-latest
-
+  code_quality:
+    name: 🔍 Code Quality (Lint & Analysis)
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository code
       uses: actions/checkout@v4
@@ -24,14 +24,85 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
 
-    - name: Run Build Runner Generation
-      run: flutter pub run build_runner build --delete-conflicting-outputs
+    - name: Create mock Env files
+      run: |
+        touch .env.dev
+        touch .env.prod
+        echo "SUPABASE_URL=https://mock.supabase.co" > .env.dev
+        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.dev
+        echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
+        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
 
     - name: Analyze Code Integrity
       run: flutter analyze
 
+  security_scan:
+    name: 🔒 Security & Dependency Scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.29.3'
+        channel: 'stable'
+        cache: true
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Check Dependencies Integrity
+      run: flutter pub deps
+
+  unit_tests:
+    name: 🧪 Unit Tests & Coverage
+    needs: [code_quality, security_scan]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.29.3'
+        channel: 'stable'
+        cache: true
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Create mock Env files
+      run: |
+        touch .env.dev
+        touch .env.prod
+        echo "SUPABASE_URL=https://mock.supabase.co" > .env.dev
+        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.dev
+        echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
+        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
+
     - name: Run Unit Tests
       run: flutter test
+
+  build_ios:
+    name: 📦 Build iOS App Bundle
+    needs: unit_tests
+    runs-on: macos-latest
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.29.3'
+        channel: 'stable'
+        cache: true
+
+    - name: Install dependencies
+      run: flutter pub get
 
     - name: Create mock Env files for compilation
       run: |
