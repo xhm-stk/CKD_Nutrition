@@ -27,6 +27,15 @@ jobs:
     - name: Run Build Runner Generation
       run: flutter pub run build_runner build --delete-conflicting-outputs
 
+    - name: Create mock Env files for compilation
+      run: |
+        touch .env.dev
+        touch .env.prod
+        echo "SUPABASE_URL=https://mock.supabase.co" > .env.dev
+        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.dev
+        echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
+        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
+
     - name: Build iOS App (Unsigned)
       run: flutter build ios --no-codesign --release
 
