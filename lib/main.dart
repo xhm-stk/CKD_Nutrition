@@ -7,7 +7,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'l10n/app_localizations.dart';
 
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models/isar/food_item.dart';
 import 'models/isar/offline_action.dart';
@@ -21,14 +20,22 @@ import 'theme/app_theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // บังคับให้ Flutter สตาร์ท
-  await initializeDateFormatting();
+  WidgetsFlutterBinding.ensureInitialized();
 
-  // บังคับให้แอปเป็นแนวตั้งเท่านั้น เพื่อป้องกัน Layout พัง
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  try {
+    await initializeDateFormatting();
+  } catch (e) {
+    debugPrint('⚠️ DateFormatting warning: $e');
+  }
+
+  try {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  } catch (e) {
+    debugPrint('⚠️ Orientation setting warning: $e');
+  }
 
   // 1. ตรวจสอบค่า Environment (ค่าเริ่มต้นคือ dev)
   const String env = String.fromEnvironment('ENV', defaultValue: 'dev');
@@ -48,24 +55,23 @@ void main() async {
       dotenv.env['SUPABASE_ANON_KEY'] ??
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjA5NTcxNTM4N30.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek';
 
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
-
-  // 2. เตรียมคีย์เข้ารหัสลับ 256-bit
-  // final isarKey = await EncryptionService.getOrCreateIsarKey(); // Isar v3 does not support encryption natively yet
-
-  // 3. เปิด Isar (Local) แบบเข้ารหัส
-  final dir = await getApplicationDocumentsDirectory();
-  late Isar isarInstance;
   try {
-    isarInstance = await Isar.open(
-      [FoodItemSchema, CkdRuleCacheSchema, OfflineActionSchema],
-      directory: dir.path,
-      // encryptionKey: isarKey, // removed due to Isar v3 not supporting it out-of-the-box
-    );
+    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
   } catch (e) {
-    debugPrint('🚨 Isar open failed: $e');
-    // เพื่อไม่ให้ข้อมูลสูญหาย (destructive loss) จะไม่สั่ง deleteFromDisk ทันที
-    // ให้พยายามกู้คืนหรือใช้ fallback ก่อน (ตอนนี้ทำแค่โยน error ให้รับรู้ หรือลองเปิดแบบไม่มี key)
+    debugPrint('⚠️ Supabase init warning: $e');
+  }
+
+  // 3. เปิด Isar (Local DB)
+  late Isar isarInstance;
+  final dir = await getApplicationDocumentsDirectory();
+  try {
+    isarInstance = await Isar.open([
+      FoodItemSchema,
+      CkdRuleCacheSchema,
+      OfflineActionSchema,
+    ], directory: dir.path);
+  } catch (e) {
+    debugPrint('🚨 Isar open fallback: $e');
     isarInstance = await Isar.open([
       FoodItemSchema,
       CkdRuleCacheSchema,
@@ -73,61 +79,62 @@ void main() async {
     ], directory: dir.path);
   }
 
-  // 4. ปั๊มข้อมูลอาหาร 156 เมนูลงเครื่อง (แก้บั๊ก forceUpdate: true ทำให้ช้าทุกครั้งที่เปิดแอป)
-  await IsarSeedService.seedFoodData(isarInstance, forceUpdate: false);
+  // 4. ปั๊มข้อมูลอาหาร 156 เมนูลงเครื่อง
+  try {
+    await IsarSeedService.seedFoodData(isarInstance, forceUpdate: false);
+  } catch (e) {
+    debugPrint('⚠️ Isar seed warning: $e');
+  }
 
   // 5. โหลด SharedPreferences
   final prefs = await SharedPreferences.getInstance();
 
-  // 6. เปิดระบบการแจ้งเตือนดื่มน้ำ และมื้ออาหาร (Task 6)
-  final notifService = NotificationService();
-  await notifService.init();
-  await notifService.scheduleWaterReminder();
+  // 6. เปิดระบบการแจ้งเตือนดื่มน้ำ และมื้ออาหาร (Non-blocking background initialization)
+  Future.microtask(() async {
+    try {
+      final notifService = NotificationService();
+      await notifService.init();
+      await notifService.scheduleWaterReminder();
 
-  // Re-schedule meal reminders on app start (especially for iOS where boot receivers don't exist)
-  final mealRemindersEnabled = prefs.getBool('meal_reminders_enabled') ?? false;
-  if (mealRemindersEnabled) {
-    notifService.scheduleMealReminder(
-      id: 101,
-      title: 'ได้เวลาอาหารเช้า',
-      body: 'อย่าลืมทานอาหารให้ตรงเวลาและบันทึกโภชนาการนะครับ',
-      hour: 8,
-      minute: 0,
-    );
-    notifService.scheduleMealReminder(
-      id: 102,
-      title: 'ได้เวลาอาหารเที่ยง',
-      body: 'พักเที่ยงแล้ว ทานอาหารที่เหมาะสมกับสุขภาพไตด้วยนะครับ',
-      hour: 12,
-      minute: 0,
-    );
-    notifService.scheduleMealReminder(
-      id: 103,
-      title: 'ได้เวลาอาหารเย็น',
-      body: 'ทานอาหารเย็นแต่พอดี และอย่าลืมบันทึกข้อมูลนะครับ',
-      hour: 18,
-      minute: 0,
-    );
-  }
+      final mealRemindersEnabled =
+          prefs.getBool('meal_reminders_enabled') ?? false;
+      if (mealRemindersEnabled) {
+        notifService.scheduleMealReminder(
+          id: 101,
+          title: 'ได้เวลาอาหารเช้า',
+          body: 'อย่าลืมทานอาหารให้ตรงเวลาและบันทึกโภชนาการนะครับ',
+          hour: 8,
+          minute: 0,
+        );
+        notifService.scheduleMealReminder(
+          id: 102,
+          title: 'ได้เวลาอาหารเที่ยง',
+          body: 'พักเที่ยงแล้ว ทานอาหารที่เหมาะสมกับสุขภาพไตด้วยนะครับ',
+          hour: 12,
+          minute: 0,
+        );
+        notifService.scheduleMealReminder(
+          id: 103,
+          title: 'ได้เวลาอาหารเย็น',
+          body: 'ทานอาหารเย็นแต่พอดี และอย่าลืมบันทึกข้อมูลนะครับ',
+          hour: 18,
+          minute: 0,
+        );
+      }
+    } catch (e) {
+      debugPrint('⚠️ Notification init warning: $e');
+    }
+  });
 
-  // 6. เปิดระบบดักจับ Error ด้วย Sentry
-  await SentryFlutter.init(
-    (options) {
-      options.dsn = dotenv.env['SENTRY_DSN'];
-      options.tracesSampleRate = 1.0; // ดักจับ 100% ในเวอร์ชันแรก
-      // เพิ่มฟีเจอร์ช่วยให้เรารู้ว่าแอปแครชเพราะ UI หรือ Logic
-      options.attachScreenshot = true;
-    },
-    appRunner:
-        () => runApp(
-          ProviderScope(
-            overrides: [
-              isarProvider.overrideWithValue(isarInstance),
-              sharedPreferencesProvider.overrideWithValue(prefs),
-            ],
-            child: const MyApp(),
-          ),
-        ),
+  // 7. Mount Flutter UI ทันที การันตีไม่มีการค้างหน้าจอขาวบน iOS
+  runApp(
+    ProviderScope(
+      overrides: [
+        isarProvider.overrideWithValue(isarInstance),
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
