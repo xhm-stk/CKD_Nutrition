@@ -7,13 +7,20 @@ import 'package:flutter/foundation.dart';
 void main() {
   HttpOverrides.global = null;
 
-  final envFile = File('.env').readAsStringSync();
-  String url = '';
-  String anonKey = '';
-  for (var line in envFile.split('\n')) {
-    if (line.startsWith('SUPABASE_URL=')) url = line.split('=')[1].trim();
-    if (line.startsWith('SUPABASE_ANON_KEY=')) {
-      anonKey = line.substring(18).trim();
+  File envFile = File('.env');
+  if (!envFile.existsSync()) {
+    envFile = File('.env.dev');
+  }
+  String url = 'https://mock.supabase.co';
+  String anonKey = 'mock_key';
+  if (envFile.existsSync()) {
+    final envContent = envFile.readAsStringSync();
+    for (var line in envContent.split('\n')) {
+      if (line.startsWith('SUPABASE_URL=')) url = line.split('=')[1].trim();
+      if (line.startsWith('SUPABASE_ANON_KEY=')) {
+        final parts = line.split('=');
+        if (parts.length > 1) anonKey = parts.sublist(1).join('=').trim();
+      }
     }
   }
 
