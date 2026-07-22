@@ -46,7 +46,7 @@ jobs:
         echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
 
     - name: Check Code Formatting (dart format)
-      run: dart format --set-exit-if-changed lib test
+      run: dart format --output=none --set-exit-if-changed lib test
 
     - name: Run Static Analysis (flutter analyze)
       run: flutter analyze
