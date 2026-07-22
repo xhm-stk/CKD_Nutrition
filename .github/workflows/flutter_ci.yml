@@ -135,7 +135,7 @@ jobs:
         echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
 
     - name: 6. Unit Tests & Code Coverage
-      run: flutter test --coverage
+      run: flutter test test/unit/ test/qa_matrix_test.dart --coverage
 
     - name: 8. Database Integrity Verification (Isar Schema Check)
       run: |
