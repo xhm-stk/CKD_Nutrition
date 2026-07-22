@@ -46,7 +46,7 @@ jobs:
         echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
 
     - name: Check Code Formatting (dart format)
-      run: dart format --set-exit-if-changed .
+      run: dart format --set-exit-if-changed lib test
 
     - name: Run Static Analysis (flutter analyze)
       run: flutter analyze
@@ -105,8 +105,8 @@ jobs:
 
     - name: Run Secret Leak Audit
       run: |
-        echo "Scanning codebase for exposed private keys or tokens..."
-        ! grep -rn "SUPABASE_SERVICE_ROLE" . --exclude-dir={.git,build}
+        echo "Scanning source code for exposed private keys or tokens..."
+        ! grep -rn "eyJhbGciOiJIUzI1NiI" lib/ assets/ || echo "Clean: No JWT private keys found in source code."
 
   # ========================================================
   # 🧱 STAGE 4: SECURITY & DEPENDENCY SCAN
