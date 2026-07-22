@@ -43,10 +43,10 @@ jobs:
       run: |
         touch .env.dev
         touch .env.prod
-        echo "SUPABASE_URL=https://mock.supabase.co" > .env.dev
-        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.dev
-        echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
-        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
+        echo "SUPABASE_URL=https://wgjvfqsdhozgvxrqvgyo.supabase.co" > .env.dev
+        echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjA5NTcxNTM4N30.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek" >> .env.dev
+        echo "SUPABASE_URL=https://wgjvfqsdhozgvxrqvgyo.supabase.co" > .env.prod
+        echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjA5NTcxNTM4N30.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek" >> .env.prod
 
     - name: Check Code Formatting (dart format)
       run: |
@@ -87,10 +87,10 @@ jobs:
       run: |
         touch .env.dev
         touch .env.prod
-        echo "SUPABASE_URL=https://mock.supabase.co" > .env.dev
-        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.dev
-        echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
-        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
+        echo "SUPABASE_URL=https://wgjvfqsdhozgvxrqvgyo.supabase.co" > .env.dev
+        echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjA5NTcxNTM4N30.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek" >> .env.dev
+        echo "SUPABASE_URL=https://wgjvfqsdhozgvxrqvgyo.supabase.co" > .env.prod
+        echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjA5NTcxNTM4N30.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek" >> .env.prod
 
     - name: Run Gradle Lint
       run: cd android && ./gradlew lintRelease || true
@@ -193,10 +193,10 @@ jobs:
       run: |
         touch .env.dev
         touch .env.prod
-        echo "SUPABASE_URL=https://mock.supabase.co" > .env.dev
-        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.dev
-        echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
-        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
+        echo "SUPABASE_URL=https://wgjvfqsdhozgvxrqvgyo.supabase.co" > .env.dev
+        echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjA5NTcxNTM4N30.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek" >> .env.dev
+        echo "SUPABASE_URL=https://wgjvfqsdhozgvxrqvgyo.supabase.co" > .env.prod
+        echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjA5NTcxNTM4N30.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek" >> .env.prod
 
     - name: Run Isolated Unit Tests with Coverage
       run: flutter test test/unit/ test/qa_matrix_test.dart --coverage
@@ -248,10 +248,10 @@ jobs:
       run: |
         touch .env.dev
         touch .env.prod
-        echo "SUPABASE_URL=https://mock.supabase.co" > .env.dev
-        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.dev
-        echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
-        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
+        echo "SUPABASE_URL=https://wgjvfqsdhozgvxrqvgyo.supabase.co" > .env.dev
+        echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjAyMjI4ODAwMH0.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek" >> .env.dev
+        echo "SUPABASE_URL=https://wgjvfqsdhozgvxrqvgyo.supabase.co" > .env.prod
+        echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjAyMjI4ODAwMH0.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek" >> .env.prod
 
     - name: Build Release APK & AAB
       run: |
@@ -299,10 +299,10 @@ jobs:
       run: |
         touch .env.dev
         touch .env.prod
-        echo "SUPABASE_URL=https://mock.supabase.co" > .env.dev
-        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.dev
-        echo "SUPABASE_URL=https://mock.supabase.co" > .env.prod
-        echo "SUPABASE_ANON_KEY=mock_anon_key" >> .env.prod
+        echo "SUPABASE_URL=https://wgjvfqsdhozgvxrqvgyo.supabase.co" > .env.dev
+        echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjAyMjI4ODAwMH0.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek" >> .env.dev
+        echo "SUPABASE_URL=https://wgjvfqsdhozgvxrqvgyo.supabase.co" > .env.prod
+        echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjAyMjI4ODAwMH0.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek" >> .env.prod
 
     - name: Build iOS App (Unsigned Release)
       run: flutter build ios --no-codesign --release

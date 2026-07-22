@@ -43,10 +43,11 @@ void main() async {
   // --- Initializing Required Services ---
   // 1. เชื่อมต่อ Supabase พร้อม Fallback ป้องกัน NullCheckError บน iOS
   final supabaseUrl =
-      dotenv.env['SUPABASE_URL'] ?? 'https://xhm-stk.supabase.co';
+      dotenv.env['SUPABASE_URL'] ??
+      'https://wgjvfqsdhozgvxrqvgyo.supabase.co';
   final supabaseAnonKey =
       dotenv.env['SUPABASE_ANON_KEY'] ??
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoaW0tc3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY3MTIwMDAsImV4cCI6MjAyMjI4ODAwMH0.mock';
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjA5NTcxNTM4N30.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek';
 
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
 
