@@ -125,7 +125,9 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: AppTheme.brandPrimary.withValues(alpha: 0.15),
+                            color: AppTheme.brandPrimary.withValues(
+                              alpha: 0.15,
+                            ),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: AppTheme.brandPrimary.withValues(

@@ -111,7 +111,8 @@ class AppLocalizationsTh extends AppLocalizations {
   String get confirmDeleteAcc => 'ยืนยันการลบบัญชี';
 
   @override
-  String get confirmDeleteAccDesc => 'ข้อมูลทั้งหมดของคุณจะถูกลบถาวรและไม่สามารถกู้คืนได้ คุณแน่ใจหรือไม่?';
+  String get confirmDeleteAccDesc =>
+      'ข้อมูลทั้งหมดของคุณจะถูกลบถาวรและไม่สามารถกู้คืนได้ คุณแน่ใจหรือไม่?';
 
   @override
   String get permanentlyDelete => 'ลบถาวร';
@@ -216,10 +217,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get selectAvatar => 'เลือกอวตาร์ของคุณ';
 
   @override
-  String get resetPasswordLinkSent => 'ส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณแล้ว';
+  String get resetPasswordLinkSent =>
+      'ส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณแล้ว';
 
   @override
-  String get resetPasswordLinkFailed => 'เกิดข้อผิดพลาดในการส่งลิงก์รีเซ็ตรหัสผ่าน';
+  String get resetPasswordLinkFailed =>
+      'เกิดข้อผิดพลาดในการส่งลิงก์รีเซ็ตรหัสผ่าน';
 
   @override
   String get todaysMeals => 'รายการมื้ออาหารวันนี้';
@@ -264,7 +267,8 @@ class AppLocalizationsTh extends AppLocalizations {
   String get days => 'วัน';
 
   @override
-  String get onlyLogCurrentDay => 'คุณสามารถบันทึกอาหารได้เฉพาะวันที่ปัจจุบันเท่านั้น';
+  String get onlyLogCurrentDay =>
+      'คุณสามารถบันทึกอาหารได้เฉพาะวันที่ปัจจุบันเท่านั้น';
 
   @override
   String get waterVolumeMl => 'ปริมาณ (ml)';
@@ -366,25 +370,29 @@ class AppLocalizationsTh extends AppLocalizations {
   String get onboardingTitle1 => 'จัดการโภชนาการ';
 
   @override
-  String get onboardingDesc1 => 'ติดตามสารอาหารสำคัญทุกชนิด ทั้ง โปรตีน โซเดียม และโพแทสเซียม ได้แบบเรียลไทม์';
+  String get onboardingDesc1 =>
+      'ติดตามสารอาหารสำคัญทุกชนิด ทั้ง โปรตีน โซเดียม และโพแทสเซียม ได้แบบเรียลไทม์';
 
   @override
   String get onboardingTitle2 => 'ใช้งานได้แม้ไม่มีเน็ต';
 
   @override
-  String get onboardingDesc2 => 'บันทึกอาหารได้ทุกที่ทุกเวลา ข้อมูลจะถูกซิงค์ขึ้น Cloud อัตโนมัติเมื่ออินเทอร์เน็ตกลับมา';
+  String get onboardingDesc2 =>
+      'บันทึกอาหารได้ทุกที่ทุกเวลา ข้อมูลจะถูกซิงค์ขึ้น Cloud อัตโนมัติเมื่ออินเทอร์เน็ตกลับมา';
 
   @override
   String get onboardingTitle3 => 'ปลอดภัยสูงสุด';
 
   @override
-  String get onboardingDesc3 => 'ข้อมูลสุขภาพของคุณถูกเข้ารหัสและป้องกันด้วยระบบสแกนนิ้ว / ใบหน้า';
+  String get onboardingDesc3 =>
+      'ข้อมูลสุขภาพของคุณถูกเข้ารหัสและป้องกันด้วยระบบสแกนนิ้ว / ใบหน้า';
 
   @override
   String get onboardingTitle4 => 'เริ่มต้นใช้งาน!';
 
   @override
-  String get onboardingDesc4 => 'กรอกข้อมูลสุขภาพเบื้องต้นของคุณ แล้วเริ่มควบคุมอาหารอย่างมืออาชีพ';
+  String get onboardingDesc4 =>
+      'กรอกข้อมูลสุขภาพเบื้องต้นของคุณ แล้วเริ่มควบคุมอาหารอย่างมืออาชีพ';
 
   @override
   String get skip => 'ข้าม';
@@ -429,7 +437,8 @@ class AppLocalizationsTh extends AppLocalizations {
   String get enterName => 'กรุณากรอกชื่อของคุณ';
 
   @override
-  String get noMealsToday => 'ยังไม่มีรายการอาหารวันนี้\nกดปุ่ม + เพื่อบันทึกมื้อแรกเลย!';
+  String get noMealsToday =>
+      'ยังไม่มีรายการอาหารวันนี้\nกดปุ่ม + เพื่อบันทึกมื้อแรกเลย!';
 
   @override
   String get requiredField => 'กรุณากรอกข้อมูล';
@@ -477,13 +486,15 @@ class AppLocalizationsTh extends AppLocalizations {
   String get noName => 'ไม่มีชื่อ';
 
   @override
-  String get offlineModeMessage => 'คุณกำลังอยู่ในโหมดออฟไลน์ ข้อมูลจะถูกซิงก์เมื่อเชื่อมต่ออีกครั้ง';
+  String get offlineModeMessage =>
+      'คุณกำลังอยู่ในโหมดออฟไลน์ ข้อมูลจะถูกซิงก์เมื่อเชื่อมต่ออีกครั้ง';
 
   @override
   String get noInternetTitle => 'ไม่มีการเชื่อมต่ออินเทอร์เน็ต';
 
   @override
-  String get noInternetDesc => 'กรุณาตรวจสอบอินเทอร์เน็ตของคุณ\nหากต้องการดูข้อมูลเดิม สามารถเข้าสู่โหมดออฟไลน์ได้';
+  String get noInternetDesc =>
+      'กรุณาตรวจสอบอินเทอร์เน็ตของคุณ\nหากต้องการดูข้อมูลเดิม สามารถเข้าสู่โหมดออฟไลน์ได้';
 
   @override
   String get retry => 'ลองอีกครั้ง';
@@ -492,7 +503,8 @@ class AppLocalizationsTh extends AppLocalizations {
   String get workOffline => 'ทำงานแบบออฟไลน์';
 
   @override
-  String get canOnlyLogTodayMeals => 'คุณสามารถบันทึกอาหารได้เฉพาะวันที่ปัจจุบันเท่านั้น';
+  String get canOnlyLogTodayMeals =>
+      'คุณสามารถบันทึกอาหารได้เฉพาะวันที่ปัจจุบันเท่านั้น';
 
   @override
   String get excellent => 'ยอดเยี่ยมมาก!';
@@ -511,13 +523,15 @@ class AppLocalizationsTh extends AppLocalizations {
   String get weightValidationEmpty => 'กรุณากรอกน้ำหนัก';
 
   @override
-  String get weightValidationInvalid => 'น้ำหนักต้องอยู่ระหว่าง 20 ถึง 300 กิโลกรัม';
+  String get weightValidationInvalid =>
+      'น้ำหนักต้องอยู่ระหว่าง 20 ถึง 300 กิโลกรัม';
 
   @override
   String get heightValidationEmpty => 'กรุณากรอกส่วนสูง';
 
   @override
-  String get heightValidationInvalid => 'ส่วนสูงต้องอยู่ระหว่าง 100 ถึง 250 เซนติเมตร';
+  String get heightValidationInvalid =>
+      'ส่วนสูงต้องอยู่ระหว่าง 100 ถึง 250 เซนติเมตร';
 
   @override
   String get privacyPolicy => 'นโยบายความเป็นส่วนตัว';
@@ -565,7 +579,8 @@ class AppLocalizationsTh extends AppLocalizations {
   String get fluidBalanceSubtitle => 'ความสมดุลระหว่างน้ำดื่มและปัสสาวะ';
 
   @override
-  String get fluidBalanceDoctorTip => 'ยอดดุลน้ำสะสมที่เหมาะสมควรเป็นไปตามที่แพทย์แนะนำ';
+  String get fluidBalanceDoctorTip =>
+      'ยอดดุลน้ำสะสมที่เหมาะสมควรเป็นไปตามที่แพทย์แนะนำ';
 
   @override
   String get remindersTitle => 'ตั้งเวลาแจ้งเตือน';
@@ -595,5 +610,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reminderDeleted => 'ลบการแจ้งเตือนแล้ว';
 
   @override
-  String get noReminders => 'ยังไม่มีการแจ้งเตือนกำหนดเอง\nกดปุ่ม + เพื่อเพิ่มเลย!';
+  String get noReminders =>
+      'ยังไม่มีการแจ้งเตือนกำหนดเอง\nกดปุ่ม + เพื่อเพิ่มเลย!';
 }

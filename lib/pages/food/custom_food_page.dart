@@ -49,9 +49,9 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('ไม่สามารถเลือกรูปภาพได้: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('ไม่สามารถเลือกรูปภาพได้: $e')));
       }
     }
   }
@@ -62,47 +62,60 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Wrap(
-            children: [
-              const Center(
-                child: Text(
-                  'เลือกรูปภาพเมนูอาหาร',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
+      builder:
+          (ctx) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Wrap(
+                children: [
+                  const Center(
+                    child: Text(
+                      'เลือกรูปภาพเมนูอาหาร',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.camera_alt_rounded,
+                      color: AppTheme.brandPrimary,
+                    ),
+                    title: const Text('ถ่ายภาพด้วยกล้อง (Camera)'),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _pickFoodImage(ImageSource.camera);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.photo_library_rounded,
+                      color: AppTheme.brandPrimary,
+                    ),
+                    title: const Text('เลือกจากคลังภาพ (Gallery)'),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _pickFoodImage(ImageSource.gallery);
+                    },
+                  ),
+                  if (_selectedImage != null)
+                    ListTile(
+                      leading: const Icon(
+                        Icons.delete_outline_rounded,
+                        color: Colors.red,
+                      ),
+                      title: const Text('ลบรูปภาพ'),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        setState(() => _selectedImage = null);
+                      },
+                    ),
+                ],
               ),
-              const SizedBox(height: 20),
-              ListTile(
-                leading: const Icon(Icons.camera_alt_rounded, color: AppTheme.brandPrimary),
-                title: const Text('ถ่ายภาพด้วยกล้อง (Camera)'),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _pickFoodImage(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library_rounded, color: AppTheme.brandPrimary),
-                title: const Text('เลือกจากคลังภาพ (Gallery)'),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _pickFoodImage(ImageSource.gallery);
-                },
-              ),
-              if (_selectedImage != null)
-                ListTile(
-                  leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-                  title: const Text('ลบรูปภาพ'),
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    setState(() => _selectedImage = null);
-                  },
-                ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -271,42 +284,50 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                         width: 140,
                         height: 140,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.4),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surface.withValues(alpha: 0.4),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: AppTheme.brandPrimary.withValues(alpha: 0.3),
                             width: 1.5,
                           ),
                         ),
-                        child: _selectedImage != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.file(
-                                  _selectedImage!,
-                                  fit: BoxFit.cover,
-                                  width: 140,
-                                  height: 140,
-                                ),
-                              )
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.add_a_photo_rounded,
-                                    size: 40,
-                                    color: AppTheme.brandPrimary.withValues(alpha: 0.8),
+                        child:
+                            _selectedImage != null
+                                ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.file(
+                                    _selectedImage!,
+                                    fit: BoxFit.cover,
+                                    width: 140,
+                                    height: 140,
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'เพิ่มรูปภาพอาหาร',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                )
+                                : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.add_a_photo_rounded,
+                                      size: 40,
+                                      color: AppTheme.brandPrimary.withValues(
+                                        alpha: 0.8,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'เพิ่มรูปภาพอาหาร',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.7),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                       ),
                     ),
                   ),

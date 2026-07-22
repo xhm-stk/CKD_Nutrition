@@ -43,16 +43,12 @@ void main() async {
   // --- Initializing Required Services ---
   // 1. เชื่อมต่อ Supabase พร้อม Fallback ป้องกัน NullCheckError บน iOS
   final supabaseUrl =
-      dotenv.env['SUPABASE_URL'] ??
-      'https://xhm-stk.supabase.co';
+      dotenv.env['SUPABASE_URL'] ?? 'https://xhm-stk.supabase.co';
   final supabaseAnonKey =
       dotenv.env['SUPABASE_ANON_KEY'] ??
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoaW0tc3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY3MTIwMDAsImV4cCI6MjAyMjI4ODAwMH0.mock';
 
-  await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
-  );
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
 
   // 2. เตรียมคีย์เข้ารหัสลับ 256-bit
   // final isarKey = await EncryptionService.getOrCreateIsarKey(); // Isar v3 does not support encryption natively yet

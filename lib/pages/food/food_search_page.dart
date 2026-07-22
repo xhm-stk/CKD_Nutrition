@@ -101,11 +101,12 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
   @override
   Widget build(BuildContext context) {
     final searchState = ref.watch(foodSearchControllerProvider);
-    final filteredResults = _selectedCategory == 'ทั้งหมด'
-        ? searchState.results
-        : searchState.results
-            .where((f) => f.category == _selectedCategory)
-            .toList();
+    final filteredResults =
+        _selectedCategory == 'ทั้งหมด'
+            ? searchState.results
+            : searchState.results
+                .where((f) => f.category == _selectedCategory)
+                .toList();
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -216,12 +217,11 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
                       label: Text(
                         category,
                         style: TextStyle(
-                          color: isSelected
-                              ? Colors.white
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.8),
+                          color:
+                              isSelected
+                                  ? Colors.white
+                                  : Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.8),
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.normal,
                           fontSize: 13,
@@ -229,19 +229,17 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
                       ),
                       selected: isSelected,
                       selectedColor: AppTheme.brandPrimary,
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .surface
-                          .withValues(alpha: 0.8),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surface.withValues(alpha: 0.8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                         side: BorderSide(
-                          color: isSelected
-                              ? Colors.transparent
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.1),
+                          color:
+                              isSelected
+                                  ? Colors.transparent
+                                  : Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.1),
                         ),
                       ),
                       onSelected: (selected) {
@@ -259,148 +257,155 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
 
             // Results list or states
             Expanded(
-              child: searchState.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : filteredResults.isEmpty
+              child:
+                  searchState.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : filteredResults.isEmpty
                       ? Center(
-                          child: Text(
-                            AppLocalizations.of(context)!.noFoodFound,
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.6),
-                              fontSize: 16,
-                            ),
+                        child: Text(
+                          AppLocalizations.of(context)!.noFoodFound,
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
+                            fontSize: 16,
                           ),
-                        )
+                        ),
+                      )
                       : ListView.builder(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          itemCount: filteredResults.length,
-                          itemBuilder: (ctx, i) {
-                            final f = filteredResults[i];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 6,
-                              ),
-                              color: AppTheme.getElevated(context),
-                              elevation: 1,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(16),
-                                onTap: () => _showLogDialog(f),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      SmartFoodImage(
-                                        foodId: f.foodId,
-                                        foodName: f.name,
-                                        width: 64,
-                                        height: 64,
-                                        borderRadius: 12,
-                                      ),
-                                      const SizedBox(width: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        itemCount: filteredResults.length,
+                        itemBuilder: (ctx, i) {
+                          final f = filteredResults[i];
+                          return Card(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
+                            ),
+                            color: AppTheme.getElevated(context),
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () => _showLogDialog(f),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SmartFoodImage(
+                                      foodId: f.foodId,
+                                      foodName: f.name,
+                                      width: 64,
+                                      height: 64,
+                                      borderRadius: 12,
+                                    ),
+                                    const SizedBox(width: 16),
 
-                                      // Middle section: name & 6 nutrients
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              f.name,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface,
+                                    // Middle section: name & 6 nutrients
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            f.name,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          // 6 Nutrients wrap (including water)
+                                          Wrap(
+                                            spacing: 5,
+                                            runSpacing: 5,
+                                            children: [
+                                              _buildNutrientTag(
+                                                context,
+                                                AppLocalizations.of(
+                                                  context,
+                                                )!.protein,
+                                                '${f.proteinG.toStringAsFixed(1)}g',
+                                                const Color(0xFF34D399),
                                               ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            const SizedBox(height: 8),
-                                            // 6 Nutrients wrap (including water)
-                                            Wrap(
-                                              spacing: 5,
-                                              runSpacing: 5,
-                                              children: [
-                                                _buildNutrientTag(
+                                              _buildNutrientTag(
+                                                context,
+                                                AppLocalizations.of(
                                                   context,
-                                                  AppLocalizations.of(context)!
-                                                      .protein,
-                                                  '${f.proteinG.toStringAsFixed(1)}g',
-                                                  const Color(0xFF34D399),
-                                                ),
-                                                _buildNutrientTag(
+                                                )!.carbs,
+                                                '${f.carbG.toStringAsFixed(1)}g',
+                                                const Color(0xFFFBBF24),
+                                              ),
+                                              _buildNutrientTag(
+                                                context,
+                                                AppLocalizations.of(
                                                   context,
-                                                  AppLocalizations.of(context)!
-                                                      .carbs,
-                                                  '${f.carbG.toStringAsFixed(1)}g',
-                                                  const Color(0xFFFBBF24),
-                                                ),
-                                                _buildNutrientTag(
+                                                )!.sugar,
+                                                '${f.sugarG.toStringAsFixed(1)}g',
+                                                AppTheme.brandSecondary,
+                                              ),
+                                              _buildNutrientTag(
+                                                context,
+                                                AppLocalizations.of(
                                                   context,
-                                                  AppLocalizations.of(context)!
-                                                      .sugar,
-                                                  '${f.sugarG.toStringAsFixed(1)}g',
-                                                  AppTheme.brandSecondary,
-                                                ),
-                                                _buildNutrientTag(
+                                                )!.sodium,
+                                                '${f.sodiumMg.toStringAsFixed(0)}mg',
+                                                const Color(0xFF38BDF8),
+                                              ),
+                                              _buildNutrientTag(
+                                                context,
+                                                AppLocalizations.of(
                                                   context,
-                                                  AppLocalizations.of(context)!
-                                                      .sodium,
-                                                  '${f.sodiumMg.toStringAsFixed(0)}mg',
-                                                  const Color(0xFF38BDF8),
-                                                ),
-                                                _buildNutrientTag(
+                                                )!.potassium,
+                                                '${f.potassiumMg.toStringAsFixed(0)}mg',
+                                                const Color(0xFFF87171),
+                                              ),
+                                              _buildNutrientTag(
+                                                context,
+                                                AppLocalizations.of(
                                                   context,
-                                                  AppLocalizations.of(context)!
-                                                      .potassium,
-                                                  '${f.potassiumMg.toStringAsFixed(0)}mg',
-                                                  const Color(0xFFF87171),
-                                                ),
-                                                _buildNutrientTag(
-                                                  context,
-                                                  AppLocalizations.of(context)!
-                                                      .water,
-                                                  '${f.waterMl.toStringAsFixed(0)}ml',
-                                                  const Color(0xFF60A5FA),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
+                                                )!.water,
+                                                '${f.waterMl.toStringAsFixed(0)}ml',
+                                                const Color(0xFF60A5FA),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(width: 12),
+                                    ),
+                                    const SizedBox(width: 12),
 
-                                      // Right section: Circular '+' button
-                                      Container(
-                                        width: 32,
-                                        height: 32,
-                                        decoration: const BoxDecoration(
-                                          color: AppTheme.brandPrimary,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.add,
-                                          color: Colors.white,
-                                          size: 20,
-                                        ),
+                                    // Right section: Circular '+' button
+                                    Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: const BoxDecoration(
+                                        color: AppTheme.brandPrimary,
+                                        shape: BoxShape.circle,
                                       ),
-                                    ],
-                                  ),
+                                      child: const Icon(
+                                        Icons.add,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
+                      ),
             ),
           ],
         ),
@@ -560,14 +565,14 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
                 ),
                 Row(
                   children: [
-                     SmartFoodImage(
-                       foodId: widget.food.foodId,
-                       foodName: widget.food.name,
-                       width: 44,
-                       height: 44,
-                       borderRadius: 10,
-                     ),
-                     const SizedBox(width: 12),
+                    SmartFoodImage(
+                      foodId: widget.food.foodId,
+                      foodName: widget.food.name,
+                      width: 44,
+                      height: 44,
+                      borderRadius: 10,
+                    ),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'บันทึก ${widget.food.name}',

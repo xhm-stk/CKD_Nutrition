@@ -35,7 +35,8 @@ class _SmartFoodImageState extends State<SmartFoodImage> {
   @override
   void didUpdateWidget(covariant SmartFoodImage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.foodName != widget.foodName || oldWidget.foodId != widget.foodId) {
+    if (oldWidget.foodName != widget.foodName ||
+        oldWidget.foodId != widget.foodId) {
       _loadCustomImage();
     }
   }

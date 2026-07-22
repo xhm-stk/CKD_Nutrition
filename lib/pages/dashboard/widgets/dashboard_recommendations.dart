@@ -77,25 +77,28 @@ class _DashboardRecommendationsWidgetState
 
       // Apply CKD limits filter
       // For stage 3a, 3b, 4, 5: strict limits (sodium < 250mg, potassium < 350mg)
-      final isSevere = stage == 'stage_3a' ||
+      final isSevere =
+          stage == 'stage_3a' ||
           stage == 'stage_3b' ||
           stage == 'stage_4' ||
           stage == 'stage_5';
 
-      List<FoodItem> filtered = allFoods.where((f) {
-        if (!targetCategories.contains(f.category)) return false;
-        if (isSevere) {
-          if (f.sodiumMg > 250) return false;
-          if (f.potassiumMg > 350) return false;
-        }
-        return true;
-      }).toList();
+      List<FoodItem> filtered =
+          allFoods.where((f) {
+            if (!targetCategories.contains(f.category)) return false;
+            if (isSevere) {
+              if (f.sodiumMg > 250) return false;
+              if (f.potassiumMg > 350) return false;
+            }
+            return true;
+          }).toList();
 
       // Fallback if empty
       if (filtered.isEmpty) {
-        filtered = allFoods
-            .where((f) => targetCategories.contains(f.category))
-            .toList();
+        filtered =
+            allFoods
+                .where((f) => targetCategories.contains(f.category))
+                .toList();
       }
       if (filtered.isEmpty) {
         filtered = allFoods;
@@ -145,7 +148,7 @@ class _DashboardRecommendationsWidgetState
 
   void _quickLogFood(FoodItem food) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Parse quantity from servingSize (e.g. "485g" -> 485)
     double quantityG = 100.0;
     try {
@@ -162,11 +165,9 @@ class _DashboardRecommendationsWidgetState
       }
     } catch (_) {}
 
-    final result = await ref.read(mealControllerProvider).logMeal(
-          food: food,
-          quantityG: quantityG,
-          mealType: _currentMealType,
-        );
+    final result = await ref
+        .read(mealControllerProvider)
+        .logMeal(food: food, quantityG: quantityG, mealType: _currentMealType);
 
     if (mounted) {
       switch (result) {
@@ -224,19 +225,31 @@ class _DashboardRecommendationsWidgetState
     Color iconColor = AppTheme.brandPrimary;
 
     if (_currentMealType == 'breakfast') {
-      titleText = l10n.localeName == 'th' ? '☀️ มื้อเช้าแนะนำเพื่อสุขภาพไต' : '☀️ Suggested Breakfast';
+      titleText =
+          l10n.localeName == 'th'
+              ? '☀️ มื้อเช้าแนะนำเพื่อสุขภาพไต'
+              : '☀️ Suggested Breakfast';
       headerIcon = Icons.wb_sunny_rounded;
       iconColor = Colors.orangeAccent;
     } else if (_currentMealType == 'lunch') {
-      titleText = l10n.localeName == 'th' ? '⛅ มื้อเที่ยงแนะนำเพื่อสุขภาพไต' : '⛅ Suggested Lunch';
+      titleText =
+          l10n.localeName == 'th'
+              ? '⛅ มื้อเที่ยงแนะนำเพื่อสุขภาพไต'
+              : '⛅ Suggested Lunch';
       headerIcon = Icons.wb_cloudy_rounded;
       iconColor = Colors.cyan;
     } else if (_currentMealType == 'dinner') {
-      titleText = l10n.localeName == 'th' ? '🌙 มื้อเย็นแนะนำเพื่อสุขภาพไต' : '🌙 Suggested Dinner';
+      titleText =
+          l10n.localeName == 'th'
+              ? '🌙 มื้อเย็นแนะนำเพื่อสุขภาพไต'
+              : '🌙 Suggested Dinner';
       headerIcon = Icons.dark_mode_rounded;
       iconColor = Colors.indigoAccent;
     } else {
-      titleText = l10n.localeName == 'th' ? '🍪 มื้อว่างแนะนำเพื่อสุขภาพไต' : '🍪 Suggested Snack';
+      titleText =
+          l10n.localeName == 'th'
+              ? '🍪 มื้อว่างแนะนำเพื่อสุขภาพไต'
+              : '🍪 Suggested Snack';
       headerIcon = Icons.cookie_outlined;
       iconColor = Colors.brown;
     }
@@ -308,10 +321,9 @@ class _DashboardRecommendationsWidgetState
                             : 'Suitable menu options for Kidney ${_getStageLabel(_ckdStage)}',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.5),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                       ),
                     ],
@@ -320,10 +332,9 @@ class _DashboardRecommendationsWidgetState
                 IconButton(
                   icon: const Icon(Icons.refresh_rounded, size: 22),
                   onPressed: _loadRecommendations,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                   tooltip: l10n.refresh,
                 ),
               ],
@@ -343,17 +354,25 @@ class _DashboardRecommendationsWidgetState
                   width: 190,
                   margin: const EdgeInsets.only(right: 12),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
+                    color:
+                        isDark
+                            ? Colors.white.withValues(alpha: 0.05)
+                            : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.2 : 0.04,
+                        ),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
                     ],
                     border: Border.all(
-                      color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                      color:
+                          isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.black.withValues(alpha: 0.04),
                     ),
                   ),
                   child: ClipRRect(
@@ -368,16 +387,19 @@ class _DashboardRecommendationsWidgetState
                           child: Image.asset(
                             'assets/food_images/${food.foodId}.webp',
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Container(
-                              color: AppTheme.brandPrimary.withValues(alpha: 0.08),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.restaurant_menu_rounded,
-                                  color: AppTheme.brandPrimary,
-                                  size: 32,
+                            errorBuilder:
+                                (context, error, stackTrace) => Container(
+                                  color: AppTheme.brandPrimary.withValues(
+                                    alpha: 0.08,
+                                  ),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.restaurant_menu_rounded,
+                                      color: AppTheme.brandPrimary,
+                                      size: 32,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
                           ),
                         ),
                         Expanded(
@@ -422,19 +444,22 @@ class _DashboardRecommendationsWidgetState
                                           _buildNutrientChip(
                                             context,
                                             label: 'P',
-                                            value: '${food.proteinG.toStringAsFixed(0)}g',
+                                            value:
+                                                '${food.proteinG.toStringAsFixed(0)}g',
                                             color: Colors.blue,
                                           ),
                                           _buildNutrientChip(
                                             context,
                                             label: 'K',
-                                            value: '${food.potassiumMg.toStringAsFixed(0)}mg',
+                                            value:
+                                                '${food.potassiumMg.toStringAsFixed(0)}mg',
                                             color: Colors.amber.shade700,
                                           ),
                                           _buildNutrientChip(
                                             context,
                                             label: 'Na',
-                                            value: '${food.sodiumMg.toStringAsFixed(0)}mg',
+                                            value:
+                                                '${food.sodiumMg.toStringAsFixed(0)}mg',
                                             color: Colors.redAccent,
                                           ),
                                         ],
@@ -509,7 +534,9 @@ class _DashboardRecommendationsWidgetState
             style: TextStyle(
               fontSize: 8.5,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.8),
             ),
           ),
         ],

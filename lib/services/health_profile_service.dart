@@ -47,14 +47,10 @@ class HealthProfileService {
       await _sb
           .from('user_health_profiles')
           .upsert(payload, onConflict: 'user_id');
-      
+
       // Update name in Supabase Auth user metadata so it matches and email templates work
       if (fullName != null && fullName.isNotEmpty) {
-        await _sb.auth.updateUser(
-          UserAttributes(
-            data: {'name': fullName},
-          ),
-        );
+        await _sb.auth.updateUser(UserAttributes(data: {'name': fullName}));
       }
     } catch (e) {
       debugPrint('🚨 Supabase failed, falling back to offline queue: $e');

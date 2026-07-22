@@ -27,7 +27,12 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
     state = list;
   }
 
-  Future<void> addReminder(String type, String time, String itemName, {String? date}) async {
+  Future<void> addReminder(
+    String type,
+    String time,
+    String itemName, {
+    String? date,
+  }) async {
     final id = DateTime.now().millisecondsSinceEpoch.remainder(
       100000000,
     ); // 32-bit int safe ID
@@ -81,7 +86,7 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
     final isEn = langCode == 'en';
 
     final isWater = reminder.type == 'water';
-    
+
     String title;
     String body;
     String testTitle;
@@ -90,27 +95,33 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
     if (isEn) {
       if (isWater) {
         title = 'Reminder: Scheduled water intake 💧';
-        body = 'Target: ${reminder.itemName}. Sipping water in moderate amounts helps maintain optimal fluid balance for your kidneys.';
+        body =
+            'Target: ${reminder.itemName}. Sipping water in moderate amounts helps maintain optimal fluid balance for your kidneys.';
       } else {
         title = 'Reminder: Meal nutrition time 🍽️';
-        body = 'Scheduled menu: ${reminder.itemName}. Having your meals on time and logging your intake helps keep your kidney health goals on track.';
+        body =
+            'Scheduled menu: ${reminder.itemName}. Having your meals on time and logging your intake helps keep your kidney health goals on track.';
       }
       testTitle = '🔔 Reminder set successfully';
-      testBody = reminder.date != null
-          ? 'The system will remind you of "${reminder.itemName}" on ${reminder.date} at ${reminder.time}.'
-          : 'The system will remind you of "${reminder.itemName}" daily at ${reminder.time}.';
+      testBody =
+          reminder.date != null
+              ? 'The system will remind you of "${reminder.itemName}" on ${reminder.date} at ${reminder.time}.'
+              : 'The system will remind you of "${reminder.itemName}" daily at ${reminder.time}.';
     } else {
       if (isWater) {
         title = 'แจ้งเตือน: ถึงเวลาดื่มน้ำตามกำหนด 💧';
-        body = 'เป้าหมาย: ${reminder.itemName} แนะนำให้จิบน้ำทีละน้อยเพื่อรักษาสมดุลของไตและหลีกเลี่ยงภาวะน้ำเกินครับ';
+        body =
+            'เป้าหมาย: ${reminder.itemName} แนะนำให้จิบน้ำทีละน้อยเพื่อรักษาสมดุลของไตและหลีกเลี่ยงภาวะน้ำเกินครับ';
       } else {
         title = 'แจ้งเตือน: ถึงเวลาดูแลโภชนาการมื้ออาหาร 🍽️';
-        body = 'เมนูที่กำหนดไว้: ${reminder.itemName} แนะนำให้รับประทานตรงเวลาและบันทึกปริมาณสารอาหารเพื่อควบคุมโควต้าสุขภาพไตประจำวันครับ';
+        body =
+            'เมนูที่กำหนดไว้: ${reminder.itemName} แนะนำให้รับประทานตรงเวลาและบันทึกปริมาณสารอาหารเพื่อควบคุมโควต้าสุขภาพไตประจำวันครับ';
       }
       testTitle = '🔔 ตั้งค่าแจ้งเตือนสำเร็จ';
-      testBody = reminder.date != null
-          ? 'ระบบจะเตือน "${reminder.itemName}" วันที่ ${reminder.date} เวลา ${reminder.time} น. เรียบร้อยแล้วครับ'
-          : 'ระบบได้รับการบันทึกการแจ้งเตือนสำหรับ "${reminder.itemName}" ทุกวันเวลา ${reminder.time} น. เรียบร้อยแล้วครับ';
+      testBody =
+          reminder.date != null
+              ? 'ระบบจะเตือน "${reminder.itemName}" วันที่ ${reminder.date} เวลา ${reminder.time} น. เรียบร้อยแล้วครับ'
+              : 'ระบบได้รับการบันทึกการแจ้งเตือนสำหรับ "${reminder.itemName}" ทุกวันเวลา ${reminder.time} น. เรียบร้อยแล้วครับ';
     }
 
     DateTime? targetDate;

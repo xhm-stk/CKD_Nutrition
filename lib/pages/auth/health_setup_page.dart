@@ -286,15 +286,21 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                             child: PremiumTextField(
                               controller: _egfrCtrl,
                               label: AppLocalizations.of(context)!.egfrValue,
-                              keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true,
-                              ),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) {
-                                if (val == null || val.trim().isEmpty) return null;
+                                if (val == null || val.trim().isEmpty) {
+                                  return null;
+                                }
                                 final clean = val.replaceAll(',', '.').trim();
                                 final n = double.tryParse(clean);
                                 if (n == null || n < 0 || n > 200) {
-                                  return AppLocalizations.of(context)!.localeName == 'th'
+                                  return AppLocalizations.of(
+                                            context,
+                                          )!.localeName ==
+                                          'th'
                                       ? 'กรอกค่า eGFR (0-200)'
                                       : 'Invalid eGFR (0-200)';
                                 }
@@ -441,22 +447,30 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                                   ),
                                   const SizedBox(width: 12),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        AppLocalizations.of(context)!.localeName == 'th'
+                                        AppLocalizations.of(
+                                                  context,
+                                                )!.localeName ==
+                                                'th'
                                             ? 'ได้รับการฟอกไต/ล้างไตแล้ว'
                                             : 'Undergoing Dialysis',
                                         style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       Text(
-                                        AppLocalizations.of(context)!.localeName == 'th'
+                                        AppLocalizations.of(
+                                                  context,
+                                                )!.localeName ==
+                                                'th'
                                             ? 'สลับหากได้รับการฟอกไตแล้ว'
                                             : 'Toggle if undergoing dialysis',
                                         style: TextStyle(

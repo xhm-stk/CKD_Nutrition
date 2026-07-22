@@ -172,7 +172,10 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -183,7 +186,10 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                       Icons.lock_reset_rounded,
                       color: AppTheme.brandPrimary,
                       size: 64,
-                    ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
+                    ).animate().scale(
+                      duration: 500.ms,
+                      curve: Curves.easeOutBack,
+                    ),
                     const SizedBox(height: 24),
                     const Text(
                       'ตั้งรหัสผ่านใหม่',
@@ -197,10 +203,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                     const SizedBox(height: 8),
                     const Text(
                       'กรุณากรอกรหัสผ่านใหม่ที่คุณต้องการใช้สำหรับบัญชีนี้',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF475569),
-                      ),
+                      style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 32),
@@ -211,8 +214,11 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                       isPassword: true,
                       errorText: _passError,
                       onChanged: (v) {
-                        if (_passError != null) setState(() => _passError = null);
-                        if (_confirmError != null && _confirmPassCtrl.text == v) {
+                        if (_passError != null) {
+                          setState(() => _passError = null);
+                        }
+                        if (_confirmError != null &&
+                            _confirmPassCtrl.text == v) {
                           setState(() => _confirmError = null);
                         }
                         setState(() {});

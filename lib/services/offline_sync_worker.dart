@@ -131,11 +131,7 @@ class OfflineSyncWorker {
               .upsert(payload, onConflict: 'user_id');
           final fullName = payload['full_name'];
           if (fullName != null && fullName.toString().isNotEmpty) {
-            await _sb.auth.updateUser(
-              UserAttributes(
-                data: {'name': fullName},
-              ),
-            );
+            await _sb.auth.updateUser(UserAttributes(data: {'name': fullName}));
           }
           return _SyncStatus.success;
 

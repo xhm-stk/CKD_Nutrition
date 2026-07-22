@@ -488,15 +488,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         decoration: BoxDecoration(
           color: isActive ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
-          boxShadow: isActive
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
+          boxShadow:
+              isActive
+                  ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                  : null,
         ),
         child: Text(
           label,
@@ -522,38 +523,39 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         centerTitle: true,
       ),
       body: MeshGradientBackground(
-        child: _isFetching
-            ? const Center(
-                child: CircularProgressIndicator(
-                  color: AppTheme.brandPrimary,
-                ),
-              )
-            : Form(
-                key: _formKey,
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
+        child:
+            _isFetching
+                ? const Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.brandPrimary,
                   ),
-                  children: [
-                    Center(
-                      child: Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: AppTheme.brandPrimary.withValues(
-                              alpha: 0.1,
-                            ),
-                            backgroundImage:
-                                (_customAvatarPath != null &&
-                                        File(_customAvatarPath!).existsSync())
-                                    ? FileImage(File(_customAvatarPath!))
-                                    : null,
-                            child:
-                                (_customAvatarPath != null &&
-                                        File(_customAvatarPath!).existsSync())
-                                    ? null
-                                    : Text(
+                )
+                : Form(
+                  key: _formKey,
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
+                    children: [
+                      Center(
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundColor: AppTheme.brandPrimary.withValues(
+                                alpha: 0.1,
+                              ),
+                              backgroundImage:
+                                  (_customAvatarPath != null &&
+                                          File(_customAvatarPath!).existsSync())
+                                      ? FileImage(File(_customAvatarPath!))
+                                      : null,
+                              child:
+                                  (_customAvatarPath != null &&
+                                          File(_customAvatarPath!).existsSync())
+                                      ? null
+                                      : Text(
                                         'A$_avatarId',
                                         style: const TextStyle(
                                           fontSize: 32,
@@ -561,519 +563,569 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap: _showAvatarPicker,
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: const BoxDecoration(
-                                  color: AppTheme.brandPrimary,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.edit,
-                                  size: 20,
-                                  color: Colors.white,
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                onTap: _showAvatarPicker,
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: const BoxDecoration(
+                                    color: AppTheme.brandPrimary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit,
+                                    size: 20,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                      ).animate().scale(
+                        duration: 400.ms,
+                        curve: Curves.easeOutBack,
                       ),
-                    ).animate().scale(
-                          duration: 400.ms,
-                          curve: Curves.easeOutBack,
-                        ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          l10n.healthData,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                        if (!_isEditingEnabled)
-                          IconButton(
-                            icon: const Icon(Icons.edit_rounded, size: 20, color: AppTheme.brandPrimary),
-                            onPressed: () {
-                              setState(() {
-                                _isEditingEnabled = true;
-                              });
-                            },
-                          ),
-                      ],
-                    ).animate().fade(duration: 400.ms).slideY(begin: 0.2),
-                    const SizedBox(height: 12),
-                    PremiumTextField(
-                      controller: _nameCtrl,
-                      label: l10n.fullName,
-                      isCompact: true,
-                      enabled: _isEditingEnabled,
-                      validator: (val) {
-                        if (val == null || val.trim().isEmpty) {
-                          return l10n.fullNameValidationEmpty;
-                        }
-                        return null;
-                      },
-                    ).animate().fade(duration: 450.ms).slideY(begin: 0.1),
-                    const SizedBox(height: 12),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: PremiumTextField(
-                            controller: _ageCtrl,
-                            label: l10n.ageYears,
-                            isCompact: true,
-                            enabled: _isEditingEnabled,
-                            keyboardType: TextInputType.number,
-                            validator: (val) {
-                              if (val == null || val.trim().isEmpty) {
-                                return l10n.ageValidationEmpty;
-                              }
-                              final n = int.tryParse(val.trim());
-                              if (n == null || n < 1 || n > 120) {
-                                return l10n.ageValidationInvalid;
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: PremiumTextField(
-                            controller: _egfrCtrl,
-                            label: l10n.egfrValue,
-                            isCompact: true,
-                            enabled: _isEditingEnabled,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            validator: (val) {
-                              if (val == null || val.trim().isEmpty) {
-                                return l10n.egfrValidationEmpty;
-                              }
-                              final clean = val.replaceAll(',', '.').trim();
-                              final n = double.tryParse(clean);
-                              if (n == null || n < 0 || n > 200) {
-                                return l10n.egfrValidationInvalid;
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                      ],
-                    ).animate().fade(duration: 500.ms).slideY(begin: 0.1),
-                    const SizedBox(height: 12),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: PremiumTextField(
-                            controller: _weightCtrl,
-                            label: l10n.weightKg,
-                            isCompact: true,
-                            enabled: _isEditingEnabled,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            validator: (val) {
-                              if (val == null || val.trim().isEmpty) {
-                                return l10n.weightValidationEmpty;
-                              }
-                              final clean = val
-                                  .replaceAll(',', '.')
-                                  .replaceAll(RegExp(r'[^0-9\.]'), '')
-                                  .trim();
-                              final n = double.tryParse(clean);
-                              if (n == null || n < 20 || n > 300) {
-                                return l10n.weightValidationInvalid;
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: PremiumTextField(
-                            controller: _heightCtrl,
-                            label: l10n.heightCm,
-                            isCompact: true,
-                            enabled: _isEditingEnabled,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            validator: (val) {
-                              if (val == null || val.trim().isEmpty) {
-                                return l10n.heightValidationEmpty;
-                              }
-                              final clean = val
-                                  .replaceAll(',', '.')
-                                  .replaceAll(RegExp(r'[^0-9\.]'), '')
-                                  .trim();
-                              final n = double.tryParse(clean);
-                              if (n == null || n < 100 || n > 250) {
-                                return l10n.heightValidationInvalid;
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                      ],
-                    ).animate().fade(duration: 550.ms).slideY(begin: 0.1),
-                    const SizedBox(height: 12),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: PremiumDropdownField<String>(
-                            label: l10n.gender,
-                            value: _selectedGender,
-                            isCompact: true,
-                            enabled: _isEditingEnabled,
-                            items: [
-                              DropdownMenuItem(
-                                value: 'male',
-                                child: Text(l10n.male),
-                              ),
-                              DropdownMenuItem(
-                                value: 'female',
-                                child: Text(l10n.female),
-                              ),
-                            ],
-                            onChanged: (val) => setState(() => _selectedGender = val!),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: PremiumDropdownField<String>(
-                            label: l10n.ckdStage,
-                            value: _selectedStage,
-                            isCompact: true,
-                            enabled: _isEditingEnabled,
-                            items: [
-                              DropdownMenuItem(
-                                value: 'stage_1',
-                                child: Text(l10n.stage1),
-                              ),
-                              DropdownMenuItem(
-                                value: 'stage_2',
-                                child: Text(l10n.stage2),
-                              ),
-                              DropdownMenuItem(
-                                value: 'stage_3a',
-                                child: Text(l10n.stage3a),
-                              ),
-                              DropdownMenuItem(
-                                value: 'stage_3b',
-                                child: Text(l10n.stage3b),
-                              ),
-                              DropdownMenuItem(
-                                value: 'stage_4',
-                                child: Text(l10n.stage4),
-                              ),
-                              DropdownMenuItem(
-                                value: 'stage_5',
-                                child: Text(l10n.stage5),
-                              ),
-                            ],
-                            onChanged: (val) {
-                              setState(() {
-                                _selectedStage = val!;
-                                if (_selectedStage != 'stage_5') {
-                                  _isOnDialysis = false;
-                                }
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ).animate().fade(duration: 600.ms).slideY(begin: 0.1),
-                    if (_selectedStage == 'stage_5') ...[
-                      const SizedBox(height: 12),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _isEditingEnabled
-                              ? AppTheme.getSurface(context)
-                              : AppTheme.getSurface(context).withValues(alpha: 0.7),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.08),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.local_hospital_rounded,
-                                  color: _isEditingEnabled
-                                      ? AppTheme.brandPrimary
-                                      : AppTheme.brandPrimary.withValues(alpha: 0.5),
-                                ),
-                                const SizedBox(width: 12),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      l10n.localeName == 'th'
-                                          ? 'ได้รับการฟอกไต/ล้างไตแล้ว'
-                                          : 'Undergoing Dialysis',
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      l10n.localeName == 'th'
-                                          ? 'สลับหากได้รับการฟอกไตแล้ว'
-                                          : 'Toggle if undergoing dialysis',
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withValues(alpha: 0.5),
-                                        fontSize: 11,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Switch(
-                              value: _isOnDialysis,
-                              activeColor: AppTheme.brandPrimary,
-                              onChanged: _isEditingEnabled
-                                  ? (val) {
-                                      setState(() {
-                                        _isOnDialysis = val;
-                                      });
-                                    }
-                                  : null,
-                            ),
-                          ],
-                        ),
-                      ).animate().fade(duration: 400.ms).slideY(begin: 0.1),
-                    ],
-                    const SizedBox(height: 20),
-                    if (_isEditingEnabled)
+                      const SizedBox(height: 24),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                            child: OutlinedButton(
+                          Text(
+                            l10n.healthData,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          if (!_isEditingEnabled)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit_rounded,
+                                size: 20,
+                                color: AppTheme.brandPrimary,
+                              ),
                               onPressed: () {
                                 setState(() {
-                                  _isEditingEnabled = false;
-                                  _loadProfile();
+                                  _isEditingEnabled = true;
                                 });
                               },
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                side: const BorderSide(
-                                  color: AppTheme.brandPrimary,
-                                  width: 1.5,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                              ),
-                              child: const Text(
-                                'ยกเลิก',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppTheme.brandPrimary,
-                                ),
-                              ),
+                            ),
+                        ],
+                      ).animate().fade(duration: 400.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 12),
+                      PremiumTextField(
+                        controller: _nameCtrl,
+                        label: l10n.fullName,
+                        isCompact: true,
+                        enabled: _isEditingEnabled,
+                        validator: (val) {
+                          if (val == null || val.trim().isEmpty) {
+                            return l10n.fullNameValidationEmpty;
+                          }
+                          return null;
+                        },
+                      ).animate().fade(duration: 450.ms).slideY(begin: 0.1),
+                      const SizedBox(height: 12),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: PremiumTextField(
+                              controller: _ageCtrl,
+                              label: l10n.ageYears,
+                              isCompact: true,
+                              enabled: _isEditingEnabled,
+                              keyboardType: TextInputType.number,
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) {
+                                  return l10n.ageValidationEmpty;
+                                }
+                                final n = int.tryParse(val.trim());
+                                if (n == null || n < 1 || n > 120) {
+                                  return l10n.ageValidationInvalid;
+                                }
+                                return null;
+                              },
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: _isLoading
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                      color: AppTheme.brandPrimary,
-                                    ),
-                                  )
-                                : Container(
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(22),
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          AppTheme.brandPrimary,
-                                          AppTheme.brandAccent,
-                                        ],
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppTheme.brandPrimary.withValues(
-                                            alpha: 0.25,
-                                          ),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: ElevatedButton(
-                                      onPressed: _saveProfile,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        shadowColor: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(22),
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'บันทึก',
+                            child: PremiumTextField(
+                              controller: _egfrCtrl,
+                              label: l10n.egfrValue,
+                              isCompact: true,
+                              enabled: _isEditingEnabled,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) {
+                                  return l10n.egfrValidationEmpty;
+                                }
+                                final clean = val.replaceAll(',', '.').trim();
+                                final n = double.tryParse(clean);
+                                if (n == null || n < 0 || n > 200) {
+                                  return l10n.egfrValidationInvalid;
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
+                      ).animate().fade(duration: 500.ms).slideY(begin: 0.1),
+                      const SizedBox(height: 12),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: PremiumTextField(
+                              controller: _weightCtrl,
+                              label: l10n.weightKg,
+                              isCompact: true,
+                              enabled: _isEditingEnabled,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) {
+                                  return l10n.weightValidationEmpty;
+                                }
+                                final clean =
+                                    val
+                                        .replaceAll(',', '.')
+                                        .replaceAll(RegExp(r'[^0-9\.]'), '')
+                                        .trim();
+                                final n = double.tryParse(clean);
+                                if (n == null || n < 20 || n > 300) {
+                                  return l10n.weightValidationInvalid;
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: PremiumTextField(
+                              controller: _heightCtrl,
+                              label: l10n.heightCm,
+                              isCompact: true,
+                              enabled: _isEditingEnabled,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) {
+                                  return l10n.heightValidationEmpty;
+                                }
+                                final clean =
+                                    val
+                                        .replaceAll(',', '.')
+                                        .replaceAll(RegExp(r'[^0-9\.]'), '')
+                                        .trim();
+                                final n = double.tryParse(clean);
+                                if (n == null || n < 100 || n > 250) {
+                                  return l10n.heightValidationInvalid;
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
+                      ).animate().fade(duration: 550.ms).slideY(begin: 0.1),
+                      const SizedBox(height: 12),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: PremiumDropdownField<String>(
+                              label: l10n.gender,
+                              value: _selectedGender,
+                              isCompact: true,
+                              enabled: _isEditingEnabled,
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'male',
+                                  child: Text(l10n.male),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'female',
+                                  child: Text(l10n.female),
+                                ),
+                              ],
+                              onChanged:
+                                  (val) =>
+                                      setState(() => _selectedGender = val!),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: PremiumDropdownField<String>(
+                              label: l10n.ckdStage,
+                              value: _selectedStage,
+                              isCompact: true,
+                              enabled: _isEditingEnabled,
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'stage_1',
+                                  child: Text(l10n.stage1),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'stage_2',
+                                  child: Text(l10n.stage2),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'stage_3a',
+                                  child: Text(l10n.stage3a),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'stage_3b',
+                                  child: Text(l10n.stage3b),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'stage_4',
+                                  child: Text(l10n.stage4),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'stage_5',
+                                  child: Text(l10n.stage5),
+                                ),
+                              ],
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedStage = val!;
+                                  if (_selectedStage != 'stage_5') {
+                                    _isOnDialysis = false;
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ).animate().fade(duration: 600.ms).slideY(begin: 0.1),
+                      if (_selectedStage == 'stage_5') ...[
+                        const SizedBox(height: 12),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                _isEditingEnabled
+                                    ? AppTheme.getSurface(context)
+                                    : AppTheme.getSurface(
+                                      context,
+                                    ).withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.08),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.local_hospital_rounded,
+                                    color:
+                                        _isEditingEnabled
+                                            ? AppTheme.brandPrimary
+                                            : AppTheme.brandPrimary.withValues(
+                                              alpha: 0.5,
+                                            ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        l10n.localeName == 'th'
+                                            ? 'ได้รับการฟอกไต/ล้างไตแล้ว'
+                                            : 'Undergoing Dialysis',
                                         style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
                                         ),
+                                      ),
+                                      Text(
+                                        l10n.localeName == 'th'
+                                            ? 'สลับหากได้รับการฟอกไตแล้ว'
+                                            : 'Toggle if undergoing dialysis',
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.5),
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Switch(
+                                value: _isOnDialysis,
+                                activeColor: AppTheme.brandPrimary,
+                                onChanged:
+                                    _isEditingEnabled
+                                        ? (val) {
+                                          setState(() {
+                                            _isOnDialysis = val;
+                                          });
+                                        }
+                                        : null,
+                              ),
+                            ],
+                          ),
+                        ).animate().fade(duration: 400.ms).slideY(begin: 0.1),
+                      ],
+                      const SizedBox(height: 20),
+                      if (_isEditingEnabled)
+                        Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _isEditingEnabled = false;
+                                        _loadProfile();
+                                      });
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                      ),
+                                      side: const BorderSide(
+                                        color: AppTheme.brandPrimary,
+                                        width: 1.5,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'ยกเลิก',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppTheme.brandPrimary,
                                       ),
                                     ),
                                   ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child:
+                                      _isLoading
+                                          ? const Center(
+                                            child: CircularProgressIndicator(
+                                              color: AppTheme.brandPrimary,
+                                            ),
+                                          )
+                                          : Container(
+                                            height: 44,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(22),
+                                              gradient: const LinearGradient(
+                                                colors: [
+                                                  AppTheme.brandPrimary,
+                                                  AppTheme.brandAccent,
+                                                ],
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: AppTheme.brandPrimary
+                                                      .withValues(alpha: 0.25),
+                                                  blurRadius: 10,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: ElevatedButton(
+                                              onPressed: _saveProfile,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                shadowColor: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(22),
+                                                ),
+                                              ),
+                                              child: const Text(
+                                                'บันทึก',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                ),
+                              ],
+                            )
+                            .animate()
+                            .fade(duration: 650.ms)
+                            .scale(begin: const Offset(0.95, 0.95)),
+                      const SizedBox(height: 24),
+                      const Divider(
+                        color: Colors.black12,
+                      ).animate().fade(duration: 700.ms),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            l10n.language,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildLanguageOption(
+                                  'TH',
+                                  ref.watch(localeProvider).languageCode ==
+                                      'th',
+                                  'th',
+                                ),
+                                _buildLanguageOption(
+                                  'EN',
+                                  ref.watch(localeProvider).languageCode ==
+                                      'en',
+                                  'en',
+                                ),
+                              ],
+                            ),
                           ),
                         ],
-                      ).animate().fade(duration: 650.ms).scale(begin: const Offset(0.95, 0.95)),
-                    const SizedBox(height: 24),
-                    const Divider(
-                      color: Colors.black12,
-                    ).animate().fade(duration: 700.ms),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          l10n.language,
+                      ).animate().fade(duration: 750.ms),
+                      const SizedBox(height: 24),
+                      const Divider(
+                        color: Colors.black12,
+                      ).animate().fade(duration: 800.ms),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.accountSettings,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ).animate().fade(duration: 850.ms),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: _changePassword,
+                        icon: Icon(
+                          Icons.lock_reset,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                        label: Text(
+                          l10n.changePassword,
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 14,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(16),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          side: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.2),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _buildLanguageOption('TH', ref.watch(localeProvider).languageCode == 'th', 'th'),
-                              _buildLanguageOption('EN', ref.watch(localeProvider).languageCode == 'en', 'en'),
-                            ],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                      ],
-                    ).animate().fade(duration: 750.ms),
-                    const SizedBox(height: 24),
-                    const Divider(
-                      color: Colors.black12,
-                    ).animate().fade(duration: 800.ms),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n.accountSettings,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ).animate().fade(duration: 850.ms),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: _changePassword,
-                      icon: Icon(
-                        Icons.lock_reset,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                      ),
-                      label: Text(
-                        l10n.changePassword,
-                        style: TextStyle(
+                      ).animate().fade(duration: 900.ms).slideY(begin: 0.1),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: _confirmLogout,
+                        icon: Icon(
+                          Icons.logout_rounded,
                           color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 14,
                         ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                        label: Text(
+                          l10n.logout,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 14,
+                          ),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.black.withValues(alpha: 0.03),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          side: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.08),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
                         ),
-                      ),
-                    ).animate().fade(duration: 900.ms).slideY(begin: 0.1),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: _confirmLogout,
-                      icon: Icon(
-                        Icons.logout_rounded,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      label: Text(
-                        l10n.logout,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 14,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.black.withValues(alpha: 0.03),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ).animate().fade(duration: 950.ms).slideY(begin: 0.1),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: _confirmDeleteAccount,
-                      icon: const Icon(
-                        Icons.delete_forever,
-                        color: AppTheme.errorBase,
-                      ),
-                      label: Text(
-                        l10n.deleteAccount,
-                        style: const TextStyle(
+                      ).animate().fade(duration: 950.ms).slideY(begin: 0.1),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: _confirmDeleteAccount,
+                        icon: const Icon(
+                          Icons.delete_forever,
                           color: AppTheme.errorBase,
-                          fontSize: 14,
                         ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: const BorderSide(color: AppTheme.errorBase),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                        label: Text(
+                          l10n.deleteAccount,
+                          style: const TextStyle(
+                            color: AppTheme.errorBase,
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ).animate().fade(duration: 1000.ms).slideY(begin: 0.1),
-                    const SizedBox(height: 32),
-                  ],
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          side: const BorderSide(color: AppTheme.errorBase),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ).animate().fade(duration: 1000.ms).slideY(begin: 0.1),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
                 ),
-              ),
       ),
     );
   }

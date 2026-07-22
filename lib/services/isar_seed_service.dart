@@ -41,7 +41,9 @@ class IsarSeedService {
 
       final bool countMismatch = countBefore != rawData.length;
       if (countBefore > 0 && !forceUpdate && !countMismatch) {
-        debugPrint('📦 [Isar Seeding] ข้อมูลใน Isar ตรงกันแล้ว ข้ามการปั๊มข้อมูล');
+        debugPrint(
+          '📦 [Isar Seeding] ข้อมูลใน Isar ตรงกันแล้ว ข้ามการปั๊มข้อมูล',
+        );
         return;
       }
 
@@ -81,7 +83,9 @@ class IsarSeedService {
       // บันทึกข้อมูลลงฐานข้อมูล
       await isar.writeTxn(() async {
         if (forceUpdate || countMismatch) {
-          debugPrint('📦 [Isar Seeding] กำลังล้างตารางอาหารเดิมเพื่อให้ข้อมูลตรงกัน...');
+          debugPrint(
+            '📦 [Isar Seeding] กำลังล้างตารางอาหารเดิมเพื่อให้ข้อมูลตรงกัน...',
+          );
           await isar.foodItems.clear();
         }
         debugPrint(

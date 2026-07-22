@@ -23,7 +23,8 @@ class CustomFoodEntrySheet extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<CustomFoodEntrySheet> createState() => _CustomFoodEntrySheetState();
+  ConsumerState<CustomFoodEntrySheet> createState() =>
+      _CustomFoodEntrySheetState();
 }
 
 class _CustomFoodEntrySheetState extends ConsumerState<CustomFoodEntrySheet> {
@@ -234,7 +235,9 @@ class _CustomFoodEntrySheetState extends ConsumerState<CustomFoodEntrySheet> {
                       children: [
                         Text(
                           'เพิ่มเมนูอาหารส่วนตัว',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
@@ -243,7 +246,9 @@ class _CustomFoodEntrySheetState extends ConsumerState<CustomFoodEntrySheet> {
                           onPressed: () => Navigator.of(context).pop(),
                           icon: Icon(
                             Icons.close_rounded,
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -253,14 +258,22 @@ class _CustomFoodEntrySheetState extends ConsumerState<CustomFoodEntrySheet> {
                       controller: _nameCtrl,
                       label: 'ชื่อเมนูอาหาร',
                       isCompact: true,
-                      validator: (val) => val == null || val.trim().isEmpty ? 'กรุณากรอกชื่ออาหาร' : null,
+                      validator:
+                          (val) =>
+                              val == null || val.trim().isEmpty
+                                  ? 'กรุณากรอกชื่ออาหาร'
+                                  : null,
                     ),
                     const SizedBox(height: 10),
                     PremiumTextField(
                       controller: _servingCtrl,
                       label: 'ปริมาณ (เช่น 1 จาน, 100g)',
                       isCompact: true,
-                      validator: (val) => val == null || val.trim().isEmpty ? 'กรุณากรอกปริมาณ' : null,
+                      validator:
+                          (val) =>
+                              val == null || val.trim().isEmpty
+                                  ? 'กรุณากรอกปริมาณ'
+                                  : null,
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -302,7 +315,10 @@ class _CustomFoodEntrySheetState extends ConsumerState<CustomFoodEntrySheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: _buildNumberField(_potassiumCtrl, 'โพแทสเซียม (mg)'),
+                          child: _buildNumberField(
+                            _potassiumCtrl,
+                            'โพแทสเซียม (mg)',
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
@@ -348,23 +364,25 @@ class _CustomFoodEntrySheetState extends ConsumerState<CustomFoodEntrySheet> {
                               ),
                               elevation: 0,
                             ),
-                            onPressed: _isLoading ? null : _saveAndEatCustomFood,
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
+                            onPressed:
+                                _isLoading ? null : _saveAndEatCustomFood,
+                            child:
+                                _isLoading
+                                    ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                    : const Text(
+                                      'บันทึก & กินทันที',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  )
-                                : const Text(
-                                    'บันทึก & กินทันที',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
                           ),
                         ),
                       ],

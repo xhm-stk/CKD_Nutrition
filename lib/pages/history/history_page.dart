@@ -130,8 +130,10 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
                     });
                   },
                   availableCalendarFormats: {
-                    CalendarFormat.week: l10n.localeName == 'th' ? 'สัปดาห์' : 'Week',
-                    CalendarFormat.month: l10n.localeName == 'th' ? 'เดือน' : 'Month',
+                    CalendarFormat.week:
+                        l10n.localeName == 'th' ? 'สัปดาห์' : 'Week',
+                    CalendarFormat.month:
+                        l10n.localeName == 'th' ? 'เดือน' : 'Month',
                   },
                   headerStyle: HeaderStyle(
                     formatButtonVisible: true,

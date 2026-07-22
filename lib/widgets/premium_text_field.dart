@@ -99,9 +99,10 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
-            color: widget.enabled
-                ? AppTheme.getSurface(context)
-                : AppTheme.getSurface(context).withValues(alpha: 0.7),
+            color:
+                widget.enabled
+                    ? AppTheme.getSurface(context)
+                    : AppTheme.getSurface(context).withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(30.0),
             border: Border.all(
               color: borderColor,
@@ -109,9 +110,12 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
             ),
             boxShadow: [
               BoxShadow(
-                color: _isFocused
-                    ? AppTheme.brandPrimary.withValues(alpha: 0.15)
-                    : Colors.black.withValues(alpha: widget.enabled ? 0.04 : 0.01),
+                color:
+                    _isFocused
+                        ? AppTheme.brandPrimary.withValues(alpha: 0.15)
+                        : Colors.black.withValues(
+                          alpha: widget.enabled ? 0.04 : 0.01,
+                        ),
                 blurRadius: _isFocused ? 16 : 8,
                 spreadRadius: _isFocused ? 2 : 0,
                 offset: const Offset(0, 4),
@@ -164,21 +168,21 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
                   horizontal: 20,
                   vertical: widget.isCompact ? 12 : 18,
                 ),
-                prefixIcon: widget.prefixIcon != null
-                    ? AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: Icon(
-                          widget.prefixIcon,
-                          key: ValueKey(_isFocused),
-                          color:
-                              _isFocused
-                                  ? AppTheme.brandPrimary
-                                  : Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface.withValues(alpha: 0.4),
-                        ),
-                      )
-                    : null,
+                prefixIcon:
+                    widget.prefixIcon != null
+                        ? AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: Icon(
+                            widget.prefixIcon,
+                            key: ValueKey(_isFocused),
+                            color:
+                                _isFocused
+                                    ? AppTheme.brandPrimary
+                                    : Theme.of(context).colorScheme.onSurface
+                                        .withValues(alpha: 0.4),
+                          ),
+                        )
+                        : null,
                 suffixIcon:
                     widget.isPassword
                         ? IconButton(

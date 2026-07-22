@@ -285,9 +285,10 @@ class AddActionSheet extends ConsumerWidget {
                     context,
                     icon: Icons.notifications_active_rounded,
                     title: AppLocalizations.of(context)!.remindersTitle,
-                    subtitle: AppLocalizations.of(context)!.localeName == 'th'
-                        ? 'ตั้งเวลาแจ้งเตือนดื่มน้ำ ทานยา หรือล้างไตช่องท้อง'
-                        : 'Set reminders for water, meals, meds, or PD',
+                    subtitle:
+                        AppLocalizations.of(context)!.localeName == 'th'
+                            ? 'ตั้งเวลาแจ้งเตือนดื่มน้ำ ทานยา หรือล้างไตช่องท้อง'
+                            : 'Set reminders for water, meals, meds, or PD',
                     color: Colors.purple,
                     onTap: () {
                       Navigator.pop(context);

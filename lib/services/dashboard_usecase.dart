@@ -82,7 +82,7 @@ class DashboardUseCase {
     }
 
     final weightKg = (profile['weight_kg'] ?? 60.0).toDouble();
-    
+
     // ดึงตัวคูณโปรตีนจากคอลัมน์จริง protein_limit_g (แทน protein_multiplier เดิมที่มีบั๊ก)
     double proteinMultiplier = (rules['protein_limit_g'] ?? 0.8).toDouble();
 

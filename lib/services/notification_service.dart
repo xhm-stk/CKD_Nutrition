@@ -72,22 +72,26 @@ class NotificationService {
 
   Future<void> scheduleWaterReminder() async {
     if (Platform.environment.containsKey('FLUTTER_TEST')) return;
-    
+
     final prefs = await SharedPreferences.getInstance();
     final langCode = prefs.getString('language_code') ?? 'th';
     final isEn = langCode == 'en';
 
-    final String title = isEn
-        ? 'Reminder: Time to drink water 💧'
-        : 'แจ้งเตือน: ได้เวลาดื่มน้ำเพื่อสุขภาพไต 💧';
-    final String body = isEn
-        ? 'Please sip water regularly to support kidney function and help clear metabolic wastes efficiently.'
-        : 'ควรทยอยจิบน้ำอย่างสม่ำเสมอ เพื่อช่วยให้ระบบขับถ่ายของเสียทำงานได้อย่างมีประสิทธิภาพและรักษาสมดุลของร่างกายครับ';
+    final String title =
+        isEn
+            ? 'Reminder: Time to drink water 💧'
+            : 'แจ้งเตือน: ได้เวลาดื่มน้ำเพื่อสุขภาพไต 💧';
+    final String body =
+        isEn
+            ? 'Please sip water regularly to support kidney function and help clear metabolic wastes efficiently.'
+            : 'ควรทยอยจิบน้ำอย่างสม่ำเสมอ เพื่อช่วยให้ระบบขับถ่ายของเสียทำงานได้อย่างมีประสิทธิภาพและรักษาสมดุลของร่างกายครับ';
 
-    final String channelName = isEn ? 'Water Intake Reminders' : 'แจ้งเตือนดื่มน้ำ';
-    final String channelDesc = isEn
-        ? 'Reminds you to sip water regularly for better kidney health'
-        : 'เตือนให้ดื่มน้ำเพื่อสุขภาพไตที่ดี';
+    final String channelName =
+        isEn ? 'Water Intake Reminders' : 'แจ้งเตือนดื่มน้ำ';
+    final String channelDesc =
+        isEn
+            ? 'Reminds you to sip water regularly for better kidney health'
+            : 'เตือนให้ดื่มน้ำเพื่อสุขภาพไตที่ดี';
 
     final AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
@@ -186,13 +190,16 @@ class NotificationService {
         scheduledDate,
         platformChannelSpecifics,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        matchDateTimeComponents: targetDate != null
-            ? DateTimeComponents.dateAndTime
-            : DateTimeComponents.time,
+        matchDateTimeComponents:
+            targetDate != null
+                ? DateTimeComponents.dateAndTime
+                : DateTimeComponents.time,
       );
     } catch (e, stack) {
       // ignore: avoid_print
-      print('Exact alarm scheduling failed, falling back to inexact: $e\n$stack');
+      print(
+        'Exact alarm scheduling failed, falling back to inexact: $e\n$stack',
+      );
       try {
         await flutterLocalNotificationsPlugin.zonedSchedule(
           id,
@@ -201,9 +208,10 @@ class NotificationService {
           scheduledDate,
           platformChannelSpecifics,
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-          matchDateTimeComponents: targetDate != null
-              ? DateTimeComponents.dateAndTime
-              : DateTimeComponents.time,
+          matchDateTimeComponents:
+              targetDate != null
+                  ? DateTimeComponents.dateAndTime
+                  : DateTimeComponents.time,
         );
       } catch (e2, stack2) {
         // ignore: avoid_print
@@ -230,7 +238,7 @@ class NotificationService {
     if (isEn) {
       channelName = 'Nutrient Quota Alerts';
       channelDesc = 'Alerts when nutrient intake approaches the limit';
-      
+
       String name = nutrientName;
       if (nutrientName == 'โปรตีน') name = 'Protein';
       if (nutrientName == 'โซเดียม') name = 'Sodium';
@@ -239,7 +247,8 @@ class NotificationService {
       if (nutrientName == 'คาร์โบไฮเดรต') name = 'Carbohydrates';
 
       title = 'Notice: High $name Intake';
-      body = 'Your daily $name intake has reached $percentage% of the recommended limit. Please manage your subsequent meals carefully.';
+      body =
+          'Your daily $name intake has reached $percentage% of the recommended limit. Please manage your subsequent meals carefully.';
     } else {
       channelName = 'แจ้งเตือนสารอาหารเกินกำหนด';
       channelDesc = 'เตือนเมื่อบริโภคสารอาหารเข้าใกล้ขีดจำกัด';
@@ -252,7 +261,8 @@ class NotificationService {
       if (nutrientName == 'Carbohydrates') name = 'คาร์โบไฮเดรต';
 
       title = 'แจ้งเตือน: ปริมาณ $name สูง';
-      body = 'ปริมาณ $name ที่คุณบริโภคในวันนี้สูงถึง $percentage% ของเกณฑ์ควบคุมแล้ว แนะนำให้ดูแลและจำกัดปริมาณในมื้ออาหารที่เหลือของวันครับ';
+      body =
+          'ปริมาณ $name ที่คุณบริโภคในวันนี้สูงถึง $percentage% ของเกณฑ์ควบคุมแล้ว แนะนำให้ดูแลและจำกัดปริมาณในมื้ออาหารที่เหลือของวันครับ';
     }
 
     final AndroidNotificationDetails androidPlatformChannelSpecifics =
@@ -316,7 +326,9 @@ class NotificationService {
       );
     } catch (e, stack) {
       // ignore: avoid_print
-      print('Exact test alarm scheduling failed, falling back to inexact: $e\n$stack');
+      print(
+        'Exact test alarm scheduling failed, falling back to inexact: $e\n$stack',
+      );
       try {
         await flutterLocalNotificationsPlugin.zonedSchedule(
           id + 99999,

@@ -187,7 +187,8 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                                               Row(
                                                 children: [
                                                   Icon(
-                                                    Icons.calendar_month_rounded,
+                                                    Icons
+                                                        .calendar_month_rounded,
                                                     size: 13,
                                                     color: Theme.of(context)
                                                         .colorScheme
@@ -202,7 +203,9 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                                                       color: Theme.of(context)
                                                           .colorScheme
                                                           .onSurface
-                                                          .withValues(alpha: 0.4),
+                                                          .withValues(
+                                                            alpha: 0.4,
+                                                          ),
                                                     ),
                                                   ),
                                                 ],
@@ -362,7 +365,8 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
 
     String? dateStr;
     if (_selectedDate != null) {
-      dateStr = '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}';
+      dateStr =
+          '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}';
     }
 
     await ref
@@ -560,7 +564,9 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n.localeName == 'th' ? 'วันที่ตั้งเตือนล่วงหน้า (ไม่บังคับ)' : 'Reminder Date (Optional)',
+                      l10n.localeName == 'th'
+                          ? 'วันที่ตั้งเตือนล่วงหน้า (ไม่บังคับ)'
+                          : 'Reminder Date (Optional)',
                       style: TextStyle(
                         fontSize: 14,
                         color: Theme.of(
@@ -592,13 +598,21 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
                               child: Text(
                                 _selectedDate != null
                                     ? '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}'
-                                    : (l10n.localeName == 'th' ? 'แจ้งเตือนทุกวัน (ไม่กำหนดวัน)' : 'Every day (No specific date)'),
+                                    : (l10n.localeName == 'th'
+                                        ? 'แจ้งเตือนทุกวัน (ไม่กำหนดวัน)'
+                                        : 'Every day (No specific date)'),
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: _selectedDate != null
-                                      ? Theme.of(context).colorScheme.onSurface
-                                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                                  color:
+                                      _selectedDate != null
+                                          ? Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.4),
                                 ),
                               ),
                             ),
@@ -631,9 +645,10 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
                 // Custom Menu / Fluid input
                 PremiumTextField(
                   controller: _itemCtrl,
-                  label: _selectedType == 'meal'
-                      ? '${l10n.reminderMenu} (${l10n.localeName == 'th' ? 'ไม่บังคับ' : 'Optional'})'
-                      : '${l10n.localeName == 'th' ? 'ปริมาณน้ำ / ข้อความเตือน' : 'Water Volume / Message'} (${l10n.localeName == 'th' ? 'ไม่บังคับ' : 'Optional'})',
+                  label:
+                      _selectedType == 'meal'
+                          ? '${l10n.reminderMenu} (${l10n.localeName == 'th' ? 'ไม่บังคับ' : 'Optional'})'
+                          : '${l10n.localeName == 'th' ? 'ปริมาณน้ำ / ข้อความเตือน' : 'Water Volume / Message'} (${l10n.localeName == 'th' ? 'ไม่บังคับ' : 'Optional'})',
                   hint:
                       _selectedType == 'meal'
                           ? 'เช่น ข้าวต้มปลา'
