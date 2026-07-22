@@ -34,9 +34,9 @@ jobs:
       run: flutter pub run build_runner build --delete-conflicting-outputs
 
     - name: Setup Android SDK 36
-      run: |
-        yes | sdkmanager --licenses || true
-        sdkmanager "platforms;android-36"
+      uses: android-actions/setup-android@v3
+      with:
+        packages: "platforms;android-36"
 
     - name: Build Android APK
       run: flutter build apk --release
