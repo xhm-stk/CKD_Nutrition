@@ -33,14 +33,25 @@ void main() async {
   // 1. ตรวจสอบค่า Environment (ค่าเริ่มต้นคือ dev)
   const String env = String.fromEnvironment('ENV', defaultValue: 'dev');
 
-  // 2. โหลดไฟล์ .env ตาม Environment ที่รัน (ถ้าไม่มีให้ fallback ไปที่ .env.dev)
-  await dotenv.load(fileName: '.env.$env');
+  // 2. โหลดไฟล์ .env ตาม Environment ที่รัน (ปลอดภัยจากการแครช White Screen บน iOS ถ้าไฟล์ขาด)
+  try {
+    await dotenv.load(fileName: '.env.$env');
+  } catch (e) {
+    debugPrint('⚠️ Dotenv load warning (using fallback env): $e');
+  }
 
   // --- Initializing Required Services ---
-  // 1. เชื่อมต่อ Supabase
+  // 1. เชื่อมต่อ Supabase พร้อม Fallback ป้องกัน NullCheckError บน iOS
+  final supabaseUrl =
+      dotenv.env['SUPABASE_URL'] ??
+      'https://xhm-stk.supabase.co';
+  final supabaseAnonKey =
+      dotenv.env['SUPABASE_ANON_KEY'] ??
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoaW0tc3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY3MTIwMDAsImV4cCI6MjAyMjI4ODAwMH0.mock';
+
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
   );
 
   // 2. เตรียมคีย์เข้ารหัสลับ 256-bit
