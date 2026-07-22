@@ -47,5 +47,16 @@
 	<true/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>แอปพลิเคชันต้องการใช้ Face ID / Touch ID เพื่อยืนยันตัวตนก่อนเข้าถึงข้อมูลสุขภาพส่วนบุคคลของคุณ</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>io.supabase.ckdnutrition</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

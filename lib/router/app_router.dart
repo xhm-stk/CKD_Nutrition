@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/core_providers.dart';
 import '../providers/auth_providers.dart';
 import '../pages/auth/login_page.dart';
@@ -16,11 +17,26 @@ import '../widgets/main_scaffold.dart';
 import '../pages/auth/biometrics_lock_screen.dart';
 import '../pages/profile/reminders_page.dart';
 
+import '../pages/auth/reset_password_page.dart';
+
+// Provider สำหรับจำลองสถานะการกู้คืนรหัสผ่าน
+final isRecoveringPasswordProvider = StateProvider<bool>((ref) => false);
+
 // เปลี่ยน GoRouter ให้รับค่า ref เพื่อให้มันฟังเสียงจาก Auth State ได้
 final routerProvider = Provider<GoRouter>((ref) {
   // ให้ Router รู้ตัวเมื่อมีการเปลี่ยนสถานะ Login/Logout (บอก Riverpod ให้ rebuild provider นี้)
-  ref.watch(authStateProvider);
+  final authState = ref.watch(authStateProvider);
   ref.watch(sessionUnlockedProvider); // ให้ Router รีโหลดถ้ามีการปลดล็อก
+  ref.watch(isRecoveringPasswordProvider);
+
+  // ดักฟังเหตุการณ์การกู้คืนรหัสผ่านจาก authState
+  authState.whenData((data) {
+    if (data.event == AuthChangeEvent.passwordRecovery) {
+      Future.microtask(() {
+        ref.read(isRecoveringPasswordProvider.notifier).state = true;
+      });
+    }
+  });
 
   final supabase = ref.read(supabaseProvider);
 
@@ -31,6 +47,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuth = session != null;
       final isGoingToLogin = state.uri.path == '/login';
       final isGoingToRegister = state.uri.path == '/register';
+
+      final isRecoveringVal = ref.read(isRecoveringPasswordProvider);
+      final isGoingToReset = state.uri.path == '/reset-password';
+
+      if (isRecoveringVal) {
+        return isGoingToReset ? null : '/reset-password';
+      }
 
       if (!isAuth) {
         return isGoingToRegister ? null : '/login';
@@ -43,6 +66,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/reset-password',
+        builder: (context, state) => const ResetPasswordPage(),
+      ),
       GoRoute(
         path: '/onboarding',
         builder: (context, state) => const OnboardingPage(),

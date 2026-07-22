@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -71,11 +72,28 @@ class NotificationService {
 
   Future<void> scheduleWaterReminder() async {
     if (Platform.environment.containsKey('FLUTTER_TEST')) return;
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    
+    final prefs = await SharedPreferences.getInstance();
+    final langCode = prefs.getString('language_code') ?? 'th';
+    final isEn = langCode == 'en';
+
+    final String title = isEn
+        ? 'Reminder: Time to drink water 💧'
+        : 'แจ้งเตือน: ได้เวลาดื่มน้ำเพื่อสุขภาพไต 💧';
+    final String body = isEn
+        ? 'Please sip water regularly to support kidney function and help clear metabolic wastes efficiently.'
+        : 'ควรทยอยจิบน้ำอย่างสม่ำเสมอ เพื่อช่วยให้ระบบขับถ่ายของเสียทำงานได้อย่างมีประสิทธิภาพและรักษาสมดุลของร่างกายครับ';
+
+    final String channelName = isEn ? 'Water Intake Reminders' : 'แจ้งเตือนดื่มน้ำ';
+    final String channelDesc = isEn
+        ? 'Reminds you to sip water regularly for better kidney health'
+        : 'เตือนให้ดื่มน้ำเพื่อสุขภาพไตที่ดี';
+
+    final AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
           'water_reminder_channel',
-          'แจ้งเตือนดื่มน้ำ',
-          channelDescription: 'เตือนให้ดื่มน้ำเพื่อสุขภาพไตที่ดี',
+          channelName,
+          channelDescription: channelDesc,
           importance: Importance.max,
           priority: Priority.high,
           icon: '@mipmap/ic_launcher',
@@ -84,7 +102,7 @@ class NotificationService {
     const DarwinNotificationDetails iOSPlatformChannelSpecifics =
         DarwinNotificationDetails();
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    final NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
       iOS: iOSPlatformChannelSpecifics,
     );
@@ -96,8 +114,8 @@ class NotificationService {
     // For simplicity in this implementation, we use a periodic notification.
     await flutterLocalNotificationsPlugin.periodicallyShow(
       100,
-      'ได้เวลาดื่มน้ำแล้วครับ 💧',
-      'จิบน้ำบ่อยๆ ช่วยให้ไตทำงานได้ดีขึ้นนะครับ',
+      title,
+      body,
       RepeatInterval.hourly,
       platformChannelSpecifics,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -110,6 +128,7 @@ class NotificationService {
     required String body,
     required int hour,
     required int minute,
+    DateTime? targetDate,
   }) async {
     if (Platform.environment.containsKey('FLUTTER_TEST')) return;
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
@@ -126,31 +145,71 @@ class NotificationService {
       iOS: DarwinNotificationDetails(),
     );
 
-    await flutterLocalNotificationsPlugin.cancel(id);
+    try {
+      await flutterLocalNotificationsPlugin.cancel(id);
+    } catch (_) {}
 
-    // Schedule for daily at specific time
     var now = tz.TZDateTime.now(tz.local);
-    var scheduledDate = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    );
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    tz.TZDateTime scheduledDate;
+
+    if (targetDate != null) {
+      scheduledDate = tz.TZDateTime(
+        tz.local,
+        targetDate.year,
+        targetDate.month,
+        targetDate.day,
+        hour,
+        minute,
+      );
+      if (scheduledDate.isBefore(now)) {
+        return; // Past date, do not schedule
+      }
+    } else {
+      scheduledDate = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        hour,
+        minute,
+      );
+      if (scheduledDate.isBefore(now)) {
+        scheduledDate = scheduledDate.add(const Duration(days: 1));
+      }
     }
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate,
-      platformChannelSpecifics,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
+    try {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        platformChannelSpecifics,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: targetDate != null
+            ? DateTimeComponents.dateAndTime
+            : DateTimeComponents.time,
+      );
+    } catch (e, stack) {
+      // ignore: avoid_print
+      print('Exact alarm scheduling failed, falling back to inexact: $e\n$stack');
+      try {
+        await flutterLocalNotificationsPlugin.zonedSchedule(
+          id,
+          title,
+          body,
+          scheduledDate,
+          platformChannelSpecifics,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          matchDateTimeComponents: targetDate != null
+              ? DateTimeComponents.dateAndTime
+              : DateTimeComponents.time,
+        );
+      } catch (e2, stack2) {
+        // ignore: avoid_print
+        print('Inexact alarm scheduling fallback failed: $e2\n$stack2');
+      }
+    }
   }
 
   Future<void> showHighNutrientAlert(
@@ -158,27 +217,65 @@ class NotificationService {
     int percentage,
   ) async {
     if (Platform.environment.containsKey('FLUTTER_TEST')) return;
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+
+    final prefs = await SharedPreferences.getInstance();
+    final langCode = prefs.getString('language_code') ?? 'th';
+    final isEn = langCode == 'en';
+
+    String title;
+    String body;
+    String channelName;
+    String channelDesc;
+
+    if (isEn) {
+      channelName = 'Nutrient Quota Alerts';
+      channelDesc = 'Alerts when nutrient intake approaches the limit';
+      
+      String name = nutrientName;
+      if (nutrientName == 'โปรตีน') name = 'Protein';
+      if (nutrientName == 'โซเดียม') name = 'Sodium';
+      if (nutrientName == 'โพแทสเซียม') name = 'Potassium';
+      if (nutrientName == 'น้ำตาล') name = 'Sugar';
+      if (nutrientName == 'คาร์โบไฮเดรต') name = 'Carbohydrates';
+
+      title = 'Notice: High $name Intake';
+      body = 'Your daily $name intake has reached $percentage% of the recommended limit. Please manage your subsequent meals carefully.';
+    } else {
+      channelName = 'แจ้งเตือนสารอาหารเกินกำหนด';
+      channelDesc = 'เตือนเมื่อบริโภคสารอาหารเข้าใกล้ขีดจำกัด';
+
+      String name = nutrientName;
+      if (nutrientName == 'Protein') name = 'โปรตีน';
+      if (nutrientName == 'Sodium') name = 'โซเดียม';
+      if (nutrientName == 'Potassium') name = 'โพแทสเซียม';
+      if (nutrientName == 'Sugar') name = 'น้ำตาล';
+      if (nutrientName == 'Carbohydrates') name = 'คาร์โบไฮเดรต';
+
+      title = 'แจ้งเตือน: ปริมาณ $name สูง';
+      body = 'ปริมาณ $name ที่คุณบริโภคในวันนี้สูงถึง $percentage% ของเกณฑ์ควบคุมแล้ว แนะนำให้ดูแลและจำกัดปริมาณในมื้ออาหารที่เหลือของวันครับ';
+    }
+
+    final AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
           'alert_channel',
-          'แจ้งเตือนสารอาหารเกินกำหนด',
-          channelDescription: 'เตือนเมื่อบริโภคสารอาหารเข้าใกล้ขีดจำกัด',
+          channelName,
+          channelDescription: channelDesc,
           importance: Importance.high,
           priority: Priority.high,
-          color: Color(0xFFFF5252), // Red alert
+          color: const Color(0xFFFF5252), // Red alert
         );
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    final NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
-      iOS: DarwinNotificationDetails(),
+      iOS: const DarwinNotificationDetails(),
     );
 
     final int alertId = 200 + (nutrientName.hashCode % 100).abs();
 
     await flutterLocalNotificationsPlugin.show(
       alertId, // Unique ID per nutrient
-      '⚠️ ระวัง! $nutrientName สูง',
-      'คุณบริโภค $nutrientName ไปแล้ว $percentage% ของโควต้าวันนี้',
+      title,
+      body,
       platformChannelSpecifics,
     );
   }
@@ -193,7 +290,7 @@ class NotificationService {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
           'reminder_test_channel',
-          'ทดสอบแจ้งเตือน (BETA)',
+          'ทดสอบแจ้งเตือน',
           channelDescription: 'ใช้สำหรับทดสอบการทำงานของระบบแจ้งเตือน',
           importance: Importance.max,
           priority: Priority.high,
@@ -208,14 +305,32 @@ class NotificationService {
       tz.local,
     ).add(const Duration(seconds: 3));
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      id + 99999,
-      title,
-      body,
-      scheduledDate,
-      platformChannelSpecifics,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    );
+    try {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        id + 99999,
+        title,
+        body,
+        scheduledDate,
+        platformChannelSpecifics,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+    } catch (e, stack) {
+      // ignore: avoid_print
+      print('Exact test alarm scheduling failed, falling back to inexact: $e\n$stack');
+      try {
+        await flutterLocalNotificationsPlugin.zonedSchedule(
+          id + 99999,
+          title,
+          body,
+          scheduledDate,
+          platformChannelSpecifics,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        );
+      } catch (e2, stack2) {
+        // ignore: avoid_print
+        print('Inexact test alarm scheduling fallback failed: $e2\n$stack2');
+      }
+    }
   }
 
   Future<void> cancelReminder(int id) async {

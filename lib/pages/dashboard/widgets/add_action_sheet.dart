@@ -223,7 +223,7 @@ class AddActionSheet extends ConsumerWidget {
                     title: AppLocalizations.of(context)!.logUrine,
                     subtitle: AppLocalizations.of(context)!.logUrineDesc,
                     color: Colors.amber,
-                    isBeta: true,
+                    isBeta: false,
                     onTap: () {
                       final l10n = AppLocalizations.of(context)!;
                       final urineSuccess = l10n.urineLoggedSuccess;
@@ -278,6 +278,20 @@ class AddActionSheet extends ConsumerWidget {
                                   ),
                             ),
                       );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildActionItem(
+                    context,
+                    icon: Icons.notifications_active_rounded,
+                    title: AppLocalizations.of(context)!.remindersTitle,
+                    subtitle: AppLocalizations.of(context)!.localeName == 'th'
+                        ? 'ตั้งเวลาแจ้งเตือนดื่มน้ำ ทานยา หรือล้างไตช่องท้อง'
+                        : 'Set reminders for water, meals, meds, or PD',
+                    color: Colors.purple,
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/reminders');
                     },
                   ),
                   const SizedBox(height: 24),
@@ -356,27 +370,6 @@ class AddActionSheet extends ConsumerWidget {
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
-                      if (isBeta) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.shade700,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'BETA',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                   const SizedBox(height: 4),

@@ -10,11 +10,11 @@ import '../../services/quota_engine.dart';
 
 import '../../widgets/meals_list.dart';
 import '../../models/supabase/daily_log.dart';
-import 'package:intl/intl.dart';
 import 'widgets/dashboard_nutrients.dart';
-import 'widgets/fluid_balance.dart';
 import 'widgets/dashboard_warnings.dart';
 import 'widgets/dashboard_calendar.dart';
+import 'widgets/fluid_balance.dart';
+import 'widgets/dashboard_recommendations.dart';
 import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 
 class DashboardPage extends ConsumerWidget {
@@ -62,59 +62,18 @@ class DashboardPage extends ConsumerWidget {
                     vertical: 24.0,
                   ),
                   children: [
-                    // Header with staggered animation
-                    Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    DateFormat(
-                                      'dd / MM / yyyy',
-                                      Localizations.localeOf(
-                                        context,
-                                      ).toString(),
-                                    ).format(DateTime.now()),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withValues(alpha: 0.6),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    AppLocalizations.of(context)!.navDashboard,
-                                    style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
-                                      height: 1.2,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                        .animate()
-                        .fade(duration: 500.ms)
-                        .slideY(begin: 0.1, curve: Curves.easeOutCubic),
-                    const SizedBox(height: 24),
-
                     const DashboardCalendar()
                         .animate()
                         .fade(delay: 100.ms, duration: 500.ms)
                         .slideY(begin: -0.05),
                     const SizedBox(height: 16),
+
+                    // Recommendations Widget — staggered
+                    DashboardRecommendationsWidget(log: log)
+                        .animate()
+                        .fade(delay: 150.ms, duration: 500.ms)
+                        .slideY(begin: 0.08),
+                    const SizedBox(height: 24),
 
                     // Nutrients card — staggered
                     DashboardNutrientsWidget(quotas: quotas)
@@ -123,17 +82,17 @@ class DashboardPage extends ConsumerWidget {
                         .slideY(begin: 0.08),
                     const SizedBox(height: 24),
 
-                    // Fluid Balance card — staggered
-                    FluidBalanceWidget(log: log)
-                        .animate()
-                        .fade(delay: 300.ms, duration: 500.ms)
-                        .slideY(begin: 0.08),
-                    const SizedBox(height: 24),
-
                     // Warnings — staggered
                     DashboardWarningsWidget(quotas: quotas)
                         .animate()
                         .fade(delay: 600.ms, duration: 500.ms)
+                        .slideY(begin: 0.08),
+                    const SizedBox(height: 24),
+
+                    // Fluid Balance card — staggered
+                    FluidBalanceWidget(log: log)
+                        .animate()
+                        .fade(delay: 700.ms, duration: 500.ms)
                         .slideY(begin: 0.08),
 
                     const Divider(height: 32, thickness: 1),

@@ -62,8 +62,7 @@ import 'app_localizations_th.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -71,8 +70,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -84,18 +82,17 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('th'),
+    Locale('th')
   ];
 
   /// No description provided for @appName.
@@ -409,6 +406,54 @@ abstract class AppLocalizations {
   /// In th, this message translates to:
   /// **'บันทึกข้อมูลล้มเหลว กรุณาลองใหม่อีกครั้ง'**
   String get saveFailed;
+
+  /// No description provided for @fullName.
+  ///
+  /// In th, this message translates to:
+  /// **'ชื่อผู้ป่วย'**
+  String get fullName;
+
+  /// No description provided for @ageYears.
+  ///
+  /// In th, this message translates to:
+  /// **'อายุ (ปี)'**
+  String get ageYears;
+
+  /// No description provided for @egfrValue.
+  ///
+  /// In th, this message translates to:
+  /// **'ค่า eGFR (mL/min/1.73ม.²)'**
+  String get egfrValue;
+
+  /// No description provided for @fullNameValidationEmpty.
+  ///
+  /// In th, this message translates to:
+  /// **'กรุณากรอกชื่อผู้ป่วย'**
+  String get fullNameValidationEmpty;
+
+  /// No description provided for @ageValidationEmpty.
+  ///
+  /// In th, this message translates to:
+  /// **'กรุณากรอกอายุ'**
+  String get ageValidationEmpty;
+
+  /// No description provided for @ageValidationInvalid.
+  ///
+  /// In th, this message translates to:
+  /// **'กรุณากรอกอายุที่ถูกต้อง (1-120)'**
+  String get ageValidationInvalid;
+
+  /// No description provided for @egfrValidationEmpty.
+  ///
+  /// In th, this message translates to:
+  /// **'กรุณากรอกค่า eGFR'**
+  String get egfrValidationEmpty;
+
+  /// No description provided for @egfrValidationInvalid.
+  ///
+  /// In th, this message translates to:
+  /// **'กรุณากรอกค่า eGFR ที่ถูกต้อง (0-200)'**
+  String get egfrValidationInvalid;
 
   /// No description provided for @pleaseEnterHealthData.
   ///
@@ -1019,13 +1064,13 @@ abstract class AppLocalizations {
   /// No description provided for @warningOverLimitDash.
   ///
   /// In th, this message translates to:
-  /// **'คุณทาน {nutrients} เกินโควต้าประจำวันแล้ว!'**
+  /// **'ปริมาณ {nutrients} ที่บริโภคในวันนี้เกินเกณฑ์ที่แนะนำสำหรับสุขภาพไตแล้ว ควรจำกัดการบริโภคในมื้อถัดไป'**
   String warningOverLimitDash(Object nutrients);
 
   /// No description provided for @warningNearLimitDash.
   ///
   /// In th, this message translates to:
-  /// **'ปริมาณ {nutrients} ใกล้เกินกำหนดแล้ว ระวังด้วยนะ'**
+  /// **'ปริมาณ {nutrients} ที่บริโภควันนี้สูงกว่า 80% ของเกณฑ์ควบคุมแล้ว แนะนำให้เลือกเมนูที่มีปริมาณสารอาหารนี้ต่ำลงสำหรับมื้อถัดไป'**
   String warningNearLimitDash(Object nutrients);
 
   /// No description provided for @weightValidationEmpty.
@@ -1209,8 +1254,7 @@ abstract class AppLocalizations {
   String get noReminders;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -1219,26 +1263,25 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'th'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'th'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en':
-      return AppLocalizationsEn();
-    case 'th':
-      return AppLocalizationsTh();
+    case 'en': return AppLocalizationsEn();
+    case 'th': return AppLocalizationsTh();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
+    'that was used.'
   );
 }

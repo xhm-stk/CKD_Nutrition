@@ -54,6 +54,14 @@
   "saveHealthData": "บันทึกข้อมูลสุขภาพ",
   "saveSuccess": "บันทึกข้อมูลสำเร็จ",
   "saveFailed": "บันทึกข้อมูลล้มเหลว กรุณาลองใหม่อีกครั้ง",
+  "fullName": "ชื่อผู้ป่วย",
+  "ageYears": "อายุ (ปี)",
+  "egfrValue": "ค่า eGFR (mL/min/1.73ม.²)",
+  "fullNameValidationEmpty": "กรุณากรอกชื่อผู้ป่วย",
+  "ageValidationEmpty": "กรุณากรอกอายุ",
+  "ageValidationInvalid": "กรุณากรอกอายุที่ถูกต้อง (1-120)",
+  "egfrValidationEmpty": "กรุณากรอกค่า eGFR",
+  "egfrValidationInvalid": "กรุณากรอกค่า eGFR ที่ถูกต้อง (0-200)",
   "pleaseEnterHealthData": "กรุณาบันทึกข้อมูลสุขภาพ",
 
   "notifications": "การแจ้งเตือน",
@@ -182,11 +190,11 @@
   "workOffline": "ทำงานแบบออฟไลน์",
   "canOnlyLogTodayMeals": "คุณสามารถบันทึกอาหารได้เฉพาะวันที่ปัจจุบันเท่านั้น",
   "excellent": "ยอดเยี่ยมมาก!",
-  "warningOverLimitDash": "คุณทาน {nutrients} เกินโควต้าประจำวันแล้ว!",
+  "warningOverLimitDash": "ปริมาณ {nutrients} ที่บริโภคในวันนี้เกินเกณฑ์ที่แนะนำสำหรับสุขภาพไตแล้ว ควรจำกัดการบริโภคในมื้อถัดไป",
   "@warningOverLimitDash": {
     "placeholders": { "nutrients": {} }
   },
-  "warningNearLimitDash": "ปริมาณ {nutrients} ใกล้เกินกำหนดแล้ว ระวังด้วยนะ",
+  "warningNearLimitDash": "ปริมาณ {nutrients} ที่บริโภควันนี้สูงกว่า 80% ของเกณฑ์ควบคุมแล้ว แนะนำให้เลือกเมนูที่มีปริมาณสารอาหารนี้ต่ำลงสำหรับมื้อถัดไป",
   "@warningNearLimitDash": {
     "placeholders": { "nutrients": {} }
   },

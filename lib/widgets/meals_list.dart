@@ -119,24 +119,33 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Leading meal type icon
-                      Container(
-                        width: 64,
-                        height: 64,
-                        decoration: BoxDecoration(
-                          color: AppTheme.brandPrimary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppTheme.brandPrimary.withValues(
-                              alpha: 0.25,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            color: AppTheme.brandPrimary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppTheme.brandPrimary.withValues(
+                                alpha: 0.25,
+                              ),
+                              width: 1,
                             ),
-                            width: 1,
                           ),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            _getMealIcon(meal.mealType),
-                            color: AppTheme.brandAccent,
-                            size: 26,
+                          child: Image.asset(
+                            'assets/food_images/${meal.foodId}.webp',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Center(
+                                child: Icon(
+                                  _getMealIcon(meal.mealType),
+                                  color: AppTheme.brandAccent,
+                                  size: 26,
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),

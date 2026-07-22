@@ -129,6 +129,14 @@ class OfflineSyncWorker {
           await _sb
               .from('user_health_profiles')
               .upsert(payload, onConflict: 'user_id');
+          final fullName = payload['full_name'];
+          if (fullName != null && fullName.toString().isNotEmpty) {
+            await _sb.auth.updateUser(
+              UserAttributes(
+                data: {'name': fullName},
+              ),
+            );
+          }
           return _SyncStatus.success;
 
         case 'LOG_MEAL_RPC':

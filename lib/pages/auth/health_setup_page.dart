@@ -23,8 +23,11 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
   final _nameCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
   final _heightCtrl = TextEditingController();
+  final _ageCtrl = TextEditingController();
+  final _egfrCtrl = TextEditingController();
   String _selectedGender = 'male';
   String _selectedStage = 'stage_3a';
+  bool _isOnDialysis = false;
   bool _isLoading = false;
   bool _isFetching = true;
 
@@ -44,11 +47,15 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
 
       if (data != null && mounted) {
         setState(() {
-          _nameCtrl.text = userName;
+          final dbName = data['full_name']?.toString() ?? '';
+          _nameCtrl.text = dbName.isNotEmpty ? dbName : userName;
           _weightCtrl.text = data['weight_kg']?.toString() ?? '';
           _heightCtrl.text = data['height_cm']?.toString() ?? '';
+          _ageCtrl.text = data['age']?.toString() ?? '';
+          _egfrCtrl.text = data['egfr']?.toString() ?? '';
           _selectedGender = data['gender'] ?? 'male';
           _selectedStage = data['ckd_stage'] ?? 'stage_3a';
+          _isOnDialysis = data['is_on_dialysis'] ?? false;
         });
       } else if (mounted) {
         setState(() {
@@ -94,6 +101,11 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
               .replaceAll(',', '.')
               .replaceAll(RegExp(r'[^0-9\.]'), '')
               .trim();
+      final ageClean = _ageCtrl.text.trim();
+      final egfrClean = _egfrCtrl.text.replaceAll(',', '.').trim();
+      final ageVal = ageClean.isNotEmpty ? int.tryParse(ageClean) : null;
+      final egfrVal = egfrClean.isNotEmpty ? double.tryParse(egfrClean) : null;
+
       await ref
           .read(healthProfileServiceProvider)
           .saveHealthProfile(
@@ -101,6 +113,10 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
             heightCm: double.parse(heightClean),
             gender: _selectedGender,
             ckdStage: _selectedStage,
+            isOnDialysis: _isOnDialysis,
+            fullName: newName,
+            age: ageVal,
+            egfr: egfrVal,
           );
 
       if (!mounted) return;
@@ -184,6 +200,8 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
     _nameCtrl.dispose();
     _weightCtrl.dispose();
     _heightCtrl.dispose();
+    _ageCtrl.dispose();
+    _egfrCtrl.dispose();
     super.dispose();
   }
 
@@ -239,14 +257,57 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                       PremiumTextField(
                         controller: _nameCtrl,
                         label: AppLocalizations.of(context)!.enterName,
-                        prefixIcon: Icons.person_outline,
                         keyboardType: TextInputType.name,
                       ).animate().fade(duration: 450.ms).slideY(begin: 0.2),
+                      const SizedBox(height: 16),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: PremiumTextField(
+                              controller: _ageCtrl,
+                              label: AppLocalizations.of(context)!.ageYears,
+                              keyboardType: TextInputType.number,
+                              validator: (val) {
+                                final l10n = AppLocalizations.of(context)!;
+                                if (val == null || val.trim().isEmpty) {
+                                  return l10n.ageValidationEmpty;
+                                }
+                                final n = int.tryParse(val.trim());
+                                if (n == null || n < 1 || n > 120) {
+                                  return l10n.ageValidationInvalid;
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: PremiumTextField(
+                              controller: _egfrCtrl,
+                              label: AppLocalizations.of(context)!.egfrValue,
+                              keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true,
+                              ),
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) return null;
+                                final clean = val.replaceAll(',', '.').trim();
+                                final n = double.tryParse(clean);
+                                if (n == null || n < 0 || n > 200) {
+                                  return AppLocalizations.of(context)!.localeName == 'th'
+                                      ? 'กรอกค่า eGFR (0-200)'
+                                      : 'Invalid eGFR (0-200)';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
+                      ).animate().fade(duration: 480.ms).slideY(begin: 0.2),
                       const SizedBox(height: 16),
                       PremiumTextField(
                         controller: _weightCtrl,
                         label: AppLocalizations.of(context)!.weightKg,
-                        prefixIcon: Icons.monitor_weight_outlined,
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
@@ -271,7 +332,6 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                       PremiumTextField(
                         controller: _heightCtrl,
                         label: AppLocalizations.of(context)!.heightCm,
-                        prefixIcon: Icons.height_outlined,
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
@@ -296,7 +356,6 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                       PremiumDropdownField<String>(
                         label: AppLocalizations.of(context)!.gender,
                         value: _selectedGender,
-                        prefixIcon: Icons.person_outline,
                         items: [
                           DropdownMenuItem(
                             value: 'male',
@@ -314,7 +373,6 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                       PremiumDropdownField<String>(
                         label: AppLocalizations.of(context)!.ckdStage,
                         value: _selectedStage,
-                        prefixIcon: Icons.medical_services_outlined,
                         items: [
                           DropdownMenuItem(
                             value: 'stage_1',
@@ -341,9 +399,91 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                             child: Text(AppLocalizations.of(context)!.stage5),
                           ),
                         ],
-                        onChanged:
-                            (val) => setState(() => _selectedStage = val!),
+                        onChanged: (val) {
+                          setState(() {
+                            _selectedStage = val!;
+                            if (_selectedStage != 'stage_5') {
+                              _isOnDialysis = false;
+                            }
+                          });
+                        },
                       ).animate().fade(duration: 800.ms).slideY(begin: 0.2),
+                      if (_selectedStage == 'stage_5') ...[
+                        const SizedBox(height: 16),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.getSurface(context),
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.08),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.local_hospital_rounded,
+                                    color: AppTheme.brandPrimary,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)!.localeName == 'th'
+                                            ? 'ได้รับการฟอกไต/ล้างไตแล้ว'
+                                            : 'Undergoing Dialysis',
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        AppLocalizations.of(context)!.localeName == 'th'
+                                            ? 'สลับหากได้รับการฟอกไตแล้ว'
+                                            : 'Toggle if undergoing dialysis',
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.5),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Switch(
+                                value: _isOnDialysis,
+                                activeColor: AppTheme.brandPrimary,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _isOnDialysis = val;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ).animate().fade(duration: 400.ms).slideY(begin: 0.1),
+                      ],
                       const SizedBox(height: 48),
                       _isLoading
                           ? const Center(

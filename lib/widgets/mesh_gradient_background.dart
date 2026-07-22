@@ -65,7 +65,21 @@ class MeshGradientBackground extends StatelessWidget {
         ),
 
         // Foreground content
-        Positioned.fill(child: child),
+        Positioned.fill(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth > 600) {
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 540),
+                    child: child,
+                  ),
+                );
+              }
+              return child;
+            },
+          ),
+        ),
       ],
     );
   }

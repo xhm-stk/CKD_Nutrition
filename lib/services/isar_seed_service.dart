@@ -27,18 +27,23 @@ class IsarSeedService {
       final String fJson = await rootBundle.loadString(
         'assets/data/food_master.json',
       );
-      debugPrint(
-        '📦 [Isar Seeding] โหลดไฟล์ JSON สำเร็จ ขนาด: ${fJson.length} ตัวอักษร',
-      );
 
-      // โยนงานถอดรหัส JSON ไปให้ Background Thread ทำงาน
+      // ถอดรหัส JSON
       final List<dynamic> rawData = await compute(
         (String text) => jsonDecode(text) as List<dynamic>,
         fJson,
       );
+
+      final countBefore = await isar.foodItems.count();
       debugPrint(
-        '📦 [Isar Seeding] ถอดรหัส JSON สำเร็จ พบอาหารทั้งหมด: ${rawData.length} รายการ',
+        '📦 [Isar Seeding] จำนวนอาหารใน Isar: $countBefore รายการ vs JSON: ${rawData.length} รายการ (forceUpdate: $forceUpdate)',
       );
+
+      final bool countMismatch = countBefore != rawData.length;
+      if (countBefore > 0 && !forceUpdate && !countMismatch) {
+        debugPrint('📦 [Isar Seeding] ข้อมูลใน Isar ตรงกันแล้ว ข้ามการปั๊มข้อมูล');
+        return;
+      }
 
       // แปลง JSON แต่ละก้อนให้กลายเป็นออบเจกต์ FoodItem
       final List<FoodItem> foods =
@@ -73,10 +78,10 @@ class IsarSeedService {
               ..notes = parseString(j['notes']);
           }).toList();
 
-      // บันทึกข้อมูลทั้ง 156 รายการลงฐานข้อมูลรวดเดียว
+      // บันทึกข้อมูลลงฐานข้อมูล
       await isar.writeTxn(() async {
-        if (forceUpdate) {
-          debugPrint('📦 [Isar Seeding] กำลังล้างตารางอาหารเดิม...');
+        if (forceUpdate || countMismatch) {
+          debugPrint('📦 [Isar Seeding] กำลังล้างตารางอาหารเดิมเพื่อให้ข้อมูลตรงกัน...');
           await isar.foodItems.clear();
         }
         debugPrint(

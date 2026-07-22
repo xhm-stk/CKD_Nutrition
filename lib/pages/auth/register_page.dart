@@ -83,18 +83,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.water_drop_rounded,
-                            color: AppTheme.brandPrimary,
-                            size: 32,
-                            shadows: [
-                              Shadow(
-                                color: AppTheme.brandPrimary.withValues(
-                                  alpha: 0.5,
-                                ),
-                                blurRadius: 16,
-                              ),
-                            ],
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.asset(
+                              'assets/images/app_logo.png',
+                              height: 40,
+                              width: 40,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                           const SizedBox(width: 8),
                           const Text(
@@ -150,8 +146,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   const SizedBox(height: 32),
 
                   // Footer Text Button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 4,
                     children: [
                       Text(
                         AppLocalizations.of(context)!.alreadyHaveAccount,

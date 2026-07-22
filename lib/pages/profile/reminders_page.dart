@@ -65,34 +65,6 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(
-                              0xFFF59E0B,
-                            ).withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: const Color(
-                                0xFFF59E0B,
-                              ).withValues(alpha: 0.3),
-                              width: 0.5,
-                            ),
-                          ),
-                          child: const Text(
-                            'BETA',
-                            style: TextStyle(
-                              color: Color(0xFFD97706),
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ],
@@ -210,6 +182,32 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
+                                            if (item.date != null) ...[
+                                              const SizedBox(height: 4),
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.calendar_month_rounded,
+                                                    size: 13,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface
+                                                        .withValues(alpha: 0.4),
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    item.date!,
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface
+                                                          .withValues(alpha: 0.4),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
                                           ],
                                         ),
                                       ),
@@ -290,11 +288,41 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
   final TextEditingController _itemCtrl = TextEditingController();
   String _selectedType = 'meal';
   TimeOfDay _selectedTime = const TimeOfDay(hour: 8, minute: 0);
+  DateTime? _selectedDate;
+
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppTheme.brandPrimary,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Color(0xFF0F172A),
+            ),
+            dialogTheme: const DialogTheme(backgroundColor: Colors.white),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
 
   Future<void> _selectTime() async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: _selectedTime,
+      initialEntryMode: TimePickerEntryMode.input,
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
@@ -319,24 +347,27 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
 
   void _save() async {
     final l10n = AppLocalizations.of(context)!;
-    final name = _itemCtrl.text.trim();
+    String name = _itemCtrl.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.requiredField),
-          backgroundColor: AppTheme.errorBase,
-        ),
-      );
-      return;
+      if (_selectedType == 'meal') {
+        name = l10n.localeName == 'th' ? 'มื้ออาหารตามกำหนด' : 'Scheduled Meal';
+      } else {
+        name = l10n.localeName == 'th' ? 'จิบน้ำเพื่อสุขภาพ' : 'Drink Water';
+      }
     }
 
     final formattedHour = _selectedTime.hour.toString().padLeft(2, '0');
     final formattedMinute = _selectedTime.minute.toString().padLeft(2, '0');
     final timeStr = '$formattedHour:$formattedMinute';
 
+    String? dateStr;
+    if (_selectedDate != null) {
+      dateStr = '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}';
+    }
+
     await ref
         .read(customRemindersProvider.notifier)
-        .addReminder(_selectedType, timeStr, name);
+        .addReminder(_selectedType, timeStr, name, date: dateStr);
 
     if (mounted) {
       Navigator.of(context).pop();
@@ -429,34 +460,6 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
                           ).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(
-                              0xFFF59E0B,
-                            ).withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: const Color(
-                                0xFFF59E0B,
-                              ).withValues(alpha: 0.3),
-                              width: 0.5,
-                            ),
-                          ),
-                          child: const Text(
-                            'BETA',
-                            style: TextStyle(
-                              color: Color(0xFFD97706),
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                            ),
                           ),
                         ),
                       ],
@@ -552,10 +555,85 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
                 ),
                 const SizedBox(height: 16),
 
+                // Date Picker Trigger Button (Optional)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.localeName == 'th' ? 'วันที่ตั้งเตือนล่วงหน้า (ไม่บังคับ)' : 'Reminder Date (Optional)',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: _selectDate,
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.02),
+                          border: Border.all(
+                            color: Colors.black.withValues(alpha: 0.08),
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _selectedDate != null
+                                    ? '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}'
+                                    : (l10n.localeName == 'th' ? 'แจ้งเตือนทุกวัน (ไม่กำหนดวัน)' : 'Every day (No specific date)'),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: _selectedDate != null
+                                      ? Theme.of(context).colorScheme.onSurface
+                                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                                ),
+                              ),
+                            ),
+                            if (_selectedDate != null)
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedDate = null;
+                                  });
+                                },
+                                child: const Icon(
+                                  Icons.clear_rounded,
+                                  color: AppTheme.errorBase,
+                                  size: 20,
+                                ),
+                              )
+                            else
+                              const Icon(
+                                Icons.calendar_month_rounded,
+                                color: AppTheme.brandPrimary,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
                 // Custom Menu / Fluid input
                 PremiumTextField(
                   controller: _itemCtrl,
-                  label: l10n.reminderMenu,
+                  label: _selectedType == 'meal'
+                      ? '${l10n.reminderMenu} (${l10n.localeName == 'th' ? 'ไม่บังคับ' : 'Optional'})'
+                      : '${l10n.localeName == 'th' ? 'ปริมาณน้ำ / ข้อความเตือน' : 'Water Volume / Message'} (${l10n.localeName == 'th' ? 'ไม่บังคับ' : 'Optional'})',
                   hint:
                       _selectedType == 'meal'
                           ? 'เช่น ข้าวต้มปลา'

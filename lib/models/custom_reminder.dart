@@ -4,6 +4,7 @@ class CustomReminder {
   final String time; // 'HH:mm'
   final String itemName; // Food menu or fluid volume
   final bool isEnabled;
+  final String? date; // 'yyyy-MM-dd' (Optional date for future scheduling)
 
   CustomReminder({
     required this.id,
@@ -11,6 +12,7 @@ class CustomReminder {
     required this.time,
     required this.itemName,
     this.isEnabled = true,
+    this.date,
   });
 
   CustomReminder copyWith({
@@ -19,6 +21,7 @@ class CustomReminder {
     String? time,
     String? itemName,
     bool? isEnabled,
+    String? date,
   }) {
     return CustomReminder(
       id: id ?? this.id,
@@ -26,6 +29,7 @@ class CustomReminder {
       time: time ?? this.time,
       itemName: itemName ?? this.itemName,
       isEnabled: isEnabled ?? this.isEnabled,
+      date: date ?? this.date,
     );
   }
 
@@ -35,6 +39,7 @@ class CustomReminder {
     'time': time,
     'item_name': itemName,
     'is_enabled': isEnabled,
+    'date': date,
   };
 
   factory CustomReminder.fromJson(Map<String, dynamic> json) => CustomReminder(
@@ -43,5 +48,6 @@ class CustomReminder {
     time: json['time'] as String,
     itemName: json['item_name'] as String,
     isEnabled: json['is_enabled'] as bool? ?? true,
+    date: json['date'] as String?,
   );
 }

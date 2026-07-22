@@ -27,7 +27,7 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
     state = list;
   }
 
-  Future<void> addReminder(String type, String time, String itemName) async {
+  Future<void> addReminder(String type, String time, String itemName, {String? date}) async {
     final id = DateTime.now().millisecondsSinceEpoch.remainder(
       100000000,
     ); // 32-bit int safe ID
@@ -37,6 +37,7 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
       time: time,
       itemName: itemName,
       isEnabled: true,
+      date: date,
     );
 
     final updated = [...state, reminder];
@@ -76,29 +77,67 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
     final hour = int.tryParse(parts[0]) ?? 8;
     final minute = int.tryParse(parts[1]) ?? 0;
 
+    final langCode = _prefs.getString('language_code') ?? 'th';
+    final isEn = langCode == 'en';
+
     final isWater = reminder.type == 'water';
-    final title =
-        isWater ? 'ได้เวลาดื่มน้ำแล้วครับ 💧' : 'ได้เวลารับประทานมื้ออาหาร 🍽️';
-    final body =
-        isWater
-            ? 'เป้าหมาย: ${reminder.itemName} ค่อยๆ จิบน้ำเพื่อสุขภาพไตที่ดีนะครับ'
-            : 'เมนูของคุณวันนี้: ${reminder.itemName} อย่าลืมรับประทานและบันทึกโภชนาการนะครับ';
+    
+    String title;
+    String body;
+    String testTitle;
+    String testBody;
 
-    await _notifService.scheduleMealReminder(
-      id: reminder.id,
-      title: title,
-      body: body,
-      hour: hour,
-      minute: minute,
-    );
+    if (isEn) {
+      if (isWater) {
+        title = 'Reminder: Scheduled water intake 💧';
+        body = 'Target: ${reminder.itemName}. Sipping water in moderate amounts helps maintain optimal fluid balance for your kidneys.';
+      } else {
+        title = 'Reminder: Meal nutrition time 🍽️';
+        body = 'Scheduled menu: ${reminder.itemName}. Having your meals on time and logging your intake helps keep your kidney health goals on track.';
+      }
+      testTitle = '🔔 Reminder set successfully';
+      testBody = reminder.date != null
+          ? 'The system will remind you of "${reminder.itemName}" on ${reminder.date} at ${reminder.time}.'
+          : 'The system will remind you of "${reminder.itemName}" daily at ${reminder.time}.';
+    } else {
+      if (isWater) {
+        title = 'แจ้งเตือน: ถึงเวลาดื่มน้ำตามกำหนด 💧';
+        body = 'เป้าหมาย: ${reminder.itemName} แนะนำให้จิบน้ำทีละน้อยเพื่อรักษาสมดุลของไตและหลีกเลี่ยงภาวะน้ำเกินครับ';
+      } else {
+        title = 'แจ้งเตือน: ถึงเวลาดูแลโภชนาการมื้ออาหาร 🍽️';
+        body = 'เมนูที่กำหนดไว้: ${reminder.itemName} แนะนำให้รับประทานตรงเวลาและบันทึกปริมาณสารอาหารเพื่อควบคุมโควต้าสุขภาพไตประจำวันครับ';
+      }
+      testTitle = '🔔 ตั้งค่าแจ้งเตือนสำเร็จ';
+      testBody = reminder.date != null
+          ? 'ระบบจะเตือน "${reminder.itemName}" วันที่ ${reminder.date} เวลา ${reminder.time} น. เรียบร้อยแล้วครับ'
+          : 'ระบบได้รับการบันทึกการแจ้งเตือนสำหรับ "${reminder.itemName}" ทุกวันเวลา ${reminder.time} น. เรียบร้อยแล้วครับ';
+    }
 
-    // Trigger an instant test notification 3 seconds later so the user can verify
-    await _notifService.showInstantReminderTest(
-      id: reminder.id,
-      title: '🔔 ตั้งเวลาสำเร็จ! (BETA)',
-      body:
-          'ระบบจะเตือน "${reminder.itemName}" ทุกวันเวลา ${reminder.time} น. ของคุณครับ',
-    );
+    DateTime? targetDate;
+    if (reminder.date != null) {
+      targetDate = DateTime.tryParse(reminder.date!);
+    }
+
+    try {
+      await _notifService.scheduleMealReminder(
+        id: reminder.id,
+        title: title,
+        body: body,
+        hour: hour,
+        minute: minute,
+        targetDate: targetDate,
+      );
+
+      // Trigger an instant test notification 3 seconds later so the user can verify
+      await _notifService.showInstantReminderTest(
+        id: reminder.id,
+        title: testTitle,
+        body: testBody,
+      );
+    } catch (e, stack) {
+      // ignore: avoid_print
+      print('Failed to schedule local notification: $e\n$stack');
+    }
   }
 }
 

@@ -197,6 +197,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           AppTheme.lightTheme(), // Force light theme even if OS is in dark mode
       themeMode: ThemeMode.light, // Strictly enforce light mode
       routerConfig: router,
+      builder: (context, child) => child ?? const SizedBox.shrink(),
     );
   }
 }

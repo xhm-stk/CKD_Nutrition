@@ -68,7 +68,10 @@ class AuthRepository {
 
   Future<Result<void>> resetPassword(String email) async {
     try {
-      await _sb.auth.resetPasswordForEmail(email);
+      await _sb.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'io.supabase.ckdnutrition://reset-callback/',
+      );
       return Success(null);
     } on AuthException catch (e, stack) {
       return Failure(e.message, e, stack);

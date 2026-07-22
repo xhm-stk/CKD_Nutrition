@@ -8,24 +8,29 @@ class PremiumTextField extends StatefulWidget {
   final String? hint;
   final TextEditingController controller;
   final bool isPassword;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
   final TextInputType keyboardType;
   final String? errorText;
   final ValueChanged<String>? onChanged;
   final String? Function(String?)?
   validator; // เพิ่ม validator เพื่อรองรับ Form
 
+  final bool isCompact;
+  final bool enabled;
+
   const PremiumTextField({
     super.key,
     required this.label,
     required this.controller,
-    required this.prefixIcon,
+    this.prefixIcon,
     this.hint,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
     this.errorText,
     this.onChanged,
     this.validator,
+    this.isCompact = false,
+    this.enabled = true,
   });
 
   @override
@@ -61,7 +66,9 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
 
     // สีขอบ (Border Color)
     Color borderColor = Colors.white.withValues(alpha: 0.08);
-    if (hasError) {
+    if (!widget.enabled) {
+      borderColor = theme.colorScheme.onSurface.withValues(alpha: 0.05);
+    } else if (hasError) {
       borderColor = theme.colorScheme.error;
     } else if (_isFocused) {
       borderColor = AppTheme.brandPrimary;
@@ -85,29 +92,31 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
           ),
           child: Text(widget.label),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: widget.isCompact ? 4 : 8),
 
         // Text Field Container with Focus Bloom
         AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
-            color: AppTheme.getSurface(context),
+            color: widget.enabled
+                ? AppTheme.getSurface(context)
+                : AppTheme.getSurface(context).withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(30.0),
             border: Border.all(
               color: borderColor,
               width: _isFocused || hasError ? 1.5 : 1.0,
             ),
-            boxShadow:
-                _isFocused && !hasError
-                    ? [
-                      BoxShadow(
-                        color: AppTheme.brandPrimary.withValues(alpha: 0.15),
-                        blurRadius: 16,
-                        spreadRadius: 2,
-                      ),
-                    ]
-                    : [],
+            boxShadow: [
+              BoxShadow(
+                color: _isFocused
+                    ? AppTheme.brandPrimary.withValues(alpha: 0.15)
+                    : Colors.black.withValues(alpha: widget.enabled ? 0.04 : 0.01),
+                blurRadius: _isFocused ? 16 : 8,
+                spreadRadius: _isFocused ? 2 : 0,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30.0),
@@ -116,9 +125,10 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
               focusNode: _focusNode,
               obscureText: _obscureText,
               keyboardType: widget.keyboardType,
+              enabled: widget.enabled,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 16,
+                fontSize: widget.isCompact ? 14 : 16,
               ),
               onChanged: widget.onChanged,
               validator: widget.validator,
@@ -128,6 +138,7 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
                   color: Theme.of(
                     context,
                   ).colorScheme.onSurface.withValues(alpha: 0.3),
+                  fontSize: widget.isCompact ? 14 : 16,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
@@ -149,23 +160,25 @@ class _PremiumTextFieldState extends State<PremiumTextField> {
                   borderRadius: BorderRadius.circular(30.0),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(
+                contentPadding: EdgeInsets.symmetric(
                   horizontal: 20,
-                  vertical: 18,
+                  vertical: widget.isCompact ? 12 : 18,
                 ),
-                prefixIcon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(
-                    widget.prefixIcon,
-                    key: ValueKey(_isFocused),
-                    color:
-                        _isFocused
-                            ? AppTheme.brandPrimary
-                            : Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.4),
-                  ),
-                ),
+                prefixIcon: widget.prefixIcon != null
+                    ? AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          widget.prefixIcon,
+                          key: ValueKey(_isFocused),
+                          color:
+                              _isFocused
+                                  ? AppTheme.brandPrimary
+                                  : Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface.withValues(alpha: 0.4),
+                        ),
+                      )
+                    : null,
                 suffixIcon:
                     widget.isPassword
                         ? IconButton(

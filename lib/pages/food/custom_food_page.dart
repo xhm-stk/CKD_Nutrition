@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/core_providers.dart';
 import '../../providers/meal_providers.dart';
 import '../../core/result.dart';
@@ -28,6 +31,86 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
   final _waterCtrl = TextEditingController();
 
   bool _isLoading = false;
+  File? _selectedImage;
+
+  Future<void> _pickFoodImage(ImageSource source) async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: source,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 80,
+      );
+      if (picked != null) {
+        setState(() {
+          _selectedImage = File(picked.path);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('ไม่สามารถเลือกรูปภาพได้: $e')),
+        );
+      }
+    }
+  }
+
+  void _showImagePickerSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Wrap(
+            children: [
+              const Center(
+                child: Text(
+                  'เลือกรูปภาพเมนูอาหาร',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(Icons.camera_alt_rounded, color: AppTheme.brandPrimary),
+                title: const Text('ถ่ายภาพด้วยกล้อง (Camera)'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickFoodImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library_rounded, color: AppTheme.brandPrimary),
+                title: const Text('เลือกจากคลังภาพ (Gallery)'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickFoodImage(ImageSource.gallery);
+                },
+              ),
+              if (_selectedImage != null)
+                ListTile(
+                  leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
+                  title: const Text('ลบรูปภาพ'),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    setState(() => _selectedImage = null);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveImageMapping(String foodName) async {
+    if (_selectedImage == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('custom_food_img_$foodName', _selectedImage!.path);
+  }
 
   @override
   void dispose() {
@@ -66,6 +149,7 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
 
     switch (result) {
       case Success():
+        await _saveImageMapping(_nameCtrl.text.trim());
         scaffoldMessenger.showSnackBar(
           const SnackBar(content: Text('✅ บันทึกเมนูอาหารเข้าสมุดเมนูสำเร็จ!')),
         );
@@ -103,6 +187,9 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
       return;
     }
 
+    // Save image mapping
+    await _saveImageMapping(_nameCtrl.text.trim());
+
     // 2. กินทันที! (บันทึกเข้า Dashboard)
     final mealRepo = ref.read(mealRepositoryProvider);
     await mealRepo.logMealData(
@@ -137,15 +224,14 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
 
   Widget _buildNumberField(
     TextEditingController ctrl,
-    String label,
-    IconData icon, {
+    String label, {
     Key? key,
   }) {
     return PremiumTextField(
       key: key,
       controller: ctrl,
       label: label,
-      prefixIcon: icon,
+      isCompact: true,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       validator: (value) {
         if (value == null || value.trim().isEmpty) return 'กรุณากรอกข้อมูล';
@@ -178,42 +264,89 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Center(
+                    child: GestureDetector(
+                      onTap: _showImagePickerSheet,
+                      child: Container(
+                        width: 140,
+                        height: 140,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppTheme.brandPrimary.withValues(alpha: 0.3),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: _selectedImage != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.file(
+                                  _selectedImage!,
+                                  fit: BoxFit.cover,
+                                  width: 140,
+                                  height: 140,
+                                ),
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.add_a_photo_rounded,
+                                    size: 40,
+                                    color: AppTheme.brandPrimary.withValues(alpha: 0.8),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'เพิ่มรูปภาพอาหาร',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   PremiumTextField(
                     key: const Key('custom_food_name'),
                     controller: _nameCtrl,
                     label: 'ชื่อเมนูอาหาร',
-                    prefixIcon: Icons.restaurant_menu_rounded,
+                    isCompact: true,
                     validator:
                         (val) =>
                             val == null || val.trim().isEmpty
                                 ? 'กรุณากรอกชื่ออาหาร'
                                 : null,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   PremiumTextField(
                     key: const Key('custom_food_serving'),
                     controller: _servingCtrl,
                     label: 'ปริมาณ (เช่น 1 จาน, 100g)',
-                    prefixIcon: Icons.scale_rounded,
+                    isCompact: true,
                     validator:
                         (val) =>
                             val == null || val.trim().isEmpty
                                 ? 'กรุณากรอกปริมาณ'
                                 : null,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'คุณค่าทางโภชนาการ',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 15,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -221,7 +354,6 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                         child: _buildNumberField(
                           _proteinCtrl,
                           'โปรตีน (g)',
-                          Icons.egg_outlined,
                           key: const Key('custom_food_protein'),
                         ),
                       ),
@@ -230,13 +362,12 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                         child: _buildNumberField(
                           _potassiumCtrl,
                           'โพแทสเซียม (mg)',
-                          Icons.eco_outlined,
                           key: const Key('custom_food_potassium'),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -244,7 +375,6 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                         child: _buildNumberField(
                           _sodiumCtrl,
                           'โซเดียม (mg)',
-                          Icons.soup_kitchen_outlined,
                           key: const Key('custom_food_sodium'),
                         ),
                       ),
@@ -253,13 +383,12 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                         child: _buildNumberField(
                           _sugarCtrl,
                           'น้ำตาล (g)',
-                          Icons.cookie_outlined,
                           key: const Key('custom_food_sugar'),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -267,7 +396,6 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                         child: _buildNumberField(
                           _carbCtrl,
                           'คาร์โบไฮเดรต (g)',
-                          Icons.breakfast_dining_outlined,
                           key: const Key('custom_food_carb'),
                         ),
                       ),
@@ -276,13 +404,12 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                         child: _buildNumberField(
                           _waterCtrl,
                           'น้ำ (ml)',
-                          Icons.water_drop_outlined,
                           key: const Key('custom_food_water'),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                   PremiumPrimaryButton(
                     text: 'บันทึกและรับประทานทันที',
                     isLoading: _isLoading,

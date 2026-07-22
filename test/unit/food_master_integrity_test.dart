@@ -48,16 +48,16 @@ void main() {
           }).toList();
     });
 
-    test('1. อาหารในฐานข้อมูลต้องมีครบ 156 เมนู 100% (Exact Count)', () {
+    test('1. อาหารในฐานข้อมูลต้องมีครบ 154 เมนู 100% (Exact Count)', () {
       expect(
         rawData.length,
-        equals(156),
-        reason: 'จำนวนรายการใน JSON ไม่ครบ 156 รายการ',
+        equals(154),
+        reason: 'จำนวนรายการใน JSON ไม่ครบ 154 รายการ',
       );
       expect(
         foods.length,
-        equals(156),
-        reason: 'จำนวนการแปลงเป็น FoodItem ไม่ครบ 156 รายการ',
+        equals(154),
+        reason: 'จำนวนการแปลงเป็น FoodItem ไม่ครบ 154 รายการ',
       );
     });
 

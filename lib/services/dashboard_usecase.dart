@@ -82,16 +82,36 @@ class DashboardUseCase {
     }
 
     final weightKg = (profile['weight_kg'] ?? 60.0).toDouble();
-    final proteinMultiplier = (rules['protein_multiplier'] ?? 0.8).toDouble();
+    
+    // ดึงตัวคูณโปรตีนจากคอลัมน์จริง protein_limit_g (แทน protein_multiplier เดิมที่มีบั๊ก)
+    double proteinMultiplier = (rules['protein_limit_g'] ?? 0.8).toDouble();
 
-    // คำนวณ limit แบบ Dynamic จาก weight × multiplier เสมอ (ไม่ใช้ค่า static จาก View)
-    // ทำให้เปลี่ยน CKD Stage หรือน้ำหนักแล้ว Dashboard อัปเดตทันที
+    // หากเป็นคนไข้ระยะ 5 และยังไม่ได้ฟอกไต ให้ใช้โควต้าโปรตีนแบบคุมเข้มงวดเป็นพิเศษ (0.6 g/kg)
+    final ckdStage = profile['ckd_stage'] ?? '';
+    final isOnDialysis = profile['is_on_dialysis'] ?? false;
+    if (ckdStage == 'stage_5' && !isOnDialysis) {
+      proteinMultiplier = 0.6;
+    }
+
     final dynamicProtein = weightKg * proteinMultiplier;
     final dynamicPotassium = (rules['potassium_limit_mg'] ?? 2000.0).toDouble();
     final dynamicSodium = (rules['sodium_limit_mg'] ?? 2000.0).toDouble();
     final dynamicSugar = (rules['sugar_limit_g'] ?? 24.0).toDouble();
-    final dynamicCarb = (rules['carb_limit_g'] ?? 150.0).toDouble();
-    final dynamicWater = (rules['water_limit_ml'] ?? 1500.0).toDouble();
+
+    // คำนวณคาร์โบไฮเดรตแบบไดนามิกต่อน้ำหนักตัว (weightKg * multiplier)
+    final carbMultiplier = (rules['carb_limit_g'] ?? 4.5).toDouble();
+    final dynamicCarb = weightKg * carbMultiplier;
+
+    // คำนวณโควต้าน้ำดื่มไดนามิก ปัสสาวะ + 500 มล. สำหรับระยะ 4-5
+    final waterLimitInDb = (rules['water_limit_ml'] ?? 1500.0).toDouble();
+    double dynamicWater = waterLimitInDb;
+    if (waterLimitInDb == -1) {
+      final urineMl = (baseLog?.totalUrineMl ?? 0.0).toDouble();
+      dynamicWater = urineMl + 500.0;
+      if (dynamicWater < 500.0) {
+        dynamicWater = 500.0; // ค่าขั้นต่ำที่ยอมรับได้
+      }
+    }
 
     // ใช้ค่าที่คำนวณ dynamic เป็น limit เสมอ (override ค่าจาก View)
     if (baseLog != null) {
@@ -199,6 +219,17 @@ class DashboardUseCase {
                   .toDouble(),
         );
       }
+    }
+
+    // หลังจากวนลูปคำนวณยอดสะสมออฟไลน์เสร็จสิ้นแล้ว
+    // ค่อยมาประมวลผลโควต้าน้ำดื่มแบบไดนามิกอีกครั้ง เพื่อให้ยอดปัสสาวะออฟไลน์ถูกนำมารวมคำนวณอย่างถูกต้อง
+    if (waterLimitInDb == -1 && baseLog != null) {
+      final urineMl = baseLog.totalUrineMl;
+      double finalDynamicWater = urineMl + 500.0;
+      if (finalDynamicWater < 500.0) {
+        finalDynamicWater = 500.0;
+      }
+      baseLog = baseLog.copyWith(customWater: finalDynamicWater);
     }
 
     return baseLog;

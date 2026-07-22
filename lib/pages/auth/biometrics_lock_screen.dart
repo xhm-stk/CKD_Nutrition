@@ -69,15 +69,19 @@ class _BiometricsLockScreenState extends ConsumerState<BiometricsLockScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppTheme.brandPrimary.withValues(alpha: 0.1),
                   ),
-                  child: const Icon(
-                    Icons.fingerprint_rounded,
-                    size: 80,
-                    color: AppTheme.brandPrimary,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      'assets/images/app_logo.png',
+                      height: 72,
+                      width: 72,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 32),

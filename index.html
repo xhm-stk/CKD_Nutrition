@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เปลี่ยนรหัสผ่านใหม่ | CKD Nutrition</title>
+    <!-- โหลด Supabase JS SDK จาก CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h2 { color: #0f172a; margin-bottom: 8px; }
+        p { color: #64748b; font-size: 14px; margin-bottom: 24px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0288d1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background-color: #0277bd; }
+        .success { color: #10b981; font-weight: bold; display: none; }
+        .error { color: #ef4444; font-size: 13px; margin-bottom: 12px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="form-section">
+        <h2>กำหนดรหัสผ่านใหม่</h2>
+        <p>ระบุรหัสผ่านใหม่สำหรับเข้าสู่ระบบ CKD Nutrition ของคุณ</p>
+        
+        <div id="error-msg" class="error"></div>
+        <input type="password" id="new-password" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)">
+        <input type="password" id="confirm-password" placeholder="ยืนยันรหัสผ่านใหม่">
+        <button onclick="handleReset()">อัปเดตรหัสผ่าน</button>
+    </div>
+
+    <div id="success-section" style="display: none;">
+        <h2 style="color: #10b981;">✓ อัปเดตสำเร็จ</h2>
+        <p style="margin-bottom: 0;">เปลี่ยนรหัสผ่านของคุณเรียบร้อยแล้ว! ท่านสามารถเปิดแอปพลิเคชันบนมือถือและล็อกอินเข้าใช้งานด้วยรหัสผ่านใหม่ได้ทันทีครับ</p>
+    </div>
+</div>
+
+<script>
+    // ดึงค่าเชื่อมโยงจากตัวแปรแอปพลิเคชันอัตโนมัติ
+    const SUPABASE_URL = "https://wgjvfqsdhozgvxrqvgyo.supabase.co"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnanZmcXNkaG96Z3Z4cnF2Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzkzODcsImV4cCI6MjA5NTcxNTM4N30.rOjV3ef49bMzXiafBpJmdgV-8Pw9m0O5lDl0fz7Wuek";
+    
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ตรวจสอบเช็ค Token ใน URL ขากลับ
+    window.onload = function() {
+        const hash = window.location.hash;
+        if (!hash.includes("access_token=")) {
+            document.getElementById("error-msg").innerText = "Token สำหรับตั้งรหัสผ่านใหม่ไม่ถูกต้องหรือหมดอายุแล้ว";
+            document.getElementById("error-msg").style.display = "block";
+            document.querySelector("button").disabled = true;
+        }
+    };
+
+    async function handleReset() {
+        const pass = document.getElementById("new-password").value;
+        const confirm = document.getElementById("confirm-password").value;
+        const errorDiv = document.getElementById("error-msg");
+
+        if (pass.length < 6) {
+            errorDiv.innerText = "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร";
+            errorDiv.style.display = "block";
+            return;
+        }
+        if (pass !== confirm) {
+            errorDiv.innerText = "รหัสผ่านที่ป้อนไม่ตรงกัน";
+            errorDiv.style.display = "block";
+            return;
+        }
+
+        // ดึง Token จาก URL Hash อัตโนมัติเพื่อใช้ยืนยันการตั้งค่า
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get("access_token");
+
+        if (!accessToken) {
+            errorDiv.innerText = "ไม่สามารถยืนยันตัวตนเพื่อกู้คืนรหัสผ่านได้";
+            errorDiv.style.display = "block";
+            return;
+        }
+
+        // เซ็ต Token เข้าสู่เซสชันบราวเซอร์
+        const { data, error: sessionErr } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: hashParams.get("refresh_token")
+        });
+
+        if (sessionErr) {
+            errorDiv.innerText = "เซสชันรีเซ็ตหมดอายุ กรุณาส่งอีเมลคำขอใหม่อีกครั้ง";
+            errorDiv.style.display = "block";
+            return;
+        }
+
+        // ยิงสั่งแก้ไขรหัสผ่านใหม่
+        const { error } = await supabase.auth.updateUser({ password: pass });
+
+        if (error) {
+            errorDiv.innerText = "เกิดข้อผิดพลาด: " + error.message;
+            errorDiv.style.display = "block";
+        } else {
+            document.getElementById("form-section").style.display = "none";
+            document.getElementById("success-section").style.display = "block";
+            // สั่งเคลียร์และล็อกเอาต์เซสชันบนบราวเซอร์
+            await supabase.auth.signOut();
+        }
+    }
+</script>
+</body>
+</html>

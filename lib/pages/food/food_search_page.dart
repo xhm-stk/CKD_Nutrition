@@ -9,6 +9,7 @@ import '../../core/result.dart';
 import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/mesh_gradient_background.dart';
+import '../../widgets/smart_food_image.dart';
 
 class FoodSearchPage extends ConsumerStatefulWidget {
   const FoodSearchPage({super.key});
@@ -19,6 +20,17 @@ class FoodSearchPage extends ConsumerStatefulWidget {
 
 class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
   final TextEditingController _searchCtrl = TextEditingController();
+  String _selectedCategory = 'ทั้งหมด';
+  final List<String> _categories = [
+    'ทั้งหมด',
+    'กับข้าว',
+    'อาหารจานเดียว/เส้น',
+    'ผลไม้',
+    'เครื่องดื่ม',
+    'ผัก',
+    'เนื้อสัตว์',
+    'เครื่องปรุง',
+  ];
 
   @override
   void initState() {
@@ -89,6 +101,11 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
   @override
   Widget build(BuildContext context) {
     final searchState = ref.watch(foodSearchControllerProvider);
+    final filteredResults = _selectedCategory == 'ทั้งหมด'
+        ? searchState.results
+        : searchState.results
+            .where((f) => f.category == _selectedCategory)
+            .toList();
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -179,156 +196,214 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
         ),
       ),
       body: MeshGradientBackground(
-        child:
-            searchState.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : searchState.results.isEmpty
-                ? Center(
-                  child: Text(
-                    AppLocalizations.of(context)!.noFoodFound,
-                    style: TextStyle(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.6),
-                      fontSize: 16,
-                    ),
-                  ),
-                )
-                : ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  itemCount: searchState.results.length,
-                  itemBuilder: (ctx, i) {
-                    final f = searchState.results[i];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 6,
-                      ),
-                      color: AppTheme.getElevated(context),
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () => _showLogDialog(f),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // Photo placeholder on the left
-                              Container(
-                                width: 64,
-                                height: 64,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.getBase(context),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: AppTheme.getBorderColor(context),
-                                  ),
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.restaurant_rounded,
-                                    color: AppTheme.brandAccent,
-                                    size: 28,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-
-                              // Middle section: name & 6 nutrients
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      f.name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    // 6 Nutrients wrap (including water)
-                                    Wrap(
-                                      spacing: 5,
-                                      runSpacing: 5,
-                                      children: [
-                                        _buildNutrientTag(
-                                          context,
-                                          AppLocalizations.of(context)!.protein,
-                                          '${f.proteinG.toStringAsFixed(1)}g',
-                                          const Color(0xFF34D399),
-                                        ),
-                                        _buildNutrientTag(
-                                          context,
-                                          AppLocalizations.of(context)!.carbs,
-                                          '${f.carbG.toStringAsFixed(1)}g',
-                                          const Color(0xFFFBBF24),
-                                        ),
-                                        _buildNutrientTag(
-                                          context,
-                                          AppLocalizations.of(context)!.sugar,
-                                          '${f.sugarG.toStringAsFixed(1)}g',
-                                          AppTheme.brandSecondary,
-                                        ),
-                                        _buildNutrientTag(
-                                          context,
-                                          AppLocalizations.of(context)!.sodium,
-                                          '${f.sodiumMg.toStringAsFixed(0)}mg',
-                                          const Color(0xFF38BDF8),
-                                        ),
-                                        _buildNutrientTag(
-                                          context,
-                                          AppLocalizations.of(
-                                            context,
-                                          )!.potassium,
-                                          '${f.potassiumMg.toStringAsFixed(0)}mg',
-                                          const Color(0xFFF87171),
-                                        ),
-                                        _buildNutrientTag(
-                                          context,
-                                          AppLocalizations.of(context)!.water,
-                                          '${f.waterMl.toStringAsFixed(0)}ml',
-                                          const Color(0xFF60A5FA),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-
-                              // Right section: Circular '+' button
-                              Container(
-                                width: 32,
-                                height: 32,
-                                decoration: const BoxDecoration(
-                                  color: AppTheme.brandPrimary,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                            ],
-                          ),
+        child: Column(
+          children: [
+            // Horizontal scrolling category chips
+            Container(
+              height: 40,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _categories.length,
+                itemBuilder: (context, index) {
+                  final category = _categories[index];
+                  final isSelected = _selectedCategory == category;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      showCheckmark: false,
+                      label: Text(
+                        category,
+                        style: TextStyle(
+                          color: isSelected
+                              ? Colors.white
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.8),
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 13,
                         ),
                       ),
-                    );
-                  },
-                ),
+                      selected: isSelected,
+                      selectedColor: AppTheme.brandPrimary,
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .surface
+                          .withValues(alpha: 0.8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(
+                          color: isSelected
+                              ? Colors.transparent
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.1),
+                        ),
+                      ),
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() {
+                            _selectedCategory = category;
+                          });
+                        }
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Results list or states
+            Expanded(
+              child: searchState.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : filteredResults.isEmpty
+                      ? Center(
+                          child: Text(
+                            AppLocalizations.of(context)!.noFoodFound,
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.6),
+                              fontSize: 16,
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          itemCount: filteredResults.length,
+                          itemBuilder: (ctx, i) {
+                            final f = filteredResults[i];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 6,
+                              ),
+                              color: AppTheme.getElevated(context),
+                              elevation: 1,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () => _showLogDialog(f),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      SmartFoodImage(
+                                        foodId: f.foodId,
+                                        foodName: f.name,
+                                        width: 64,
+                                        height: 64,
+                                        borderRadius: 12,
+                                      ),
+                                      const SizedBox(width: 16),
+
+                                      // Middle section: name & 6 nutrients
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              f.name,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            // 6 Nutrients wrap (including water)
+                                            Wrap(
+                                              spacing: 5,
+                                              runSpacing: 5,
+                                              children: [
+                                                _buildNutrientTag(
+                                                  context,
+                                                  AppLocalizations.of(context)!
+                                                      .protein,
+                                                  '${f.proteinG.toStringAsFixed(1)}g',
+                                                  const Color(0xFF34D399),
+                                                ),
+                                                _buildNutrientTag(
+                                                  context,
+                                                  AppLocalizations.of(context)!
+                                                      .carbs,
+                                                  '${f.carbG.toStringAsFixed(1)}g',
+                                                  const Color(0xFFFBBF24),
+                                                ),
+                                                _buildNutrientTag(
+                                                  context,
+                                                  AppLocalizations.of(context)!
+                                                      .sugar,
+                                                  '${f.sugarG.toStringAsFixed(1)}g',
+                                                  AppTheme.brandSecondary,
+                                                ),
+                                                _buildNutrientTag(
+                                                  context,
+                                                  AppLocalizations.of(context)!
+                                                      .sodium,
+                                                  '${f.sodiumMg.toStringAsFixed(0)}mg',
+                                                  const Color(0xFF38BDF8),
+                                                ),
+                                                _buildNutrientTag(
+                                                  context,
+                                                  AppLocalizations.of(context)!
+                                                      .potassium,
+                                                  '${f.potassiumMg.toStringAsFixed(0)}mg',
+                                                  const Color(0xFFF87171),
+                                                ),
+                                                _buildNutrientTag(
+                                                  context,
+                                                  AppLocalizations.of(context)!
+                                                      .water,
+                                                  '${f.waterMl.toStringAsFixed(0)}ml',
+                                                  const Color(0xFF60A5FA),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+
+                                      // Right section: Circular '+' button
+                                      Container(
+                                        width: 32,
+                                        height: 32,
+                                        decoration: const BoxDecoration(
+                                          color: AppTheme.brandPrimary,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -485,11 +560,14 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
                 ),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.restaurant_rounded,
-                      color: AppTheme.brandAccent,
-                    ),
-                    const SizedBox(width: 10),
+                     SmartFoodImage(
+                       foodId: widget.food.foodId,
+                       foodName: widget.food.name,
+                       width: 44,
+                       height: 44,
+                       borderRadius: 10,
+                     ),
+                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'บันทึก ${widget.food.name}',
@@ -639,6 +717,7 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
                         final picked = await showTimePicker(
                           context: context,
                           initialTime: _eatenTime,
+                          initialEntryMode: TimePickerEntryMode.input,
                           builder:
                               (context, child) => Theme(
                                 data: ThemeData.light().copyWith(

@@ -60,7 +60,8 @@ class HistoryPage extends ConsumerStatefulWidget {
 
 class _HistoryPageState extends ConsumerState<HistoryPage> {
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  DateTime? _selectedDay = DateTime.now();
+  CalendarFormat _calendarFormat = CalendarFormat.week;
 
   String _formatDate(DateTime day) => DateFormat('yyyy-MM-dd').format(day);
 
@@ -122,10 +123,28 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
                       _focusedDay = focusedDay;
                     });
                   },
-                  calendarFormat: CalendarFormat.month,
-                  availableCalendarFormats: {CalendarFormat.month: l10n.month},
+                  calendarFormat: _calendarFormat,
+                  onFormatChanged: (format) {
+                    setState(() {
+                      _calendarFormat = format;
+                    });
+                  },
+                  availableCalendarFormats: {
+                    CalendarFormat.week: l10n.localeName == 'th' ? 'สัปดาห์' : 'Week',
+                    CalendarFormat.month: l10n.localeName == 'th' ? 'เดือน' : 'Month',
+                  },
                   headerStyle: HeaderStyle(
-                    formatButtonVisible: false,
+                    formatButtonVisible: true,
+                    formatButtonShowsNext: false,
+                    formatButtonDecoration: BoxDecoration(
+                      color: AppTheme.brandPrimary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    formatButtonTextStyle: const TextStyle(
+                      color: AppTheme.brandPrimary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
                     titleCentered: true,
                     titleTextStyle: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
@@ -399,14 +418,27 @@ class _HistoryMealsList extends ConsumerWidget {
                     ),
                   ),
                   child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: AppTheme.brandPrimary.withValues(
-                        alpha: 0.15,
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppTheme.brandPrimary.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.restaurant_rounded,
-                        color: AppTheme.brandPrimary,
-                        size: 20,
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/food_images/${meal.foodId}.webp',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(
+                                Icons.restaurant_rounded,
+                                color: AppTheme.brandPrimary,
+                                size: 20,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                     title: Text(

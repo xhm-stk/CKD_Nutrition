@@ -8,7 +8,6 @@ import '../../../theme/app_theme.dart';
 import '../../../widgets/mesh_gradient_background.dart';
 import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 import 'widgets/login_form.dart';
-import 'widgets/social_auth_buttons.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -59,18 +58,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.water_drop_rounded,
-                            color: AppTheme.brandPrimary,
-                            size: 40,
-                            shadows: [
-                              Shadow(
-                                color: AppTheme.brandPrimary.withValues(
-                                  alpha: 0.5,
-                                ),
-                                blurRadius: 16,
-                              ),
-                            ],
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              'assets/images/app_logo.png',
+                              height: 48,
+                              width: 48,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                           const SizedBox(width: 8),
                           const Text(
@@ -123,45 +118,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       .animate()
                       .fade(delay: 400.ms, duration: 500.ms)
                       .slideY(begin: 0.05),
-                  const SizedBox(height: 32),
-
-                  // Divider
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          color: Colors.black.withValues(alpha: 0.08),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          AppLocalizations.of(context)!.orLoginWith,
-                          style: TextStyle(
-                            color: Colors.black.withValues(alpha: 0.4),
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          color: Colors.black.withValues(alpha: 0.08),
-                        ),
-                      ),
-                    ],
-                  ).animate().fade(delay: 500.ms, duration: 500.ms),
-                  const SizedBox(height: 32),
-
-                  // Social Buttons
-                  const SocialAuthButtons()
-                      .animate()
-                      .fade(delay: 600.ms, duration: 500.ms)
-                      .slideY(begin: 0.05),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 24),
 
                   // Footer Text Button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 4,
                     children: [
                       Text(
                         AppLocalizations.of(context)!.dontHaveAccount,

@@ -54,6 +54,14 @@
   "saveHealthData": "Save Health Data",
   "saveSuccess": "Saved successfully",
   "saveFailed": "Failed to save data. Please try again.",
+  "fullName": "Patient Name",
+  "ageYears": "Age (years)",
+  "egfrValue": "eGFR (mL/min/1.73m²)",
+  "fullNameValidationEmpty": "Please enter patient name",
+  "ageValidationEmpty": "Please enter age",
+  "ageValidationInvalid": "Please enter a valid age (1-120)",
+  "egfrValidationEmpty": "Please enter eGFR",
+  "egfrValidationInvalid": "Please enter a valid eGFR (0-200)",
   "pleaseEnterHealthData": "Please enter your health data",
 
   "notifications": "Notifications",
@@ -182,11 +190,11 @@
   "workOffline": "Work Offline",
   "canOnlyLogTodayMeals": "You can only log meals for today.",
   "excellent": "Excellent!",
-  "warningOverLimitDash": "You have exceeded your daily quota of {nutrients}!",
+  "warningOverLimitDash": "Your daily intake of {nutrients} has exceeded the recommended limit for kidney health. Please monitor your next meals carefully.",
   "@warningOverLimitDash": {
     "placeholders": { "nutrients": {} }
   },
-  "warningNearLimitDash": "Your {nutrients} is approaching the limit. Be careful!",
+  "warningNearLimitDash": "Your intake of {nutrients} has reached 80% of the daily limit. We recommend choosing options with lower amounts for the rest of the day.",
   "@warningNearLimitDash": {
     "placeholders": { "nutrients": {} }
   },

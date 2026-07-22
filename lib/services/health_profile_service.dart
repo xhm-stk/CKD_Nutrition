@@ -14,12 +14,15 @@ class HealthProfileService {
     _ckdSvc = CkdRuleService(_isar);
   }
 
-  // บันทึกโปรไฟล์สุขภาพ
   Future<void> saveHealthProfile({
     required double weightKg,
     required double heightCm,
     required String gender,
     required String ckdStage,
+    bool isOnDialysis = false,
+    String? fullName,
+    int? age,
+    double? egfr,
   }) async {
     final user = _sb.auth.currentUser;
     if (user == null) {
@@ -34,12 +37,25 @@ class HealthProfileService {
       'height_cm': heightCm,
       'gender': gender,
       'ckd_stage': ckdStage,
+      'is_on_dialysis': isOnDialysis,
+      'full_name': fullName,
+      'age': age,
+      'egfr': egfr,
     };
 
     try {
       await _sb
           .from('user_health_profiles')
           .upsert(payload, onConflict: 'user_id');
+      
+      // Update name in Supabase Auth user metadata so it matches and email templates work
+      if (fullName != null && fullName.isNotEmpty) {
+        await _sb.auth.updateUser(
+          UserAttributes(
+            data: {'name': fullName},
+          ),
+        );
+      }
     } catch (e) {
       debugPrint('🚨 Supabase failed, falling back to offline queue: $e');
 
@@ -51,6 +67,7 @@ class HealthProfileService {
       await _isar.writeTxn(() async {
         await _isar.offlineActions.put(action);
       });
+      rethrow;
     }
 
     await _ckdSvc.syncToIsar(ckdStage);
