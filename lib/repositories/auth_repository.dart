@@ -144,7 +144,7 @@ class AuthRepository {
       final user = _sb.auth.currentUser;
       if (user == null) return Failure('กรุณาเข้าสู่ระบบก่อน');
 
-      await _sb.rpc('delete_user_account', params: {'p_user_id': user.id});
+      await _sb.rpc('delete_user_account');
       await logout();
       return Success(null);
     } catch (e, stack) {

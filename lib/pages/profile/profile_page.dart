@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../providers/core_providers.dart';
 import '../../../repositories/auth_repository.dart';
+import '../../../core/result.dart';
 import '../../../widgets/premium_text_field.dart';
 import '../../../widgets/premium_dropdown_field.dart';
 import '../../../theme/app_theme.dart';
@@ -261,7 +262,35 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
                 onPressed: () async {
                   Navigator.pop(context);
-                  await ref.read(authRepositoryProvider).deleteAccount();
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('กำลังลบบัญชีผู้ใช้ของคุณ...'),
+                      duration: Duration(seconds: 10),
+                    ),
+                  );
+
+                  final result = await ref.read(authRepositoryProvider).deleteAccount();
+
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                  switch (result) {
+                    case Success():
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('ลบบัญชีผู้ใช้สำเร็จ ระบบกำลังนำคุณออกจากระบบ'),
+                          backgroundColor: AppTheme.brandPrimary,
+                        ),
+                      );
+                    case Failure(:final userMessage):
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(userMessage),
+                          backgroundColor: AppTheme.errorBase,
+                        ),
+                      );
+                  }
                 },
                 child: Text(l10n.permanentlyDelete),
               ),
