@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
@@ -136,7 +137,6 @@ class OfflineSyncWorker {
           return _SyncStatus.success;
 
         case 'LOG_MEAL_RPC':
-          // เช็คว่า p_eaten_at มีส่งมาไหม (แก้บั๊กเวลาเพี้ยนข้ามวัน Patch 8)
           final params = {
             'p_food_id': payload['food_id'],
             'p_food_name': payload['food_name'],
@@ -148,6 +148,9 @@ class OfflineSyncWorker {
             'p_sugar': payload['sugar'],
             'p_carb': payload['carb'],
             'p_water': payload['water'],
+            'p_phosphorus': payload['phosphorus'] ?? 0.0,
+            'p_eaten_at': payload['eaten_at'],
+            'p_log_date': payload['log_date'],
           };
           await _sb.rpc('log_meal', params: params);
           return _SyncStatus.success;
@@ -162,7 +165,11 @@ class OfflineSyncWorker {
         case 'LOG_URINE_RPC':
           await _sb.rpc(
             'log_urine',
-            params: {'p_amount_ml': payload['amount_ml']},
+            params: {
+              'p_amount_ml': payload['amount_ml'],
+              'p_logged_at': payload['logged_at'],
+              'p_log_date': payload['log_date'],
+            },
           );
           return _SyncStatus.success;
 
@@ -177,6 +184,25 @@ class OfflineSyncWorker {
           final user = _sb.auth.currentUser;
           if (user != null) {
             payload['user_id'] = user.id;
+
+            final localImgPath = payload.remove('local_image_path') as String?;
+            if (localImgPath != null && File(localImgPath).existsSync()) {
+              try {
+                final file = File(localImgPath);
+                final fileName =
+                    'custom_foods/${user.id}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+                await _sb.storage
+                    .from('food_images')
+                    .upload(fileName, file);
+                final publicUrl = _sb.storage
+                    .from('food_images')
+                    .getPublicUrl(fileName);
+                payload['image_url'] = publicUrl;
+              } catch (e) {
+                debugPrint('⚠️ Storage upload warning in sync worker: $e');
+              }
+            }
+
             await _sb.from('custom_foods').insert(payload);
           }
           return _SyncStatus.success;

@@ -5,6 +5,7 @@ import '../providers/meal_providers.dart';
 import '../core/result.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
+import 'meal_detail_dialog.dart';
 
 class MealsListWidget extends ConsumerStatefulWidget {
   const MealsListWidget({super.key});
@@ -113,11 +114,14 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () => MealDetailDialog.show(context, meal),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
                       // Leading meal type icon
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
@@ -206,7 +210,7 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            // Nutrients Wrap — all 6
+                            // Nutrients Wrap — including phosphorus
                             Wrap(
                               spacing: 5,
                               runSpacing: 5,
@@ -215,37 +219,37 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                                   context,
                                   l10n.protein,
                                   '${meal.proteinG.toStringAsFixed(1)}${l10n.gramsUnit}',
-                                  const Color(0xFF34D399),
+                                  const Color(0xFF059669),
                                 ),
                                 _buildNutrientTag(
                                   context,
                                   l10n.carbs,
                                   '${meal.carbG.toStringAsFixed(1)}${l10n.gramsUnit}',
-                                  const Color(0xFFFBBF24),
+                                  const Color(0xFFD97706),
                                 ),
                                 _buildNutrientTag(
                                   context,
                                   l10n.sugar,
                                   '${meal.sugarG.toStringAsFixed(1)}${l10n.gramsUnit}',
-                                  AppTheme.brandSecondary,
+                                  const Color(0xFFEA580C),
                                 ),
                                 _buildNutrientTag(
                                   context,
                                   l10n.sodium,
                                   '${meal.sodiumMg.toStringAsFixed(0)}${l10n.milligramsUnit}',
-                                  const Color(0xFF38BDF8),
+                                  const Color(0xFF0284C7),
                                 ),
                                 _buildNutrientTag(
                                   context,
                                   l10n.potassium,
                                   '${meal.potassiumMg.toStringAsFixed(0)}${l10n.milligramsUnit}',
-                                  const Color(0xFFF87171),
+                                  const Color(0xFFDC2626),
                                 ),
                                 _buildNutrientTag(
                                   context,
-                                  l10n.water,
-                                  '${meal.waterMl.toStringAsFixed(0)}${l10n.millilitersUnit}',
-                                  const Color(0xFF60A5FA),
+                                  l10n.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus',
+                                  '${meal.phosphorusMg.toStringAsFixed(0)}${l10n.milligramsUnit}',
+                                  const Color(0xFF9333EA),
                                 ),
                               ],
                             ),
@@ -260,24 +264,21 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            _getMealTypeName(meal.mealType),
+                            _getMealTypeName(context, meal.mealType),
                             style: const TextStyle(
-                              fontSize: 12,
+                              color: AppTheme.brandPrimary,
                               fontWeight: FontWeight.bold,
-                              color: AppTheme.brandAccent,
+                              fontSize: 13,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            l10n.localeName == 'th'
-                                ? '${meal.eatenAt.hour.toString().padLeft(2, '0')}:${meal.eatenAt.minute.toString().padLeft(2, '0')} น.'
-                                : '${meal.eatenAt.hour.toString().padLeft(2, '0')}:${meal.eatenAt.minute.toString().padLeft(2, '0')}',
+                            '${meal.eatenAt.toLocal().hour.toString().padLeft(2, '0')}:${meal.eatenAt.toLocal().minute.toString().padLeft(2, '0')} น.',
                             style: TextStyle(
-                              fontSize: 11,
+                              fontSize: 12,
                               color: Theme.of(
                                 context,
                               ).colorScheme.onSurface.withValues(alpha: 0.5),
-                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -286,35 +287,32 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                   ),
                 ),
               ),
-            );
-          },
-        );
-      },
-      loading:
-          () => const Center(
-            child: Padding(
-              padding: EdgeInsets.all(20.0),
-              child: CircularProgressIndicator(),
             ),
-          ),
-      error: (e, st) => Center(child: Text('${l10n.error}: $e')),
+          );
+        },
+      );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text('Error: $error')),
     );
   }
 
   IconData _getMealIcon(String type) {
     switch (type) {
       case 'breakfast':
-        return Icons.wb_twilight;
+        return Icons.wb_sunny_rounded;
       case 'lunch':
-        return Icons.wb_sunny;
+        return Icons.wb_cloudy_rounded;
       case 'dinner':
-        return Icons.nights_stay;
+        return Icons.dark_mode_rounded;
+      case 'snack':
+        return Icons.cookie_outlined;
       default:
-        return Icons.local_cafe;
+        return Icons.restaurant_menu_rounded;
     }
   }
 
-  String _getMealTypeName(String type) {
+  String _getMealTypeName(BuildContext context, String type) {
     final l10n = AppLocalizations.of(context)!;
     switch (type) {
       case 'breakfast':
@@ -336,12 +334,13 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
     String value,
     Color color,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
+        color: isDark ? color.withValues(alpha: 0.18) : color.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.25), width: 0.8),
+        border: Border.all(color: color.withValues(alpha: 0.35), width: 1.0),
       ),
       child: RichText(
         text: TextSpan(
@@ -349,17 +348,17 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
             TextSpan(
               text: '$label ',
               style: TextStyle(
-                fontSize: 10,
-                color: Colors.white.withValues(alpha: 0.5),
-                fontWeight: FontWeight.w500,
+                fontSize: 11,
+                color: isDark ? Colors.white70 : const Color(0xFF334155),
+                fontWeight: FontWeight.w600,
               ),
             ),
             TextSpan(
               text: value,
               style: TextStyle(
                 fontSize: 11,
-                color: color,
-                fontWeight: FontWeight.bold,
+                color: isDark ? color : color.withValues(alpha: 0.95),
+                fontWeight: FontWeight.w800,
               ),
             ),
           ],

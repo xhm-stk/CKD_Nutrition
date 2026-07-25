@@ -285,6 +285,21 @@ class AppLocalizationsTh extends AppLocalizations {
   String get carbs => 'คาร์บ';
 
   @override
+  String get phosphorus => 'ฟอสฟอรัส';
+
+  @override
+  String get unitGram => ' ก.';
+
+  @override
+  String get gramsUnit => ' ก.';
+
+  @override
+  String get unitMilligram => 'มก.';
+
+  @override
+  String get unitMilliliter => 'มล.';
+
+  @override
   String get searchFoodHint => 'ค้นหาอาหาร... เช่น ข้าวต้ม, ปลา';
 
   @override
@@ -318,22 +333,25 @@ class AppLocalizationsTh extends AppLocalizations {
   String get foodName => 'ชื่อเมนูอาหาร';
 
   @override
-  String get proteinG => 'โปรตีน (g)';
+  String get proteinG => 'โปรตีน (กรัม)';
 
   @override
-  String get sodiumMg => 'โซเดียม (mg)';
+  String get sodiumMg => 'โซเดียม (มก.)';
 
   @override
-  String get potassiumMg => 'โพแทสเซียม (mg)';
+  String get potassiumMg => 'โพแทสเซียม (มก.)';
 
   @override
-  String get sugarG => 'น้ำตาล (g)';
+  String get sugarG => 'น้ำตาล (กรัม)';
 
   @override
-  String get carbsG => 'คาร์โบไฮเดรต (g)';
+  String get carbsG => 'คาร์โบไฮเดรต (กรัม)';
 
   @override
-  String get waterMl => 'น้ำ (ml)';
+  String get waterMl => 'น้ำ (มล.)';
+
+  @override
+  String get phosphorusMg => 'ฟอสฟอรัส (มก.)';
 
   @override
   String get eatingHistory => 'ประวัติการกินอาหาร';
@@ -551,9 +569,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get fluidBalanceTitle => 'การประเมินภาวะสมดุลน้ำ (Fluid Balance)';
-
-  @override
-  String get gramsUnit => 'กรัม';
 
   @override
   String get milligramsUnit => 'มก.';

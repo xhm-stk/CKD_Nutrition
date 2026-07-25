@@ -7,6 +7,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/mesh_gradient_background.dart';
 import '../../widgets/premium_text_field.dart';
 import '../../widgets/premium_dropdown_field.dart';
+import '../../widgets/custom_time_date_picker.dart';
 import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 
 class RemindersPage extends ConsumerStatefulWidget {
@@ -294,25 +295,11 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
   DateTime? _selectedDate;
 
   Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await CustomTimeDatePicker.showCustomDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.brandPrimary,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Color(0xFF0F172A),
-            ),
-            dialogTheme: const DialogTheme(backgroundColor: Colors.white),
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       setState(() {
@@ -322,24 +309,9 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
   }
 
   Future<void> _selectTime() async {
-    final TimeOfDay? picked = await showTimePicker(
+    final TimeOfDay? picked = await CustomTimeDatePicker.show24hTimePicker(
       context: context,
       initialTime: _selectedTime,
-      initialEntryMode: TimePickerEntryMode.input,
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.brandPrimary,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Color(0xFF0F172A),
-            ),
-            dialogTheme: const DialogTheme(backgroundColor: Colors.white),
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null && picked != _selectedTime) {
       setState(() {
@@ -653,10 +625,6 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
                       _selectedType == 'meal'
                           ? 'เช่น ข้าวต้มปลา'
                           : 'เช่น น้ำ 250 มล.',
-                  prefixIcon:
-                      _selectedType == 'meal'
-                          ? Icons.restaurant_menu_rounded
-                          : Icons.water_drop_rounded,
                 ),
                 const SizedBox(height: 24),
 

@@ -132,7 +132,9 @@ class _UrineEntrySheetState extends ConsumerState<UrineEntrySheet> {
                   runSpacing: 12,
                   alignment: WrapAlignment.center,
                   children: [
+                    _buildQuickButton(100),
                     _buildQuickButton(150),
+                    _buildQuickButton(200),
                     _buildQuickButton(250),
                     _buildQuickButton(350),
                     _buildQuickButton(500),

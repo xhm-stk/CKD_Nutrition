@@ -22,6 +22,7 @@ class FakeMealRepository implements MealRepository {
     required double sugar,
     required double carb,
     required double water,
+    double phosphorus = 0.0,
     required DateTime eatenAt,
   }) async {
     return Success(null);

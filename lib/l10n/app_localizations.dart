@@ -647,6 +647,36 @@ abstract class AppLocalizations {
   /// **'คาร์บ'**
   String get carbs;
 
+  /// No description provided for @phosphorus.
+  ///
+  /// In th, this message translates to:
+  /// **'ฟอสฟอรัส'**
+  String get phosphorus;
+
+  /// No description provided for @unitGram.
+  ///
+  /// In th, this message translates to:
+  /// **' ก.'**
+  String get unitGram;
+
+  /// No description provided for @gramsUnit.
+  ///
+  /// In th, this message translates to:
+  /// **' ก.'**
+  String get gramsUnit;
+
+  /// No description provided for @unitMilligram.
+  ///
+  /// In th, this message translates to:
+  /// **'มก.'**
+  String get unitMilligram;
+
+  /// No description provided for @unitMilliliter.
+  ///
+  /// In th, this message translates to:
+  /// **'มล.'**
+  String get unitMilliliter;
+
   /// No description provided for @searchFoodHint.
   ///
   /// In th, this message translates to:
@@ -716,38 +746,44 @@ abstract class AppLocalizations {
   /// No description provided for @proteinG.
   ///
   /// In th, this message translates to:
-  /// **'โปรตีน (g)'**
+  /// **'โปรตีน (กรัม)'**
   String get proteinG;
 
   /// No description provided for @sodiumMg.
   ///
   /// In th, this message translates to:
-  /// **'โซเดียม (mg)'**
+  /// **'โซเดียม (มก.)'**
   String get sodiumMg;
 
   /// No description provided for @potassiumMg.
   ///
   /// In th, this message translates to:
-  /// **'โพแทสเซียม (mg)'**
+  /// **'โพแทสเซียม (มก.)'**
   String get potassiumMg;
 
   /// No description provided for @sugarG.
   ///
   /// In th, this message translates to:
-  /// **'น้ำตาล (g)'**
+  /// **'น้ำตาล (กรัม)'**
   String get sugarG;
 
   /// No description provided for @carbsG.
   ///
   /// In th, this message translates to:
-  /// **'คาร์โบไฮเดรต (g)'**
+  /// **'คาร์โบไฮเดรต (กรัม)'**
   String get carbsG;
 
   /// No description provided for @waterMl.
   ///
   /// In th, this message translates to:
-  /// **'น้ำ (ml)'**
+  /// **'น้ำ (มล.)'**
   String get waterMl;
+
+  /// No description provided for @phosphorusMg.
+  ///
+  /// In th, this message translates to:
+  /// **'ฟอสฟอรัส (มก.)'**
+  String get phosphorusMg;
 
   /// No description provided for @eatingHistory.
   ///
@@ -1162,12 +1198,6 @@ abstract class AppLocalizations {
   /// In th, this message translates to:
   /// **'การประเมินภาวะสมดุลน้ำ (Fluid Balance)'**
   String get fluidBalanceTitle;
-
-  /// No description provided for @gramsUnit.
-  ///
-  /// In th, this message translates to:
-  /// **'กรัม'**
-  String get gramsUnit;
 
   /// No description provided for @milligramsUnit.
   ///

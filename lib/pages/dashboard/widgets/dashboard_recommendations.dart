@@ -227,29 +227,29 @@ class _DashboardRecommendationsWidgetState
     if (_currentMealType == 'breakfast') {
       titleText =
           l10n.localeName == 'th'
-              ? '☀️ มื้อเช้าแนะนำเพื่อสุขภาพไต'
-              : '☀️ Suggested Breakfast';
+              ? 'มื้อเช้าแนะนำเพื่อสุขภาพไต'
+              : 'Suggested Breakfast';
       headerIcon = Icons.wb_sunny_rounded;
       iconColor = Colors.orangeAccent;
     } else if (_currentMealType == 'lunch') {
       titleText =
           l10n.localeName == 'th'
-              ? '⛅ มื้อเที่ยงแนะนำเพื่อสุขภาพไต'
-              : '⛅ Suggested Lunch';
+              ? 'มื้อเที่ยงแนะนำเพื่อสุขภาพไต'
+              : 'Suggested Lunch';
       headerIcon = Icons.wb_cloudy_rounded;
       iconColor = Colors.cyan;
     } else if (_currentMealType == 'dinner') {
       titleText =
           l10n.localeName == 'th'
-              ? '🌙 มื้อเย็นแนะนำเพื่อสุขภาพไต'
-              : '🌙 Suggested Dinner';
+              ? 'มื้อเย็นแนะนำเพื่อสุขภาพไต'
+              : 'Suggested Dinner';
       headerIcon = Icons.dark_mode_rounded;
       iconColor = Colors.indigoAccent;
     } else {
       titleText =
           l10n.localeName == 'th'
-              ? '🍪 มื้อว่างแนะนำเพื่อสุขภาพไต'
-              : '🍪 Suggested Snack';
+              ? 'มื้อว่างแนะนำเพื่อสุขภาพไต'
+              : 'Suggested Snack';
       headerIcon = Icons.cookie_outlined;
       iconColor = Colors.brown;
     }

@@ -11,6 +11,7 @@ import '../../../theme/app_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 import '../../../widgets/mesh_gradient_background.dart';
+import '../../../services/health_profile_service.dart';
 
 class HealthSetupPage extends ConsumerStatefulWidget {
   const HealthSetupPage({super.key});
@@ -105,6 +106,10 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
       final egfrClean = _egfrCtrl.text.replaceAll(',', '.').trim();
       final ageVal = ageClean.isNotEmpty ? int.tryParse(ageClean) : null;
       final egfrVal = egfrClean.isNotEmpty ? double.tryParse(egfrClean) : null;
+      final stageToSave =
+          egfrVal != null
+              ? HealthProfileService.calculateStageFromEgfr(egfrVal)
+              : _selectedStage;
 
       await ref
           .read(healthProfileServiceProvider)
@@ -112,7 +117,7 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
             weightKg: double.parse(weightClean),
             heightCm: double.parse(heightClean),
             gender: _selectedGender,
-            ckdStage: _selectedStage,
+            ckdStage: stageToSave,
             isOnDialysis: _isOnDialysis,
             fullName: newName,
             age: ageVal,
@@ -290,6 +295,22 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                                   const TextInputType.numberWithOptions(
                                     decimal: true,
                                   ),
+                              onChanged: (val) {
+                                final clean = val.replaceAll(',', '.').trim();
+                                final n = double.tryParse(clean);
+                                if (n != null && n >= 0 && n <= 200) {
+                                  final newStage =
+                                      HealthProfileService.calculateStageFromEgfr(n);
+                                  if (_selectedStage != newStage) {
+                                    setState(() {
+                                      _selectedStage = newStage;
+                                      if (_selectedStage != 'stage_5') {
+                                        _isOnDialysis = false;
+                                      }
+                                    });
+                                  }
+                                }
+                              },
                               validator: (val) {
                                 if (val == null || val.trim().isEmpty) {
                                   return null;

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
@@ -18,11 +19,15 @@ class NotificationService {
     try {
       tz.initializeTimeZones();
       try {
-        // Set local location to Bangkok timezone (GMT+7) for Thai users
-        tz.setLocalLocation(tz.getLocation('Asia/Bangkok'));
+        final tzInfo = await FlutterTimezone.getLocalTimezone();
+        final timeZoneName = tzInfo.identifier;
+        tz.setLocalLocation(tz.getLocation(timeZoneName));
       } catch (e) {
-        // Fallback to UTC if Bangkok is not found
-        tz.setLocalLocation(tz.UTC);
+        try {
+          tz.setLocalLocation(tz.getLocation('Asia/Bangkok'));
+        } catch (_) {
+          tz.setLocalLocation(tz.UTC);
+        }
       }
 
       // Android Initialization

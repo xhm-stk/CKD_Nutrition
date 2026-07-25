@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/isar/food_item.dart';
@@ -65,7 +67,8 @@ class FoodRepository {
                         ..sodiumMg = (e['sodium_mg'] as num).toDouble()
                         ..sugarG = (e['sugar_g'] as num).toDouble()
                         ..carbG = (e['carb_g'] as num).toDouble()
-                        ..waterMl = (e['water_ml'] as num).toDouble(),
+                        ..waterMl = (e['water_ml'] as num).toDouble()
+                        ..phosphorusMg = (e['phosphorus_mg'] as num?)?.toDouble() ?? 0.0,
                 )
                 .toList();
       }
@@ -85,10 +88,24 @@ class FoodRepository {
     required double sugarG,
     required double carbG,
     required double waterMl,
+    double phosphorusMg = 0.0,
+    File? imageFile,
   }) async {
     try {
       final user = _sb.auth.currentUser;
       if (user == null) return Failure('กรุณาเข้าสู่ระบบก่อนเพิ่มอาหาร');
+
+      String? imageUrl;
+      if (imageFile != null && imageFile.existsSync()) {
+        try {
+          final fileName =
+              'custom_foods/${user.id}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+          await _sb.storage.from('food_images').upload(fileName, imageFile);
+          imageUrl = _sb.storage.from('food_images').getPublicUrl(fileName);
+        } catch (uploadErr) {
+          debugPrint('⚠️ Storage Upload Warning: $uploadErr');
+        }
+      }
 
       await _sb.from('custom_foods').insert({
         'user_id': user.id,
@@ -100,6 +117,8 @@ class FoodRepository {
         'sugar_g': sugarG,
         'carb_g': carbG,
         'water_ml': waterMl,
+        'phosphorus_mg': phosphorusMg,
+        if (imageUrl != null) 'image_url': imageUrl,
       });
       return Success(null);
     } catch (e) {
@@ -113,6 +132,7 @@ class FoodRepository {
         'sugar_g': sugarG,
         'carb_g': carbG,
         'water_ml': waterMl,
+        if (imageFile != null) 'local_image_path': imageFile.path,
       };
       await _syncWorker.enqueueAction('ADD_CUSTOM_FOOD', payload);
       return Success(null);

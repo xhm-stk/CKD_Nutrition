@@ -1,20 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:isar/isar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../core/result.dart';
 import '../providers/core_providers.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../models/isar/offline_action.dart';
+import '../models/isar/food_item.dart';
 
-// ประกาศ Provider ให้ฉีด Supabase เข้า Repository
+// ประกาศ Provider ให้ฉีด Supabase, Isar, และ SharedPreferences เข้า Repository
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final sb = ref.watch(supabaseProvider);
-  return AuthRepository(sb);
+  final isar = ref.watch(isarProvider);
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return AuthRepository(sb, isar, prefs);
 });
 
 class AuthRepository {
   final SupabaseClient _sb;
-  AuthRepository(this._sb);
+  final Isar? _isar;
+  final SharedPreferences? _prefs;
+
+  AuthRepository(this._sb, [this._isar, this._prefs]);
 
   Future<Result<void>> login(String email, String password) async {
     try {
@@ -27,7 +36,12 @@ class AuthRepository {
       await _sb.auth.signInWithPassword(email: email, password: password);
       return Success(null);
     } on AuthException catch (e, stack) {
-      return Failure(e.message, e, stack);
+      String msg = e.message;
+      if (msg.contains('Invalid login credentials')) {
+        msg =
+            'ไม่พบบัญชีผู้ใช้งานนี้ในระบบ หรือรหัสผ่านไม่ถูกต้อง กรุณาสมัครสมาชิกหากยังไม่มีบัญชี';
+      }
+      return Failure(msg, e, stack);
     } catch (e, stack) {
       return Failure(
         'ไม่สามารถเข้าสู่ระบบได้ กรุณาตรวจสอบอินเทอร์เน็ต',
@@ -84,7 +98,26 @@ class AuthRepository {
     }
   }
 
+  Future<void> _clearLocalData() async {
+    try {
+      final isar = _isar;
+      if (isar != null) {
+        await isar.writeTxn(() async {
+          await isar.offlineActions.clear();
+          await isar.ckdRuleCaches.clear();
+        });
+      }
+      final prefs = _prefs;
+      if (prefs != null) {
+        await prefs.clear();
+      }
+    } catch (e) {
+      // Ignore local cleanup error during logout
+    }
+  }
+
   Future<void> logout() async {
+    await _clearLocalData();
     await _sb.auth.signOut();
   }
 
@@ -144,11 +177,13 @@ class AuthRepository {
       final user = _sb.auth.currentUser;
       if (user == null) return Failure('กรุณาเข้าสู่ระบบก่อน');
 
+      await _clearLocalData();
       await _sb.rpc('delete_user_account');
-      await logout();
+      await _sb.auth.signOut();
       return Success(null);
     } catch (e, stack) {
       return Failure('ไม่สามารถลบบัญชีได้: $e', e, stack);
     }
   }
 }
+

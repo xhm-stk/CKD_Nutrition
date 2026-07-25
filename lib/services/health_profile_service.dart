@@ -14,6 +14,15 @@ class HealthProfileService {
     _ckdSvc = CkdRuleService(_isar);
   }
 
+  static String calculateStageFromEgfr(double egfr) {
+    if (egfr >= 90) return 'stage_1';
+    if (egfr >= 60) return 'stage_2';
+    if (egfr >= 45) return 'stage_3a';
+    if (egfr >= 30) return 'stage_3b';
+    if (egfr >= 15) return 'stage_4';
+    return 'stage_5';
+  }
+
   Future<void> saveHealthProfile({
     required double weightKg,
     required double heightCm,

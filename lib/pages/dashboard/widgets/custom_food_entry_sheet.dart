@@ -77,11 +77,11 @@ class _CustomFoodEntrySheetState extends ConsumerState<CustomFoodEntrySheet> {
     switch (result) {
       case Success():
         scaffoldMessenger.showSnackBar(
-          const SnackBar(content: Text('✅ บันทึกเมนูอาหารเข้าสมุดเมนูสำเร็จ!')),
+          const SnackBar(content: Text('บันทึกเมนูอาหารเข้าสมุดเมนูสำเร็จ')),
         );
         navigator.pop();
       case Failure(userMessage: final msg):
-        scaffoldMessenger.showSnackBar(SnackBar(content: Text('❌ $msg')));
+        scaffoldMessenger.showSnackBar(SnackBar(content: Text(msg)));
     }
   }
 
@@ -107,7 +107,7 @@ class _CustomFoodEntrySheetState extends ConsumerState<CustomFoodEntrySheet> {
     if (result is Failure) {
       setState(() => _isLoading = false);
       scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text('❌ ${result.userMessage}')),
+        SnackBar(content: Text(result.userMessage)),
       );
       return;
     }
@@ -133,7 +133,7 @@ class _CustomFoodEntrySheetState extends ConsumerState<CustomFoodEntrySheet> {
     ref.invalidate(todayMealsProvider);
 
     scaffoldMessenger.showSnackBar(
-      const SnackBar(content: Text('✅ บันทึกเข้าสมุดและกินเรียบร้อย!')),
+      const SnackBar(content: Text('บันทึกเข้าสมุดและรับประทานเรียบร้อยแล้ว')),
     );
     navigator.pop();
   }

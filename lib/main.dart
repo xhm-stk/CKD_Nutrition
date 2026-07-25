@@ -15,7 +15,6 @@ import 'services/notification_service.dart';
 import 'providers/core_providers.dart';
 import 'router/app_router.dart';
 import 'providers/auth_providers.dart';
-import 'services/biometric_service.dart';
 import 'theme/app_theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -79,15 +78,20 @@ void main() async {
     ], directory: dir.path);
   }
 
-  // 4. ปั๊มข้อมูลอาหาร 156 เมนูลงเครื่อง
+  // 4. โหลด SharedPreferences
+  final prefs = await SharedPreferences.getInstance();
+
+  // 5. ปั๊มข้อมูลอาหาร 156 เมนูลงเครื่อง (อัปเดตอัตโนมัติหากเวอร์ชันคลังอาหาร < 2)
   try {
-    await IsarSeedService.seedFoodData(isarInstance, forceUpdate: false);
+    final currentDbVer = prefs.getInt('food_db_version') ?? 0;
+    final forceUpdate = currentDbVer < 2;
+    await IsarSeedService.seedFoodData(isarInstance, forceUpdate: forceUpdate);
+    if (forceUpdate) {
+      await prefs.setInt('food_db_version', 2);
+    }
   } catch (e) {
     debugPrint('⚠️ Isar seed warning: $e');
   }
-
-  // 5. โหลด SharedPreferences
-  final prefs = await SharedPreferences.getInstance();
 
   // 6. เปิดระบบการแจ้งเตือนดื่มน้ำ และมื้ออาหาร (Non-blocking background initialization)
   Future.microtask(() async {
@@ -150,39 +154,37 @@ class MyApp extends ConsumerStatefulWidget {
 
 class _MyAppState extends ConsumerState<MyApp> {
   late final AppLifecycleListener _listener;
-  DateTime? _pausedTime;
 
   @override
   void initState() {
     super.initState();
 
-    // Check biometrics and auto-unlock if not available
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final biometricService = ref.read(biometricServiceProvider);
-      final canCheck = await biometricService.canCheckBiometrics();
-      if (!canCheck) {
-        ref.read(sessionUnlockedProvider.notifier).state = true;
-      }
+    // Auto unlock session (biometrics screen disabled per user request)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(sessionUnlockedProvider.notifier).state = true;
     });
 
     _listener = AppLifecycleListener(
-      onPause: () {
-        _pausedTime = DateTime.now();
-      },
       onResume: () {
-        if (_pausedTime != null) {
-          final diff = DateTime.now().difference(_pausedTime!);
-          // หากพับแอปไปเกิน 1 นาที ให้เด้งหน้าจอล็อก
-          if (diff.inMinutes >= 1) {
+        // Auto-advance calendar to today if the date changed and user is on Dashboard
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final selectedDate = ref.read(selectedDateProvider);
+
+        if (selectedDate.day != today.day ||
+            selectedDate.month != today.month ||
+            selectedDate.year != today.year) {
+          try {
             final router = ref.read(routerProvider);
             final currentPath =
                 router.routerDelegate.currentConfiguration.uri.path;
-            if (currentPath != '/lock') {
-              router.push('/lock');
+            if (currentPath == '/dashboard') {
+              ref.read(selectedDateProvider.notifier).state = today;
             }
+          } catch (_) {
+            ref.read(selectedDateProvider.notifier).state = today;
           }
         }
-        _pausedTime = null;
       },
     );
   }

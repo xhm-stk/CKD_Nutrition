@@ -39,6 +39,7 @@ class QuotaEngine {
     final sugarLimit = log?.customSugar ?? rule?.sugarLimitG ?? 0;
     final carbLimit = log?.customCarb ?? rule?.carbLimitG ?? 0;
     final waterLimit = log?.customWater ?? rule?.waterLimitMl ?? 0;
+    final phosphorusLimit = log?.customPhosphorus ?? rule?.phosphorusLimitMg ?? 1000;
 
     if (proteinLimit == 0 && potassiumLimit == 0) {
       return []; // ไม่มีข้อมูล rule และ profile
@@ -53,16 +54,16 @@ class QuotaEngine {
         limit: proteinLimit,
       ),
       NutrientQuota(
-        label: 'potassium',
-        unit: 'mg',
-        consumed: log?.totalPotassiumMg ?? 0,
-        limit: potassiumLimit,
-      ),
-      NutrientQuota(
         label: 'sodium',
         unit: 'mg',
         consumed: log?.totalSodiumMg ?? 0,
         limit: sodiumLimit,
+      ),
+      NutrientQuota(
+        label: 'potassium',
+        unit: 'mg',
+        consumed: log?.totalPotassiumMg ?? 0,
+        limit: potassiumLimit,
       ),
       NutrientQuota(
         label: 'sugar',
@@ -75,6 +76,12 @@ class QuotaEngine {
         unit: 'g',
         consumed: log?.totalCarbG ?? 0,
         limit: carbLimit,
+      ),
+      NutrientQuota(
+        label: 'phosphorus',
+        unit: 'mg',
+        consumed: log?.totalPhosphorusMg ?? 0,
+        limit: phosphorusLimit,
       ),
       NutrientQuota(
         label: 'water',

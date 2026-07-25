@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 class SmartFoodImage extends StatefulWidget {
   final String foodId;
   final String foodName;
+  final String? imageUrl;
   final double width;
   final double height;
   final double borderRadius;
@@ -14,6 +15,7 @@ class SmartFoodImage extends StatefulWidget {
     super.key,
     required this.foodId,
     required this.foodName,
+    this.imageUrl,
     this.width = 56,
     this.height = 56,
     this.borderRadius = 12,
@@ -36,7 +38,8 @@ class _SmartFoodImageState extends State<SmartFoodImage> {
   void didUpdateWidget(covariant SmartFoodImage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.foodName != widget.foodName ||
-        oldWidget.foodId != widget.foodId) {
+        oldWidget.foodId != widget.foodId ||
+        oldWidget.imageUrl != widget.imageUrl) {
       _loadCustomImage();
     }
   }
@@ -44,7 +47,9 @@ class _SmartFoodImageState extends State<SmartFoodImage> {
   Future<void> _loadCustomImage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final path = prefs.getString('custom_food_img_${widget.foodName}');
+      final path =
+          prefs.getString('custom_food_img_${widget.foodName}') ??
+          prefs.getString('custom_food_img_${widget.foodName}');
       if (path != null && File(path).existsSync()) {
         if (mounted) {
           setState(() {
@@ -78,6 +83,16 @@ class _SmartFoodImageState extends State<SmartFoodImage> {
   }
 
   Widget _buildImageContent() {
+    if (widget.imageUrl != null && widget.imageUrl!.trim().startsWith('http')) {
+      return Image.network(
+        widget.imageUrl!.trim(),
+        fit: BoxFit.cover,
+        width: widget.width,
+        height: widget.height,
+        errorBuilder: (ctx, err, stack) => _buildPlaceholder(),
+      );
+    }
+
     if (_customImagePath != null) {
       return Image.file(
         File(_customImagePath!),

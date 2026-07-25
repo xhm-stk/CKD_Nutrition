@@ -27,6 +27,7 @@ class MockMealRepository implements MealRepository {
     required double sugar,
     required double carb,
     required double water,
+    double phosphorus = 0.0,
     required DateTime eatenAt,
   }) async {
     callCount++;
@@ -39,6 +40,7 @@ class MockMealRepository implements MealRepository {
       'sugar': sugar,
       'carb': carb,
       'water': water,
+      'phosphorus': phosphorus,
       'eatenAt': eatenAt,
     };
     return Success(null);

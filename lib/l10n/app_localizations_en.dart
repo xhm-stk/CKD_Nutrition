@@ -285,10 +285,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get carbs => 'Carbs';
 
   @override
+  String get phosphorus => 'Phosphorus';
+
+  @override
+  String get unitGram => 'g';
+
+  @override
+  String get gramsUnit => 'g';
+
+  @override
+  String get unitMilligram => 'mg';
+
+  @override
+  String get unitMilliliter => 'ml';
+
+  @override
   String get searchFoodHint => 'Search food... e.g., Rice, Fish';
 
   @override
-  String get createCustomFood => '➕ Create Custom Food';
+  String get createCustomFood => 'Create Custom Food';
 
   @override
   String get noFoodFound => 'No food found';
@@ -334,6 +349,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get waterMl => 'Water (ml)';
+
+  @override
+  String get phosphorusMg => 'Phosphorus (mg)';
 
   @override
   String get eatingHistory => 'Eating History';
@@ -551,9 +569,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fluidBalanceTitle => 'Fluid Balance Assessment';
-
-  @override
-  String get gramsUnit => 'g';
 
   @override
   String get milligramsUnit => 'mg';

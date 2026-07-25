@@ -76,23 +76,23 @@ class DashboardPage extends ConsumerWidget {
                     const SizedBox(height: 24),
 
                     // Nutrients card — staggered
-                    DashboardNutrientsWidget(quotas: quotas)
+                    DashboardNutrientsWidget(quotas: quotas, log: log)
                         .animate()
                         .fade(delay: 200.ms, duration: 500.ms)
+                        .slideY(begin: 0.08),
+                    const SizedBox(height: 16),
+
+                    // Fluid Balance card — staggered
+                    FluidBalanceWidget(log: log)
+                        .animate()
+                        .fade(delay: 250.ms, duration: 500.ms)
                         .slideY(begin: 0.08),
                     const SizedBox(height: 24),
 
                     // Warnings — staggered
                     DashboardWarningsWidget(quotas: quotas)
                         .animate()
-                        .fade(delay: 600.ms, duration: 500.ms)
-                        .slideY(begin: 0.08),
-                    const SizedBox(height: 24),
-
-                    // Fluid Balance card — staggered
-                    FluidBalanceWidget(log: log)
-                        .animate()
-                        .fade(delay: 700.ms, duration: 500.ms)
+                        .fade(delay: 300.ms, duration: 500.ms)
                         .slideY(begin: 0.08),
 
                     const Divider(height: 32, thickness: 1),

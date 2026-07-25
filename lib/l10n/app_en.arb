@@ -97,9 +97,13 @@
   "potassium": "Potassium",
   "sugar": "Sugar",
   "carbs": "Carbs",
+  "phosphorus": "Phosphorus",
+  "unitGram": "g",
+  "unitMilligram": "mg",
+  "unitMilliliter": "ml",
   
   "searchFoodHint": "Search food... e.g., Rice, Fish",
-  "createCustomFood": "➕ Create Custom Food",
+  "createCustomFood": "Create Custom Food",
   "noFoodFound": "No food found",
   "saveFood": "Save Food",
   "meal": "Meal",
@@ -115,6 +119,7 @@
   "sugarG": "Sugar (g)",
   "carbsG": "Carbs (g)",
   "waterMl": "Water (ml)",
+  "phosphorusMg": "Phosphorus (mg)",
 
   "eatingHistory": "Eating History",
   "tapDateToView": "Tap a date on the calendar to view history",

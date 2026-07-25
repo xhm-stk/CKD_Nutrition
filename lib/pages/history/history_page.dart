@@ -11,6 +11,7 @@ import '../../models/supabase/daily_log.dart';
 import '../../core/result.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/mesh_gradient_background.dart';
+import '../../widgets/meal_detail_dialog.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Provider สำหรับดึงรายการอาหารของวันที่เลือกในหน้า History
@@ -285,7 +286,9 @@ class _HistoryMealsList extends ConsumerWidget {
     final totalPotassium = summary?.totalPotassiumMg ?? 0.0;
     final totalSugar = summary?.totalSugarG ?? 0.0;
     final totalCarb = summary?.totalCarbG ?? 0.0;
+    final totalPhosphorus = summary?.totalPhosphorusMg ?? 0.0;
     final totalWater = summary?.totalWaterMl ?? 0.0;
+    final totalUrine = summary?.totalUrineMl ?? 0.0;
 
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -364,10 +367,33 @@ class _HistoryMealsList extends ConsumerWidget {
                     color: const Color(0xFFFBBF24),
                   ),
                   _SummaryChip(
-                    label: l10n.water,
-                    value: '${totalWater.toStringAsFixed(0)}ml',
-                    icon: Icons.local_drink_rounded,
-                    color: const Color(0xFF60A5FA),
+                    label: l10n.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus',
+                    value: '${totalPhosphorus.toStringAsFixed(0)}mg',
+                    icon: Icons.bubble_chart_rounded,
+                    color: const Color(0xFFA855F7),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              // 2 ช่องต่อจากค่าทั้ง 6 ด้านบน: น้ำเปล่า และ ปัสสาวะ
+              Row(
+                children: [
+                  Expanded(
+                    child: _SummaryChip(
+                      label: l10n.water,
+                      value: '${totalWater.toStringAsFixed(0)}ml',
+                      icon: Icons.local_drink_rounded,
+                      color: const Color(0xFF38BDF8),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _SummaryChip(
+                      label: l10n.urine,
+                      value: '${totalUrine.toStringAsFixed(0)}ml',
+                      icon: Icons.opacity_rounded,
+                      color: const Color(0xFFF59E0B),
+                    ),
                   ),
                 ],
               ),
@@ -420,6 +446,7 @@ class _HistoryMealsList extends ConsumerWidget {
                     ),
                   ),
                   child: ListTile(
+                    onTap: () => MealDetailDialog.show(context, meal),
                     leading: Container(
                       width: 40,
                       height: 40,

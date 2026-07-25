@@ -14,7 +14,6 @@ import '../pages/history/monthly_summary_page.dart';
 import '../pages/history/history_page.dart';
 import '../pages/onboarding/onboarding_page.dart';
 import '../widgets/main_scaffold.dart';
-import '../pages/auth/biometrics_lock_screen.dart';
 import '../pages/profile/reminders_page.dart';
 
 import '../pages/auth/reset_password_page.dart';
@@ -94,10 +93,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/health-setup',
         builder: (context, state) => const HealthSetupPage(),
-      ),
-      GoRoute(
-        path: '/lock',
-        builder: (context, state) => const BiometricsLockScreen(),
       ),
       GoRoute(
         path: '/reminders',

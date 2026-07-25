@@ -108,8 +108,13 @@ class MealRepository {
     required double sugar,
     required double carb,
     required double water,
+    double phosphorus = 0.0,
     required DateTime eatenAt,
   }) async {
+    final eatenAtUtcStr = eatenAt.toUtc().toIso8601String();
+    final logDateStr =
+        '${eatenAt.year}-${eatenAt.month.toString().padLeft(2, '0')}-${eatenAt.day.toString().padLeft(2, '0')}';
+
     try {
       await _sb.rpc(
         'log_meal',
@@ -124,6 +129,9 @@ class MealRepository {
           'p_sugar': sugar,
           'p_carb': carb,
           'p_water': water,
+          'p_phosphorus': phosphorus,
+          'p_eaten_at': eatenAtUtcStr,
+          'p_log_date': logDateStr,
         },
       );
       return Success(null);
@@ -144,19 +152,32 @@ class MealRepository {
         'sugar': sugar,
         'carb': carb,
         'water': water,
-        'eaten_at': eatenAt.toUtc().toIso8601String(),
+        'phosphorus': phosphorus,
+        'eaten_at': eatenAtUtcStr,
+        'log_date': logDateStr,
       };
 
       await _syncWorker.enqueueAction('LOG_MEAL_RPC', payload);
 
-      // คืนค่าบอก UI ว่าบันทึกสำเร็จ (แบบออฟไลน์)
-      return Success(null); // หรืออาจสร้างคลาส SuccessOffline แยกต่างหาก
+      return Success(null);
     }
   }
 
   Future<Result<void>> logUrine(double amountMl) async {
+    final now = DateTime.now();
+    final loggedAtUtcStr = now.toUtc().toIso8601String();
+    final logDateStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+
     try {
-      await _sb.rpc('log_urine', params: {'p_amount_ml': amountMl});
+      await _sb.rpc(
+        'log_urine',
+        params: {
+          'p_amount_ml': amountMl,
+          'p_logged_at': loggedAtUtcStr,
+          'p_log_date': logDateStr,
+        },
+      );
       return Success(null);
     } catch (e) {
       debugPrint(
@@ -165,7 +186,8 @@ class MealRepository {
 
       final payload = {
         'amount_ml': amountMl,
-        'logged_at': DateTime.now().toUtc().toIso8601String(),
+        'logged_at': loggedAtUtcStr,
+        'log_date': logDateStr,
       };
 
       await _syncWorker.enqueueAction('LOG_URINE_RPC', payload);
@@ -230,24 +252,33 @@ class MealRepository {
     for (final action in offlineActions) {
       if (action.actionType == 'LOG_MEAL_RPC') {
         final p = jsonDecode(action.payloadJson);
-        baseMeals.insert(
-          0,
-          Meal(
-            id: 'offline_${action.id}',
-            logId: 'offline_log',
-            foodId: p['food_id'],
-            foodName: p['food_name'] + ' (รอส่ง ⏳)',
-            quantityG: (p['quantity_g'] as num).toDouble(),
-            mealType: p['meal_type'],
-            proteinG: (p['protein'] as num).toDouble(),
-            potassiumMg: (p['potassium'] as num).toDouble(),
-            sodiumMg: (p['sodium'] as num).toDouble(),
-            sugarG: (p['sugar'] as num).toDouble(),
-            carbG: (p['carb'] as num).toDouble(),
-            waterMl: (p['water'] as num).toDouble(),
-            eatenAt: DateTime.parse(p['eaten_at']),
-          ),
-        );
+        final eatenAtDate = DateTime.parse(p['eaten_at']);
+        final actionDateStr =
+            p['log_date'] ??
+            '${eatenAtDate.toLocal().year}-${eatenAtDate.toLocal().month.toString().padLeft(2, '0')}-${eatenAtDate.toLocal().day.toString().padLeft(2, '0')}';
+
+        // กรอกเฉพาะมื้ออาหารออฟไลน์ที่ตรงกับวันที่ต้องการดู
+        if (actionDateStr == dateStr) {
+          baseMeals.insert(
+            0,
+            Meal(
+              id: 'offline_${action.id}',
+              logId: 'offline_log',
+              foodId: p['food_id'],
+              foodName: p['food_name'],
+              quantityG: (p['quantity_g'] as num).toDouble(),
+              mealType: p['meal_type'],
+              proteinG: (p['protein'] as num).toDouble(),
+              potassiumMg: (p['potassium'] as num).toDouble(),
+              sodiumMg: (p['sodium'] as num).toDouble(),
+              sugarG: (p['sugar'] as num).toDouble(),
+              carbG: (p['carb'] as num).toDouble(),
+              waterMl: (p['water'] as num).toDouble(),
+              phosphorusMg: (p['phosphorus'] as num?)?.toDouble() ?? 0.0,
+              eatenAt: eatenAtDate,
+            ),
+          );
+        }
       } else if (action.actionType == 'DELETE_MEAL_RPC') {
         final p = jsonDecode(action.payloadJson);
         baseMeals.removeWhere((m) => m.id == p['meal_id']);

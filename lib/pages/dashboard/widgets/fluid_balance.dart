@@ -16,13 +16,28 @@ class FluidBalanceWidget extends StatelessWidget {
     final intake = log.totalWaterMl;
     final output = log.totalUrineMl;
     final balance = intake - output;
+    final targetWater = (log.customWater ?? 2000).toDouble();
 
     final balanceStr =
         balance >= 0
             ? '+${balance.toStringAsFixed(0)}'
             : balance.toStringAsFixed(0);
-    final balanceColor =
-        balance >= 0 ? const Color(0xFF60A5FA) : const Color(0xFFF87171);
+            
+    final Color balanceColor = balance > 500
+        ? const Color(0xFFF59E0B)
+        : (balance >= 0 ? const Color(0xFF0284C7) : const Color(0xFF10B981));
+
+    final String statusText = l10n.localeName == 'th'
+        ? (balance > 0
+            ? 'มีน้ำสะสมค้างในร่างกาย +${balance.toInt()} มล.'
+            : (balance < 0
+                ? 'ขับน้ำออกมากกว่าน้ำดื่ม ${balance.abs().toInt()} มล.'
+                : 'น้ำดื่มและปัสสาวะสมดุลกันเป็นอย่างดี'))
+        : (balance > 0
+            ? 'Net fluid retention: +${balance.toInt()} ml'
+            : (balance < 0
+                ? 'Fluid loss exceeds intake: ${balance.abs().toInt()} ml'
+                : 'Fluid intake and output are perfectly balanced'));
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -36,18 +51,18 @@ class FluidBalanceWidget extends StatelessWidget {
         children: [
           // Header
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.cyan.withValues(alpha: 0.1),
+                  color: const Color(0xFF0284C7).withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.opacity_rounded,
-                  color: Colors.cyan,
-                  size: 20,
+                  Icons.water_drop_rounded,
+                  color: Color(0xFF0284C7),
+                  size: 22,
                 ),
               ),
               const SizedBox(width: 12),
@@ -55,29 +70,23 @@ class FluidBalanceWidget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            l10n.fluidBalanceTitle,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      l10n.fluidBalanceTitle,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       l10n.fluidBalanceSubtitle,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.55),
                       ),
                     ),
                   ],
@@ -87,85 +96,97 @@ class FluidBalanceWidget extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Fluid intake vs output grid-row
+          // Fluid intake vs output 2 cards
           Row(
             children: [
               // Fluid Intake Card
               Expanded(
-                child: _buildItemCard(
+                child: _buildMetricCard(
                   context,
                   title: l10n.waterIntake,
-                  val: '${intake.toStringAsFixed(0)} ${l10n.millilitersUnit}',
+                  value: '${intake.toInt()} ${l10n.millilitersUnit}',
+                  subText: 'โควต้า ${targetWater.toInt()} ${l10n.millilitersUnit}',
                   icon: Icons.local_drink_rounded,
-                  color: const Color(0xFF60A5FA),
+                  color: const Color(0xFF0284C7),
+                  bgColor: const Color(0xFFE0F2FE),
                   isDark: isDark,
                 ),
               ),
               const SizedBox(width: 12),
               // Urine Output Card
               Expanded(
-                child: _buildItemCard(
+                child: _buildMetricCard(
                   context,
                   title: l10n.urineOutput,
-                  val: '${output.toStringAsFixed(0)} ${l10n.millilitersUnit}',
+                  value: '${output.toInt()} ${l10n.millilitersUnit}',
+                  subText: l10n.localeName == 'th' ? 'ขับปัสสาวะสะสม' : 'Output total',
                   icon: Icons.opacity_rounded,
-                  color: Colors.amber.shade600,
+                  color: const Color(0xFFD97706),
+                  bgColor: const Color(0xFFFEF3C7),
                   isDark: isDark,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
-          // Net Fluid Balance Card (Full Width)
+          // Net Fluid Balance Card (Clear, Un-truncated)
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: balanceColor.withValues(alpha: 0.05),
-              border: Border.all(color: balanceColor.withValues(alpha: 0.15)),
+              color: balanceColor.withValues(alpha: isDark ? 0.15 : 0.08),
+              border: Border.all(
+                color: balanceColor.withValues(alpha: 0.25),
+                width: 1,
+              ),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.scale_rounded, color: balanceColor, size: 24),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.netWaterBalance,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                        Text(
-                          l10n.localeName == 'th'
-                              ? (balance >= 0
-                                  ? 'สมดุลน้ำเป็นบวก (สะสมน้ำ)'
-                                  : 'สมดุลน้ำเป็นลบ (สูญเสียน้ำ)')
-                              : (balance >= 0
-                                  ? 'Positive fluid balance'
-                                  : 'Negative fluid balance'),
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.5),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: balanceColor.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.scale_rounded,
+                    color: balanceColor,
+                    size: 22,
+                  ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.localeName == 'th' ? 'ยอดดุลน้ำสะสมสุทธิ' : 'Net Fluid Balance',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        statusText,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.65),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Text(
                   '$balanceStr ${l10n.millilitersUnit}',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.w900,
                     color: balanceColor,
                   ),
@@ -173,7 +194,7 @@ class FluidBalanceWidget extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Doctor Tip Info Box
           Row(
@@ -181,10 +202,11 @@ class FluidBalanceWidget extends StatelessWidget {
             children: [
               Icon(
                 Icons.info_outline_rounded,
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.4),
-                size: 14,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.45),
+                size: 15,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -192,9 +214,10 @@ class FluidBalanceWidget extends StatelessWidget {
                   l10n.fluidBalanceDoctorTip,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.4),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.45),
                     height: 1.3,
                   ),
                 ),
@@ -206,23 +229,23 @@ class FluidBalanceWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildItemCard(
+  Widget _buildMetricCard(
     BuildContext context, {
     required String title,
-    required String val,
+    required String value,
+    required String subText,
     required IconData icon,
     required Color color,
+    required Color bgColor,
     required bool isDark,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white, // Solid white surface
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppTheme.brandPrimary.withValues(
-            alpha: 0.08,
-          ), // Soft sky blue border
+          color: AppTheme.brandPrimary.withValues(alpha: 0.08),
           width: 1,
         ),
         boxShadow: [
@@ -238,17 +261,22 @@ class FluidBalanceWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: color, size: 16),
+              CircleAvatar(
+                radius: 14,
+                backgroundColor: bgColor,
+                child: Icon(icon, color: color, size: 15),
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   title,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.6),
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -256,14 +284,27 @@ class FluidBalanceWidget extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
-            val,
+            value,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: color,
             ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subText,
+            style: TextStyle(
+              fontSize: 11,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.5),
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

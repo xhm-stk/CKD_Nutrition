@@ -60,6 +60,7 @@ class MealController {
         food.name.contains('น้ำเปล่า') ||
         food.name.contains('น้ำสะอาด');
     final water = isWaterBeverage ? (food.waterMl * ratio) : 0.0;
+    final phosphorus = food.phosphorusMg * ratio;
 
     // 2. Delegate to repository for persistence
     final result = await _repository.logMealData(
@@ -73,6 +74,7 @@ class MealController {
       sugar: sugar,
       carb: carb,
       water: water,
+      phosphorus: phosphorus,
       eatenAt: eatenAt ?? DateTime.now(),
     );
 

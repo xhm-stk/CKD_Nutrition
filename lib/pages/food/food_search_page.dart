@@ -10,6 +10,7 @@ import 'package:ckd_nutrition_app/l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/mesh_gradient_background.dart';
 import '../../widgets/smart_food_image.dart';
+import '../../widgets/custom_time_date_picker.dart';
 
 class FoodSearchPage extends ConsumerStatefulWidget {
   const FoodSearchPage({super.key});
@@ -64,12 +65,13 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
     String value,
     Color color,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
+        color: isDark ? color.withValues(alpha: 0.18) : color.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.25), width: 0.8),
+        border: Border.all(color: color.withValues(alpha: 0.35), width: 1.0),
       ),
       child: RichText(
         text: TextSpan(
@@ -77,19 +79,17 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
             TextSpan(
               text: '$label ',
               style: TextStyle(
-                fontSize: 10,
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.5),
-                fontWeight: FontWeight.w500,
+                fontSize: 11,
+                color: isDark ? Colors.white70 : const Color(0xFF334155),
+                fontWeight: FontWeight.w600,
               ),
             ),
             TextSpan(
               text: value,
               style: TextStyle(
                 fontSize: 11,
-                color: color,
-                fontWeight: FontWeight.bold,
+                color: isDark ? color : color.withValues(alpha: 0.95),
+                fontWeight: FontWeight.w800,
               ),
             ),
           ],
@@ -325,7 +325,7 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           const SizedBox(height: 8),
-                                          // 6 Nutrients wrap (including water)
+                                          // Nutrients wrap (including phosphorus)
                                           Wrap(
                                             spacing: 5,
                                             runSpacing: 5,
@@ -335,48 +335,46 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
                                                 AppLocalizations.of(
                                                   context,
                                                 )!.protein,
-                                                '${f.proteinG.toStringAsFixed(1)}g',
-                                                const Color(0xFF34D399),
+                                                '${f.proteinG.toStringAsFixed(1)}${AppLocalizations.of(context)!.gramsUnit}',
+                                                const Color(0xFF059669),
                                               ),
                                               _buildNutrientTag(
                                                 context,
                                                 AppLocalizations.of(
                                                   context,
                                                 )!.carbs,
-                                                '${f.carbG.toStringAsFixed(1)}g',
-                                                const Color(0xFFFBBF24),
+                                                '${f.carbG.toStringAsFixed(1)}${AppLocalizations.of(context)!.gramsUnit}',
+                                                const Color(0xFFD97706),
                                               ),
                                               _buildNutrientTag(
                                                 context,
                                                 AppLocalizations.of(
                                                   context,
                                                 )!.sugar,
-                                                '${f.sugarG.toStringAsFixed(1)}g',
-                                                AppTheme.brandSecondary,
+                                                '${f.sugarG.toStringAsFixed(1)}${AppLocalizations.of(context)!.gramsUnit}',
+                                                const Color(0xFFEA580C),
                                               ),
                                               _buildNutrientTag(
                                                 context,
                                                 AppLocalizations.of(
                                                   context,
                                                 )!.sodium,
-                                                '${f.sodiumMg.toStringAsFixed(0)}mg',
-                                                const Color(0xFF38BDF8),
+                                                '${f.sodiumMg.toStringAsFixed(0)}${AppLocalizations.of(context)!.milligramsUnit}',
+                                                const Color(0xFF0284C7),
                                               ),
                                               _buildNutrientTag(
                                                 context,
                                                 AppLocalizations.of(
                                                   context,
                                                 )!.potassium,
-                                                '${f.potassiumMg.toStringAsFixed(0)}mg',
-                                                const Color(0xFFF87171),
+                                                '${f.potassiumMg.toStringAsFixed(0)}${AppLocalizations.of(context)!.milligramsUnit}',
+                                                const Color(0xFFDC2626),
                                               ),
                                               _buildNutrientTag(
                                                 context,
-                                                AppLocalizations.of(
-                                                  context,
-                                                )!.water,
-                                                '${f.waterMl.toStringAsFixed(0)}ml',
-                                                const Color(0xFF60A5FA),
+                                                AppLocalizations.of(context)!.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus',
+                                                '${f.phosphorusMg.toStringAsFixed(0)}${AppLocalizations.of(context)!.milligramsUnit}',
+                                                const Color(0xFF9333EA),
                                               ),
                                             ],
                                           ),
@@ -425,9 +423,27 @@ class _FoodLogBottomSheet extends ConsumerStatefulWidget {
 
 class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
   final _ctrl = TextEditingController(text: '1');
-  String _type = 'lunch';
+  late String _type;
   bool _isSubmitting = false;
-  TimeOfDay _eatenTime = TimeOfDay.now();
+  late TimeOfDay _eatenTime;
+
+  static String _getAutoMealType(TimeOfDay time) {
+    final hour = time.hour;
+    if (hour < 11) {
+      return 'breakfast';
+    } else if (hour < 16) {
+      return 'lunch';
+    } else {
+      return 'dinner';
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _eatenTime = TimeOfDay.now();
+    _type = _getAutoMealType(_eatenTime);
+  }
 
   @override
   void dispose() {
@@ -691,15 +707,6 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
                         ),
                       ),
                     ),
-                    DropdownMenuItem(
-                      value: 'snack',
-                      child: Text(
-                        'ของว่าง',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
                   ],
                   onChanged: (val) => setState(() => _type = val!),
                 ),
@@ -719,28 +726,15 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
                     ),
                     InkWell(
                       onTap: () async {
-                        final picked = await showTimePicker(
+                        final picked = await CustomTimeDatePicker.show24hTimePicker(
                           context: context,
                           initialTime: _eatenTime,
-                          initialEntryMode: TimePickerEntryMode.input,
-                          builder:
-                              (context, child) => Theme(
-                                data: ThemeData.light().copyWith(
-                                  colorScheme: const ColorScheme.light(
-                                    primary: AppTheme.brandPrimary,
-                                    onPrimary: Colors.white,
-                                    surface: Colors.white,
-                                    onSurface: Color(0xFF0F172A),
-                                  ),
-                                  dialogTheme: const DialogTheme(
-                                    backgroundColor: Colors.white,
-                                  ),
-                                ),
-                                child: child!,
-                              ),
                         );
                         if (picked != null) {
-                          setState(() => _eatenTime = picked);
+                          setState(() {
+                            _eatenTime = picked;
+                            _type = _getAutoMealType(picked);
+                          });
                         }
                       },
                       borderRadius: BorderRadius.circular(12),

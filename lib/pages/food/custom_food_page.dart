@@ -29,6 +29,7 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
   final _sugarCtrl = TextEditingController();
   final _carbCtrl = TextEditingController();
   final _waterCtrl = TextEditingController();
+  final _phosphorusCtrl = TextEditingController();
 
   bool _isLoading = false;
   File? _selectedImage;
@@ -156,6 +157,8 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
       sugarG: double.parse(_sugarCtrl.text),
       carbG: double.parse(_carbCtrl.text),
       waterMl: double.parse(_waterCtrl.text),
+      phosphorusMg: double.tryParse(_phosphorusCtrl.text.trim()) ?? 0.0,
+      imageFile: _selectedImage,
     );
 
     setState(() => _isLoading = false);
@@ -164,11 +167,11 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
       case Success():
         await _saveImageMapping(_nameCtrl.text.trim());
         scaffoldMessenger.showSnackBar(
-          const SnackBar(content: Text('✅ บันทึกเมนูอาหารเข้าสมุดเมนูสำเร็จ!')),
+          const SnackBar(content: Text('บันทึกเมนูอาหารเข้าสมุดเมนูสำเร็จ')),
         );
         router.pop();
       case Failure(userMessage: final msg):
-        scaffoldMessenger.showSnackBar(SnackBar(content: Text('❌ $msg')));
+        scaffoldMessenger.showSnackBar(SnackBar(content: Text(msg)));
     }
   }
 
@@ -190,12 +193,14 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
       sugarG: double.parse(_sugarCtrl.text),
       carbG: double.parse(_carbCtrl.text),
       waterMl: double.parse(_waterCtrl.text),
+      phosphorusMg: double.tryParse(_phosphorusCtrl.text.trim()) ?? 0.0,
+      imageFile: _selectedImage,
     );
 
     if (result is Failure) {
       setState(() => _isLoading = false);
       scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text('❌ ${(result).userMessage}')),
+        SnackBar(content: Text((result).userMessage)),
       );
       return;
     }
@@ -203,21 +208,28 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
     // Save image mapping
     await _saveImageMapping(_nameCtrl.text.trim());
 
-    // 2. กินทันที! (บันทึกเข้า Dashboard)
+    // 2. กินทันที! (บันทึกเข้า Dashboard - ปรับมื้อตามช่วงเวลาอัตโนมัติ)
+    final now = DateTime.now();
+    final hour = now.hour;
+    final String autoMealType = hour < 11
+        ? 'breakfast'
+        : (hour < 16 ? 'lunch' : 'dinner');
+
     final mealRepo = ref.read(mealRepositoryProvider);
     await mealRepo.logMealData(
       foodId:
           'custom_${DateTime.now().millisecondsSinceEpoch}', // ใช้ ID ชั่วคราวเพื่อออฟไลน์ซิงค์
       foodName: _nameCtrl.text.trim(),
       quantityG: 1, // เมนูทำเองถือเป็น 1 หน่วยบริโภค
-      mealType: 'snack', // ใส่เป็นของว่างไปก่อน
+      mealType: autoMealType,
       protein: double.parse(_proteinCtrl.text),
       potassium: double.parse(_potassiumCtrl.text),
       sodium: double.parse(_sodiumCtrl.text),
       sugar: double.parse(_sugarCtrl.text),
       carb: double.parse(_carbCtrl.text),
       water: double.parse(_waterCtrl.text),
-      eatenAt: DateTime.now(),
+      phosphorus: double.tryParse(_phosphorusCtrl.text.trim()) ?? 0.0,
+      eatenAt: now,
     );
 
     setState(() => _isLoading = false);
@@ -228,7 +240,7 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
 
     scaffoldMessenger.showSnackBar(
       const SnackBar(
-        content: Text('✅ บันทึกเข้าสมุดและกินเรียบร้อย! (เช็คที่ Dashboard)'),
+        content: Text('บันทึกเข้าสมุดและรับประทานเรียบร้อยแล้ว'),
       ),
     );
     // ดีดกลับไปหน้าแรก (Dashboard)
@@ -429,6 +441,12 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 12),
+                  _buildNumberField(
+                    _phosphorusCtrl,
+                    'ฟอสฟอรัส (mg)',
+                    key: const Key('custom_food_phosphorus'),
                   ),
                   const SizedBox(height: 24),
                   PremiumPrimaryButton(
