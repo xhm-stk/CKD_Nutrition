@@ -4,11 +4,12 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../providers/meal_providers.dart';
 import '../../providers/core_providers.dart';
 import '../../models/supabase/meal.dart';
 import '../../models/supabase/daily_log.dart';
-import '../../core/result.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/mesh_gradient_background.dart';
 import '../../widgets/meal_detail_dialog.dart';
@@ -18,11 +19,9 @@ import '../../l10n/app_localizations.dart';
 final historyMealsProvider = FutureProvider.autoDispose
     .family<List<Meal>, String>((ref, dateStr) async {
       final repo = ref.watch(mealRepositoryProvider);
-      final result = await repo.getMealsByDate(dateStr);
-      return switch (result) {
-        Success(:final data) => data,
-        Failure() => [],
-      };
+      final isar = ref.watch(isarProvider);
+      final prefs = ref.watch(sharedPreferencesProvider);
+      return repo.getMealsWithProjection(isar, prefs, dateStr);
     });
 
 /// Provider สำหรับดึงข้อมูลสรุปโภชนาการประจำวันที่เลือก
@@ -290,151 +289,189 @@ class _HistoryMealsList extends ConsumerWidget {
     final totalWater = summary?.totalWaterMl ?? 0.0;
     final totalUrine = summary?.totalUrineMl ?? 0.0;
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      children: [
-        // สรุปย่อ
-        Container(
-          padding: const EdgeInsets.all(16),
-          margin: const EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.08),
+    return RefreshIndicator(
+      onRefresh: () async {
+        final prefs = await SharedPreferences.getInstance();
+        final user = ref.read(supabaseProvider).auth.currentUser;
+        if (user != null) {
+          await prefs.remove('dashboard_${user.id}_$dateStr');
+          await prefs.remove('meals_${user.id}_$dateStr');
+        }
+        ref.invalidate(historyMealsProvider(dateStr));
+        ref.invalidate(historySummaryProvider(dateStr));
+        ref.invalidate(historyDatesProvider);
+        ref.invalidate(dashboardSummaryProvider);
+        ref.invalidate(todayMealsProvider);
+      },
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: [
+          // สรุปย่อ
+          Container(
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.08),
+              ),
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.analytics_rounded,
-                    color: AppTheme.brandPrimary,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    l10n.allNutrients,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.analytics_rounded,
+                      color: AppTheme.brandPrimary,
+                      size: 20,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              GridView.count(
-                crossAxisCount: 3,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: 0.9,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                children: [
-                  _SummaryChip(
-                    label: l10n.protein,
-                    value: '${totalProtein.toStringAsFixed(1)}g',
-                    icon: Icons.set_meal_rounded,
-                    color: const Color(0xFF34D399),
-                  ),
-                  _SummaryChip(
-                    label: l10n.sodium,
-                    value: '${totalSodium.toStringAsFixed(0)}mg',
-                    icon: Icons.water_drop_rounded,
-                    color: const Color(0xFF38BDF8),
-                  ),
-                  _SummaryChip(
-                    label: l10n.potassium,
-                    value: '${totalPotassium.toStringAsFixed(0)}mg',
-                    icon: Icons.science_rounded,
-                    color: const Color(0xFFF87171),
-                  ),
-                  _SummaryChip(
-                    label: l10n.sugar,
-                    value: '${totalSugar.toStringAsFixed(1)}g',
-                    icon: Icons.cookie_rounded,
-                    color: AppTheme.brandSecondary,
-                  ),
-                  _SummaryChip(
-                    label: l10n.carbs,
-                    value: '${totalCarb.toStringAsFixed(1)}g',
-                    icon: Icons.rice_bowl_rounded,
-                    color: const Color(0xFFFBBF24),
-                  ),
-                  _SummaryChip(
-                    label: l10n.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus',
-                    value: '${totalPhosphorus.toStringAsFixed(0)}mg',
-                    icon: Icons.bubble_chart_rounded,
-                    color: const Color(0xFFA855F7),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              // 2 ช่องต่อจากค่าทั้ง 6 ด้านบน: น้ำเปล่า และ ปัสสาวะ
-              Row(
-                children: [
-                  Expanded(
-                    child: _SummaryChip(
-                      label: l10n.water,
-                      value: '${totalWater.toStringAsFixed(0)}ml',
-                      icon: Icons.local_drink_rounded,
-                      color: const Color(0xFF38BDF8),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.localeName == 'th' ? 'สารอาหารทั้งหมด' : 'All Nutrients',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _SummaryChip(
-                      label: l10n.urine,
-                      value: '${totalUrine.toStringAsFixed(0)}ml',
-                      icon: Icons.opacity_rounded,
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // 6 ช่องสารอาหารหลัก (ตาราง 3x2)
+                GridView.count(
+                  crossAxisCount: 3,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 1.05,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  children: [
+                    _SummaryChip(
+                      label: l10n.protein,
+                      value: '${totalProtein.toStringAsFixed(1)}g',
+                      icon: Icons.egg_outlined,
+                      color: const Color(0xFF10B981),
+                    ),
+                    _SummaryChip(
+                      label: l10n.sodium,
+                      value: '${totalSodium.toStringAsFixed(0)}mg',
+                      icon: Icons.water_drop_outlined,
+                      color: const Color(0xFF0284C7),
+                    ),
+                    _SummaryChip(
+                      label: l10n.potassium,
+                      value: '${totalPotassium.toStringAsFixed(0)}mg',
+                      icon: Icons.science_outlined,
+                      color: const Color(0xFFEF4444),
+                    ),
+                    _SummaryChip(
+                      label: l10n.sugar,
+                      value: '${totalSugar.toStringAsFixed(1)}g',
+                      icon: Icons.cookie_outlined,
                       color: const Color(0xFFF59E0B),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ).animate().fade(duration: 300.ms).slideY(begin: 0.05),
+                    _SummaryChip(
+                      label: l10n.carbs,
+                      value: '${totalCarb.toStringAsFixed(1)}g',
+                      icon: Icons.bakery_dining_outlined,
+                      color: const Color(0xFFEAB308),
+                    ),
+                    _SummaryChip(
+                      label: l10n.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus',
+                      value: '${totalPhosphorus.toStringAsFixed(0)}mg',
+                      icon: Icons.grain_outlined,
+                      color: const Color(0xFF8B5CF6),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // 2 ช่องด้านล่าง: น้ำเปล่า และ ปัสสาวะ
+                Row(
+                  children: [
+                    Expanded(
+                      child: _SummaryChip(
+                        label: l10n.water,
+                        value: '${totalWater.toStringAsFixed(0)}ml',
+                        icon: Icons.local_drink_rounded,
+                        color: const Color(0xFF38BDF8),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _SummaryChip(
+                        label: l10n.urine,
+                        value: '${totalUrine.toStringAsFixed(0)}ml',
+                        icon: Icons.water_rounded,
+                        color: const Color(0xFFF59E0B),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ).animate().fade(duration: 300.ms).slideY(begin: 0.05),
 
-        // รายการอาหาร
-        if (meals.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32.0),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.no_meals_rounded,
-                    size: 44,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.25),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    l10n.noHistoryThisDay,
-                    style: TextStyle(
+          // รายการอาหาร
+          if (meals.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.no_meals_rounded,
+                      size: 44,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.5),
-                      fontSize: 14,
+                      ).colorScheme.onSurface.withValues(alpha: 0.25),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    Text(
+                      l10n.noHistoryThisDay,
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          )
-        else
-          ...meals.asMap().entries.map((entry) {
-            final i = entry.key;
-            final meal = entry.value;
-            return Container(
+            )
+          else
+            ...meals.asMap().entries.map((entry) {
+              final i = entry.key;
+              final meal = entry.value;
+              return Dismissible(
+                key: Key('history_meal_${meal.id}'),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(Icons.delete_rounded, color: Colors.white),
+                ),
+                onDismissed: (_) async {
+                  final repo = ref.read(mealRepositoryProvider);
+                  await repo.deleteMeal(meal);
+                  ref.invalidate(historyMealsProvider(dateStr));
+                  ref.invalidate(historySummaryProvider(dateStr));
+                  ref.invalidate(historyDatesProvider);
+                  ref.invalidate(dashboardSummaryProvider);
+                  ref.invalidate(todayMealsProvider);
+                },
+                child: Container(
                   margin: const EdgeInsets.only(bottom: 8),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
@@ -486,35 +523,58 @@ class _HistoryMealsList extends ConsumerWidget {
                         ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
-                    trailing: Builder(
-                      builder: (context) {
-                        final isWater =
-                            meal.foodId == 'quick_water' ||
-                            meal.foodId.toLowerCase().contains('water') ||
-                            meal.foodName == l10n.water;
-                        return Text(
-                          '${meal.quantityG.toStringAsFixed(0)}${isWater ? 'ml' : 'g'}',
-                          style: TextStyle(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.7),
-                            fontSize: 13,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Builder(
+                          builder: (context) {
+                            final isWater =
+                                meal.foodId == 'quick_water' ||
+                                meal.foodId.toLowerCase().contains('water') ||
+                                meal.foodName == l10n.water;
+                            return Text(
+                              '${meal.quantityG.toStringAsFixed(0)}${isWater ? 'ml' : 'g'}',
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.7),
+                                fontSize: 13,
+                              ),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline_rounded,
+                            color: Colors.redAccent,
+                            size: 20,
                           ),
-                        );
-                      },
+                          onPressed: () async {
+                            final repo = ref.read(mealRepositoryProvider);
+                            await repo.deleteMeal(meal);
+                            ref.invalidate(historyMealsProvider(dateStr));
+                            ref.invalidate(historySummaryProvider(dateStr));
+                            ref.invalidate(historyDatesProvider);
+                            ref.invalidate(dashboardSummaryProvider);
+                            ref.invalidate(todayMealsProvider);
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                )
-                .animate()
-                .fade(
-                  delay: Duration(milliseconds: 100 + i * 50),
-                  duration: 300.ms,
-                )
-                .slideX(begin: 0.03);
-          }),
+                ),
+              )
+              .animate()
+              .fade(
+                delay: Duration(milliseconds: 100 + i * 50),
+                duration: 300.ms,
+              )
+              .slideX(begin: 0.03);
+            }),
 
         const SizedBox(height: 24),
       ],
+    ),
     );
   }
 }

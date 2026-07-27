@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/core_providers.dart';
 import '../../providers/meal_providers.dart';
+import '../history/history_page.dart';
 import '../../core/result.dart';
 import '../../widgets/mesh_gradient_background.dart';
 import '../../theme/app_theme.dart';
@@ -234,9 +235,15 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
 
     setState(() => _isLoading = false);
 
+    final logDateStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+
     // รีเฟรช Dashboard และรายการมื้ออาหาร
     ref.invalidate(dashboardSummaryProvider);
     ref.invalidate(todayMealsProvider);
+    ref.invalidate(historyMealsProvider(logDateStr));
+    ref.invalidate(historySummaryProvider(logDateStr));
+    ref.invalidate(historyDatesProvider);
 
     scaffoldMessenger.showSnackBar(
       const SnackBar(

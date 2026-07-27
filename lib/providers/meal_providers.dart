@@ -39,7 +39,6 @@ final mealPlannerProvider = FutureProvider.autoDispose<List<dynamic>>((
   final user = sb.auth.currentUser;
   if (user == null) throw Exception('กรุณาเข้าสู่ระบบ');
 
-  // เรียกใช้ RPC recommend_meals ที่ Backend Architect เขียนไว้
   final response = await sb.rpc('recommend_meals');
   return response as List<dynamic>;
 });

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
+import '../providers/core_providers.dart';
+import '../providers/meal_providers.dart';
+import '../pages/history/history_page.dart';
 import 'smart_food_image.dart';
 
 class MealDetailDialog {
@@ -89,7 +93,43 @@ class MealDetailDialog {
               _buildDetailRow(context, l10n.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus', '${meal.phosphorusMg.toStringAsFixed(0)}${l10n.milligramsUnit}', const Color(0xFF9333EA)),
               if (meal.waterMl > 0)
                 _buildDetailRow(context, l10n.water, '${meal.waterMl.toStringAsFixed(0)}${l10n.millilitersUnit}', const Color(0xFF60A5FA)),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    return OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.redAccent,
+                        side: const BorderSide(color: Colors.redAccent),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                      label: Text(
+                        l10n.localeName == 'th' ? 'ลบมื้ออาหารนี้' : 'Delete Meal',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        final repo = ref.read(mealRepositoryProvider);
+                        await repo.deleteMeal(meal);
+                        final eatenAt = meal.eatenAt as DateTime;
+                        final dateStr =
+                            '${eatenAt.year}-${eatenAt.month.toString().padLeft(2, '0')}-${eatenAt.day.toString().padLeft(2, '0')}';
+                        ref.invalidate(dashboardSummaryProvider);
+                        ref.invalidate(todayMealsProvider);
+                        ref.invalidate(historyMealsProvider(dateStr));
+                        ref.invalidate(historySummaryProvider(dateStr));
+                        ref.invalidate(historyDatesProvider);
+                      },
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         );

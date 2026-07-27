@@ -4,5 +4,7 @@
     "java.import.gradle.enabled": false,
     "java.import.exclusions": [
         "**"
-    ]
+    ],
+    "chat.agent.sandbox.enabled": "on",
+    "chat.agent.sandbox.enabledWindows": "on"
 }

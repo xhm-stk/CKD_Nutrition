@@ -11,6 +11,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/mesh_gradient_background.dart';
 import '../../widgets/smart_food_image.dart';
 import '../../widgets/custom_time_date_picker.dart';
+import '../history/history_page.dart';
 
 class FoodSearchPage extends ConsumerStatefulWidget {
   const FoodSearchPage({super.key});
@@ -497,8 +498,13 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
 
     if (result is Success) {
       if (!mounted) return;
+      final logDateStr =
+          '${eatenAt.year}-${eatenAt.month.toString().padLeft(2, '0')}-${eatenAt.day.toString().padLeft(2, '0')}';
       ref.invalidate(dashboardSummaryProvider);
       ref.invalidate(todayMealsProvider);
+      ref.invalidate(historyMealsProvider(logDateStr));
+      ref.invalidate(historySummaryProvider(logDateStr));
+      ref.invalidate(historyDatesProvider);
       Navigator.pop(context); // กลับไปหน้า Dashboard
     } else if (result is Failure) {
       ScaffoldMessenger.of(context).showSnackBar(

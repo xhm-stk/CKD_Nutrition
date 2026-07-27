@@ -6,6 +6,7 @@ import '../core/result.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 import 'meal_detail_dialog.dart';
+import '../pages/history/history_page.dart';
 
 class MealsListWidget extends ConsumerStatefulWidget {
   const MealsListWidget({super.key});
@@ -68,15 +69,65 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                 final scaffoldMessenger = ScaffoldMessenger.of(context);
                 final repo = ref.read(mealRepositoryProvider);
 
+                final eatenAt = meal.eatenAt;
+                final dateStr =
+                    '${eatenAt.year}-${eatenAt.month.toString().padLeft(2, '0')}-${eatenAt.day.toString().padLeft(2, '0')}';
+
+                // ยิงลบลงฐานข้อมูลทันทีแบบไม่บล็อก UI
+                repo.deleteMeal(meal).then((res) {
+                  if (mounted) {
+                    if (res is Success) {
+                      ref.invalidate(dashboardSummaryProvider);
+                      ref.invalidate(todayMealsProvider);
+                      ref.invalidate(historyMealsProvider(dateStr));
+                      ref.invalidate(historySummaryProvider(dateStr));
+                      ref.invalidate(historyDatesProvider);
+                    } else if (res is Failure) {
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: Text(res.userMessage),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      setState(() {
+                        _optimisticDeletedIds.remove(meal.id);
+                      });
+                    }
+                  }
+                });
+
                 final snackBar = SnackBar(
                   content: Text(l10n.deletedMeal(meal.foodName)),
-                  duration: const Duration(seconds: 5),
+                  duration: const Duration(seconds: 3),
                   action: SnackBarAction(
                     label: l10n.undo,
                     onPressed: () {
                       if (mounted) {
-                        setState(() {
-                          _optimisticDeletedIds.remove(meal.id);
+                        // เพิ่มมื้ออาหารกลับมาถ้าผู้ใช้กด Undo
+                        ref.read(mealRepositoryProvider).logMealData(
+                          foodId: meal.foodId,
+                          foodName: meal.foodName,
+                          quantityG: meal.quantityG,
+                          mealType: meal.mealType,
+                          protein: meal.proteinG,
+                          potassium: meal.potassiumMg,
+                          sodium: meal.sodiumMg,
+                          sugar: meal.sugarG,
+                          carb: meal.carbG,
+                          water: meal.waterMl,
+                          phosphorus: meal.phosphorusMg,
+                          eatenAt: meal.eatenAt,
+                        ).then((_) {
+                          if (mounted) {
+                            setState(() {
+                              _optimisticDeletedIds.remove(meal.id);
+                            });
+                            ref.invalidate(dashboardSummaryProvider);
+                            ref.invalidate(todayMealsProvider);
+                            ref.invalidate(historyMealsProvider(dateStr));
+                            ref.invalidate(historySummaryProvider(dateStr));
+                            ref.invalidate(historyDatesProvider);
+                          }
                         });
                       }
                     },
@@ -84,25 +135,11 @@ class _MealsListWidgetState extends ConsumerState<MealsListWidget> {
                 );
 
                 scaffoldMessenger.showSnackBar(snackBar).closed.then((reason) {
-                  // ถ้ามันปิดไปโดยที่ไม่ได้กด Undo (action) ค่อยยิงลบจริง
-                  if (reason != SnackBarClosedReason.action) {
-                    repo.deleteMeal(meal).then((res) {
-                      if (mounted) {
-                        if (res is Success) {
-                          ref.invalidate(dashboardSummaryProvider);
-                          ref.invalidate(todayMealsProvider);
-                        } else if (res is Failure) {
-                          scaffoldMessenger.showSnackBar(
-                            SnackBar(
-                              content: Text(res.userMessage),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          setState(() {
-                            _optimisticDeletedIds.remove(meal.id);
-                          });
-                        }
-                      }
+                  // ถ้า SnackBar ถูกปิดตัวลงไปเฉยๆ (โดยที่ผู้ใช้ไม่ได้กดปุ่ม Undo)
+                  // ให้เคลียร์ ID ตัวนี้ออกจากรายการลบจำลอง เพื่อให้ข้อมูลซิงก์ได้อย่างสมบูรณ์
+                  if (reason != SnackBarClosedReason.action && mounted) {
+                    setState(() {
+                      _optimisticDeletedIds.remove(meal.id);
                     });
                   }
                 });

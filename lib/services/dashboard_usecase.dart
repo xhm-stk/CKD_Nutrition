@@ -21,6 +21,7 @@ class DashboardUseCase {
     DailyLog? baseLog;
     Map<String, dynamic> rules = {};
     Map<String, dynamic> profile = {};
+    List<dynamic> activeMeals = [];
 
     try {
       final profileData =
@@ -41,6 +42,17 @@ class DashboardUseCase {
               .eq('user_id', user.id)
               .eq('log_date', todayStr)
               .maybeSingle();
+
+      // Single Source of Truth Validation: ดึงมื้ออาหารจริงที่ไม่ถูกลบของ log_id หรือวันปัจจุบันเพื่อสอบทานความถูกต้อง 100%
+      if (data != null && data['id'] != null) {
+        activeMeals = await _sb
+            .from('meals')
+            .select('*')
+            .eq('log_id', data['id'])
+            .isFilter('deleted_at', null);
+      } else {
+        activeMeals = [];
+      }
 
       if (data != null) {
         baseLog = DailyLog.fromDataAndProfile(
@@ -109,7 +121,7 @@ class DashboardUseCase {
       final urineMl = (baseLog?.totalUrineMl ?? 0.0).toDouble();
       dynamicWater = urineMl + 500.0;
       if (dynamicWater < 500.0) {
-        dynamicWater = 500.0; // ค่าขั้นต่ำที่ยอมรับได้
+        dynamicWater = 500.0;
       }
     }
 
@@ -143,6 +155,41 @@ class DashboardUseCase {
       customCarb: dynamicCarb,
       customWater: dynamicWater,
     );
+
+    // Single Source of Truth Validation (ย้ายมาไว้ข้างล่างสุด): 
+    // ตรวจทานและบังคับใช้ค่าสารอาหารสะสมจริงจากรายการอาหารกับ baseLog ทุกสถานะ (รวมถึง empty_log ที่สร้างขึ้นจำลองด้วย)
+    if (activeMeals.isEmpty) {
+      baseLog = baseLog.copyWith(
+        totalProteinG: 0.0,
+        totalPotassiumMg: 0.0,
+        totalSodiumMg: 0.0,
+        totalSugarG: 0.0,
+        totalCarbG: 0.0,
+        totalWaterMl: 0.0,
+        totalPhosphorusMg: 0.0,
+      );
+    } else {
+      double calcProtein = 0, calcPotassium = 0, calcSodium = 0;
+      double calcSugar = 0, calcCarb = 0, calcWater = 0, calcPhosphorus = 0;
+      for (final m in activeMeals) {
+        calcProtein += (m['protein_g'] as num?)?.toDouble() ?? 0;
+        calcPotassium += (m['potassium_mg'] as num?)?.toDouble() ?? 0;
+        calcSodium += (m['sodium_mg'] as num?)?.toDouble() ?? 0;
+        calcSugar += (m['sugar_g'] as num?)?.toDouble() ?? 0;
+        calcCarb += (m['carb_g'] as num?)?.toDouble() ?? 0;
+        calcWater += (m['water_ml'] as num?)?.toDouble() ?? 0;
+        calcPhosphorus += (m['phosphorus_mg'] as num?)?.toDouble() ?? 0;
+      }
+      baseLog = baseLog.copyWith(
+        totalProteinG: calcProtein,
+        totalPotassiumMg: calcPotassium,
+        totalSodiumMg: calcSodium,
+        totalSugarG: calcSugar,
+        totalCarbG: calcCarb,
+        totalWaterMl: calcWater,
+        totalPhosphorusMg: calcPhosphorus,
+      );
+    }
 
     final offlineActions = await _isar.offlineActions.where().findAll();
     for (final action in offlineActions) {
@@ -201,6 +248,11 @@ class DashboardUseCase {
                   .toDouble(),
           totalWaterMl:
               (baseLog.totalWaterMl - ((p['water'] as num?)?.toDouble() ?? 0))
+                  .clamp(0, double.infinity)
+                  .toDouble(),
+          totalPhosphorusMg:
+              (baseLog.totalPhosphorusMg -
+                      ((p['phosphorus'] as num?)?.toDouble() ?? 0))
                   .clamp(0, double.infinity)
                   .toDouble(),
         );

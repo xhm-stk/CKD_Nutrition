@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/isar/offline_action.dart';
-import '../main.dart'; // To access rootScaffoldMessengerKey
 
 class OfflineSyncWorker {
   final Isar _isar;
@@ -50,19 +49,6 @@ class OfflineSyncWorker {
     _processQueue();
   }
 
-  void _showSnackBar(String message, {Color color = Colors.green}) {
-    final messenger = rootScaffoldMessengerKey.currentState;
-    if (messenger != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: color,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
   /// เริ่มกระบวนการเคลียร์คิว (FIFO - First In, First Out)
   Future<void> _processQueue() async {
     if (_isSyncing) return; // ป้องกันการซิงก์ซ้อนทับกัน
@@ -72,10 +58,6 @@ class OfflineSyncWorker {
     if (pendingCount == 0) return;
 
     _isSyncing = true;
-    _showSnackBar(
-      'กำลังส่งข้อมูลออฟไลน์ไปเก็บ...',
-      color: Colors.amber.shade800,
-    );
 
     try {
       // ดึงคิวทั้งหมดเรียงจากเก่าไปใหม่

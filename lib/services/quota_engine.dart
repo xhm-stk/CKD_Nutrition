@@ -14,17 +14,13 @@ class NutrientQuota {
 
   double get remaining => (limit - consumed).clamp(0, double.infinity);
 
-  /// ปลดล็อค percent ให้แสดงค่าเกิน 1.0 ได้ เพื่อเตือนคนไข้ว่ากินเกินลิมิต
-  /// เช่น 1.5 = กินไป 150% ของโควต้า
   double get percent => limit <= 0 ? 0 : consumed / limit;
 
-  /// ใช้สำหรับแสดง Progress Bar (clamp ไว้ไม่เกิน 1.0)
   double get progressBarPercent => percent.clamp(0, 1);
 
-  /// แก้บั๊ก: ถ้า limit = 0 หมายถึงไม่มีการกำหนดขีดจำกัด → ไม่ถือว่าเกิน
   bool get isOverLimit => limit > 0 && consumed > limit;
   bool get isNearLimit =>
-      limit > 0 && percent >= 0.8 && !isOverLimit; // แจ้งเตือนสีส้มที่ 80%
+      limit > 0 && percent >= 0.8 && !isOverLimit;
 }
 
 class QuotaEngine {

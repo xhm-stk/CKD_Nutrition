@@ -49,3 +49,7 @@ app.*.map.json
 
 # Obfuscation debug info
 debug_info/
+node_modules/
+coverage/
+supabase/.temp/
+

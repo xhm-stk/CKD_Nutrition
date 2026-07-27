@@ -6,6 +6,7 @@ import '../../../theme/app_theme.dart';
 import '../../../widgets/premium_text_field.dart';
 import '../../../providers/core_providers.dart';
 import '../../../providers/meal_providers.dart';
+import '../../history/history_page.dart';
 
 class CustomFoodEntrySheet extends ConsumerStatefulWidget {
   const CustomFoodEntrySheet({super.key});
@@ -129,8 +130,15 @@ class _CustomFoodEntrySheetState extends ConsumerState<CustomFoodEntrySheet> {
 
     setState(() => _isLoading = false);
 
+    final now = DateTime.now();
+    final logDateStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+
     ref.invalidate(dashboardSummaryProvider);
     ref.invalidate(todayMealsProvider);
+    ref.invalidate(historyMealsProvider(logDateStr));
+    ref.invalidate(historySummaryProvider(logDateStr));
+    ref.invalidate(historyDatesProvider);
 
     scaffoldMessenger.showSnackBar(
       const SnackBar(content: Text('บันทึกเข้าสมุดและรับประทานเรียบร้อยแล้ว')),

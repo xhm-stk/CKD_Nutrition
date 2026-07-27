@@ -38,7 +38,7 @@ class MealRepository {
 
       final logId = logData['id'];
 
-      // ดึงอาหารในมื้อของวันนี้ ที่ยังไม่โดน soft delete
+      // ดึงอาหารในมื้อของวันนี้ ที่ยังไม่โดน soft delete และตรงกับวันที่ทานจริง
       final mealsData = await _sb
           .from('meals')
           .select('*')
@@ -56,6 +56,21 @@ class MealRepository {
   }
 
   Future<Result<void>> deleteMeal(Meal meal) async {
+    final user = _sb.auth.currentUser;
+    final dateStr =
+        '${meal.eatenAt.year}-${meal.eatenAt.month.toString().padLeft(2, '0')}-${meal.eatenAt.day.toString().padLeft(2, '0')}';
+
+    // ล้างแคชในตัวเครื่อง SharedPreferences ออกทันทีเพื่อป้องกันแคชอาหารเก่าเด้งกลับมาค้าง
+    if (user != null) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('dashboard_${user.id}_$dateStr');
+        await prefs.remove('meals_${user.id}_$dateStr');
+      } catch (cacheErr) {
+        debugPrint('⚠️ [MealRepository] Invalidate cache warning: $cacheErr');
+      }
+    }
+
     if (meal.id.startsWith('offline_')) {
       try {
         final actionIdStr = meal.id.replaceFirst('offline_', '');
@@ -74,7 +89,6 @@ class MealRepository {
     try {
       // เรียกใช้ RPC เพื่อให้มันหักลบยอดโภชนาการใน daily_logs ด้วย
       await _sb.rpc('delete_meal', params: {'p_meal_id': meal.id});
-
       return Success(null);
     } catch (e) {
       debugPrint(
@@ -90,6 +104,7 @@ class MealRepository {
         'sugar': meal.sugarG,
         'carb': meal.carbG,
         'water': meal.waterMl,
+        'phosphorus': meal.phosphorusMg,
         'eaten_at': meal.eatenAt.toIso8601String(),
       });
 
@@ -114,7 +129,6 @@ class MealRepository {
     final eatenAtUtcStr = eatenAt.toUtc().toIso8601String();
     final logDateStr =
         '${eatenAt.year}-${eatenAt.month.toString().padLeft(2, '0')}-${eatenAt.day.toString().padLeft(2, '0')}';
-
     try {
       await _sb.rpc(
         'log_meal',
@@ -134,13 +148,18 @@ class MealRepository {
           'p_log_date': logDateStr,
         },
       );
+
+      final user = _sb.auth.currentUser;
+      if (user != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('dashboard_${user.id}_$logDateStr');
+        await prefs.remove('meals_${user.id}_$logDateStr');
+      }
       return Success(null);
     } catch (e) {
       debugPrint(
         '🚨 [MealRepository] logMeal Supabase failed: $e, Falling back to Offline Queue...',
       );
-
-      // แปลงข้อมูลเป็น Payload เพื่อเก็บลง Isar Queue
       final payload = {
         'food_id': foodId,
         'food_name': foodName,
@@ -156,13 +175,10 @@ class MealRepository {
         'eaten_at': eatenAtUtcStr,
         'log_date': logDateStr,
       };
-
       await _syncWorker.enqueueAction('LOG_MEAL_RPC', payload);
-
       return Success(null);
     }
   }
-
   Future<Result<void>> logUrine(double amountMl) async {
     final now = DateTime.now();
     final loggedAtUtcStr = now.toUtc().toIso8601String();
