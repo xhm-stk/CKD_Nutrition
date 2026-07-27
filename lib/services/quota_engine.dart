@@ -19,8 +19,7 @@ class NutrientQuota {
   double get progressBarPercent => percent.clamp(0, 1);
 
   bool get isOverLimit => limit > 0 && consumed > limit;
-  bool get isNearLimit =>
-      limit > 0 && percent >= 0.8 && !isOverLimit;
+  bool get isNearLimit => limit > 0 && percent >= 0.8 && !isOverLimit;
 }
 
 class QuotaEngine {
@@ -35,7 +34,8 @@ class QuotaEngine {
     final sugarLimit = log?.customSugar ?? rule?.sugarLimitG ?? 0;
     final carbLimit = log?.customCarb ?? rule?.carbLimitG ?? 0;
     final waterLimit = log?.customWater ?? rule?.waterLimitMl ?? 0;
-    final phosphorusLimit = log?.customPhosphorus ?? rule?.phosphorusLimitMg ?? 1000;
+    final phosphorusLimit =
+        log?.customPhosphorus ?? rule?.phosphorusLimitMg ?? 1000;
 
     if (proteinLimit == 0 && potassiumLimit == 0) {
       return []; // ไม่มีข้อมูล rule และ profile

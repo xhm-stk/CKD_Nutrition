@@ -70,7 +70,10 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(
-        color: isDark ? color.withValues(alpha: 0.18) : color.withValues(alpha: 0.10),
+        color:
+            isDark
+                ? color.withValues(alpha: 0.18)
+                : color.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: color.withValues(alpha: 0.35), width: 1.0),
       ),
@@ -373,7 +376,12 @@ class _FoodSearchPageState extends ConsumerState<FoodSearchPage> {
                                               ),
                                               _buildNutrientTag(
                                                 context,
-                                                AppLocalizations.of(context)!.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus',
+                                                AppLocalizations.of(
+                                                          context,
+                                                        )!.localeName ==
+                                                        'th'
+                                                    ? 'ฟอสฟอรัส'
+                                                    : 'Phosphorus',
                                                 '${f.phosphorusMg.toStringAsFixed(0)}${AppLocalizations.of(context)!.milligramsUnit}',
                                                 const Color(0xFF9333EA),
                                               ),
@@ -732,10 +740,11 @@ class _FoodLogBottomSheetState extends ConsumerState<_FoodLogBottomSheet> {
                     ),
                     InkWell(
                       onTap: () async {
-                        final picked = await CustomTimeDatePicker.show24hTimePicker(
-                          context: context,
-                          initialTime: _eatenTime,
-                        );
+                        final picked =
+                            await CustomTimeDatePicker.show24hTimePicker(
+                              context: context,
+                              initialTime: _eatenTime,
+                            );
                         if (picked != null) {
                           setState(() {
                             _eatenTime = picked;

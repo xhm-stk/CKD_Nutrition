@@ -65,7 +65,9 @@ class MealDetailDialog {
                           '${_getMealTypeName(context, meal.mealType)} • ${meal.quantityG.toStringAsFixed(0)}${l10n.gramsUnit}',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -77,7 +79,9 @@ class MealDetailDialog {
               const Divider(),
               const SizedBox(height: 12),
               Text(
-                l10n.localeName == 'th' ? 'คุณค่าทางโภชนาการทั้งหมด' : 'Nutritional Details',
+                l10n.localeName == 'th'
+                    ? 'คุณค่าทางโภชนาการทั้งหมด'
+                    : 'Nutritional Details',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -85,14 +89,49 @@ class MealDetailDialog {
                 ),
               ),
               const SizedBox(height: 12),
-              _buildDetailRow(context, l10n.protein, '${meal.proteinG.toStringAsFixed(1)}${l10n.gramsUnit}', const Color(0xFF059669)),
-              _buildDetailRow(context, l10n.carbs, '${meal.carbG.toStringAsFixed(1)}${l10n.gramsUnit}', const Color(0xFFD97706)),
-              _buildDetailRow(context, l10n.sugar, '${meal.sugarG.toStringAsFixed(1)}${l10n.gramsUnit}', const Color(0xFFEA580C)),
-              _buildDetailRow(context, l10n.sodium, '${meal.sodiumMg.toStringAsFixed(0)}${l10n.milligramsUnit}', const Color(0xFF0284C7)),
-              _buildDetailRow(context, l10n.potassium, '${meal.potassiumMg.toStringAsFixed(0)}${l10n.milligramsUnit}', const Color(0xFFDC2626)),
-              _buildDetailRow(context, l10n.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus', '${meal.phosphorusMg.toStringAsFixed(0)}${l10n.milligramsUnit}', const Color(0xFF9333EA)),
+              _buildDetailRow(
+                context,
+                l10n.protein,
+                '${meal.proteinG.toStringAsFixed(1)}${l10n.gramsUnit}',
+                const Color(0xFF059669),
+              ),
+              _buildDetailRow(
+                context,
+                l10n.carbs,
+                '${meal.carbG.toStringAsFixed(1)}${l10n.gramsUnit}',
+                const Color(0xFFD97706),
+              ),
+              _buildDetailRow(
+                context,
+                l10n.sugar,
+                '${meal.sugarG.toStringAsFixed(1)}${l10n.gramsUnit}',
+                const Color(0xFFEA580C),
+              ),
+              _buildDetailRow(
+                context,
+                l10n.sodium,
+                '${meal.sodiumMg.toStringAsFixed(0)}${l10n.milligramsUnit}',
+                const Color(0xFF0284C7),
+              ),
+              _buildDetailRow(
+                context,
+                l10n.potassium,
+                '${meal.potassiumMg.toStringAsFixed(0)}${l10n.milligramsUnit}',
+                const Color(0xFFDC2626),
+              ),
+              _buildDetailRow(
+                context,
+                l10n.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus',
+                '${meal.phosphorusMg.toStringAsFixed(0)}${l10n.milligramsUnit}',
+                const Color(0xFF9333EA),
+              ),
               if (meal.waterMl > 0)
-                _buildDetailRow(context, l10n.water, '${meal.waterMl.toStringAsFixed(0)}${l10n.millilitersUnit}', const Color(0xFF60A5FA)),
+                _buildDetailRow(
+                  context,
+                  l10n.water,
+                  '${meal.waterMl.toStringAsFixed(0)}${l10n.millilitersUnit}',
+                  const Color(0xFF60A5FA),
+                ),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
@@ -109,7 +148,9 @@ class MealDetailDialog {
                       ),
                       icon: const Icon(Icons.delete_outline_rounded, size: 20),
                       label: Text(
-                        l10n.localeName == 'th' ? 'ลบมื้ออาหารนี้' : 'Delete Meal',
+                        l10n.localeName == 'th'
+                            ? 'ลบมื้ออาหารนี้'
+                            : 'Delete Meal',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       onPressed: () async {
@@ -151,7 +192,12 @@ class MealDetailDialog {
     }
   }
 
-  static Widget _buildDetailRow(BuildContext context, String label, String value, Color color) {
+  static Widget _buildDetailRow(
+    BuildContext context,
+    String label,
+    String value,
+    Color color,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(

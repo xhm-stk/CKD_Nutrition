@@ -212,9 +212,8 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
     // 2. กินทันที! (บันทึกเข้า Dashboard - ปรับมื้อตามช่วงเวลาอัตโนมัติ)
     final now = DateTime.now();
     final hour = now.hour;
-    final String autoMealType = hour < 11
-        ? 'breakfast'
-        : (hour < 16 ? 'lunch' : 'dinner');
+    final String autoMealType =
+        hour < 11 ? 'breakfast' : (hour < 16 ? 'lunch' : 'dinner');
 
     final mealRepo = ref.read(mealRepositoryProvider);
     await mealRepo.logMealData(
@@ -246,9 +245,7 @@ class _CustomFoodPageState extends ConsumerState<CustomFoodPage> {
     ref.invalidate(historyDatesProvider);
 
     scaffoldMessenger.showSnackBar(
-      const SnackBar(
-        content: Text('บันทึกเข้าสมุดและรับประทานเรียบร้อยแล้ว'),
-      ),
+      const SnackBar(content: Text('บันทึกเข้าสมุดและรับประทานเรียบร้อยแล้ว')),
     );
     // ดีดกลับไปหน้าแรก (Dashboard)
     router.go('/dashboard');

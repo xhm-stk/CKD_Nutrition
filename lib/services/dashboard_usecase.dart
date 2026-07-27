@@ -156,7 +156,7 @@ class DashboardUseCase {
       customWater: dynamicWater,
     );
 
-    // Single Source of Truth Validation (ย้ายมาไว้ข้างล่างสุด): 
+    // Single Source of Truth Validation (ย้ายมาไว้ข้างล่างสุด):
     // ตรวจทานและบังคับใช้ค่าสารอาหารสะสมจริงจากรายการอาหารกับ baseLog ทุกสถานะ (รวมถึง empty_log ที่สร้างขึ้นจำลองด้วย)
     if (activeMeals.isEmpty) {
       baseLog = baseLog.copyWith(

@@ -300,7 +300,9 @@ class _HealthSetupPageState extends ConsumerState<HealthSetupPage> {
                                 final n = double.tryParse(clean);
                                 if (n != null && n >= 0 && n <= 200) {
                                   final newStage =
-                                      HealthProfileService.calculateStageFromEgfr(n);
+                                      HealthProfileService.calculateStageFromEgfr(
+                                        n,
+                                      );
                                   if (_selectedStage != newStage) {
                                     setState(() {
                                       _selectedStage = newStage;

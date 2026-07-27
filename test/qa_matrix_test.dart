@@ -161,8 +161,8 @@ void main() {
                   final quotas = QuotaEngine.calculate(log: log, rule: rule);
                   expect(
                     quotas.length,
-                    6,
-                    reason: 'Should return 6 nutrient quotas',
+                    7,
+                    reason: 'Should return 7 nutrient quotas',
                   );
                   for (final quota in quotas) {
                     expect(quota.consumed, greaterThanOrEqualTo(0));

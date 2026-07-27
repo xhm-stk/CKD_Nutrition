@@ -173,9 +173,7 @@ class OfflineSyncWorker {
                 final file = File(localImgPath);
                 final fileName =
                     'custom_foods/${user.id}/${DateTime.now().millisecondsSinceEpoch}.jpg';
-                await _sb.storage
-                    .from('food_images')
-                    .upload(fileName, file);
+                await _sb.storage.from('food_images').upload(fileName, file);
                 final publicUrl = _sb.storage
                     .from('food_images')
                     .getPublicUrl(fileName);

@@ -332,7 +332,9 @@ class _HistoryMealsList extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      l10n.localeName == 'th' ? 'สารอาหารทั้งหมด' : 'All Nutrients',
+                      l10n.localeName == 'th'
+                          ? 'สารอาหารทั้งหมด'
+                          : 'All Nutrients',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -382,7 +384,8 @@ class _HistoryMealsList extends ConsumerWidget {
                       color: const Color(0xFFEAB308),
                     ),
                     _SummaryChip(
-                      label: l10n.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus',
+                      label:
+                          l10n.localeName == 'th' ? 'ฟอสฟอรัส' : 'Phosphorus',
                       value: '${totalPhosphorus.toStringAsFixed(0)}mg',
                       icon: Icons.grain_outlined,
                       color: const Color(0xFF8B5CF6),
@@ -450,131 +453,139 @@ class _HistoryMealsList extends ConsumerWidget {
               final i = entry.key;
               final meal = entry.value;
               return Dismissible(
-                key: Key('history_meal_${meal.id}'),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 20),
-                  margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.redAccent,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: const Icon(Icons.delete_rounded, color: Colors.white),
-                ),
-                onDismissed: (_) async {
-                  final repo = ref.read(mealRepositoryProvider);
-                  await repo.deleteMeal(meal);
-                  ref.invalidate(historyMealsProvider(dateStr));
-                  ref.invalidate(historySummaryProvider(dateStr));
-                  ref.invalidate(historyDatesProvider);
-                  ref.invalidate(dashboardSummaryProvider);
-                  ref.invalidate(todayMealsProvider);
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.05),
-                    ),
-                  ),
-                  child: ListTile(
-                    onTap: () => MealDetailDialog.show(context, meal),
-                    leading: Container(
-                      width: 40,
-                      height: 40,
+                    key: Key('history_meal_${meal.id}'),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 20),
+                      margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
-                        color: AppTheme.brandPrimary.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
+                        color: Colors.redAccent,
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/food_images/${meal.foodId}.webp',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Center(
-                              child: Icon(
-                                Icons.restaurant_rounded,
-                                color: AppTheme.brandPrimary,
+                      child: const Icon(
+                        Icons.delete_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
+                    onDismissed: (_) async {
+                      final repo = ref.read(mealRepositoryProvider);
+                      await repo.deleteMeal(meal);
+                      ref.invalidate(historyMealsProvider(dateStr));
+                      ref.invalidate(historySummaryProvider(dateStr));
+                      ref.invalidate(historyDatesProvider);
+                      ref.invalidate(dashboardSummaryProvider);
+                      ref.invalidate(todayMealsProvider);
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.05),
+                        ),
+                      ),
+                      child: ListTile(
+                        onTap: () => MealDetailDialog.show(context, meal),
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppTheme.brandPrimary.withValues(
+                              alpha: 0.15,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/food_images/${meal.foodId}.webp',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(
+                                  child: Icon(
+                                    Icons.restaurant_rounded,
+                                    color: AppTheme.brandPrimary,
+                                    size: 20,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        title: Text(
+                          meal.foodName,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        subtitle: Text(
+                          '${l10n.protein} ${meal.proteinG.toStringAsFixed(1)}g · ${l10n.sodium} ${meal.sodiumMg.toStringAsFixed(0)}mg',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Builder(
+                              builder: (context) {
+                                final isWater =
+                                    meal.foodId == 'quick_water' ||
+                                    meal.foodId.toLowerCase().contains(
+                                      'water',
+                                    ) ||
+                                    meal.foodName == l10n.water;
+                                return Text(
+                                  '${meal.quantityG.toStringAsFixed(0)}${isWater ? 'ml' : 'g'}',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                    fontSize: 13,
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline_rounded,
+                                color: Colors.redAccent,
                                 size: 20,
                               ),
-                            );
-                          },
+                              onPressed: () async {
+                                final repo = ref.read(mealRepositoryProvider);
+                                await repo.deleteMeal(meal);
+                                ref.invalidate(historyMealsProvider(dateStr));
+                                ref.invalidate(historySummaryProvider(dateStr));
+                                ref.invalidate(historyDatesProvider);
+                                ref.invalidate(dashboardSummaryProvider);
+                                ref.invalidate(todayMealsProvider);
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    title: Text(
-                      meal.foodName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    subtitle: Text(
-                      '${l10n.protein} ${meal.proteinG.toStringAsFixed(1)}g · ${l10n.sodium} ${meal.sodiumMg.toStringAsFixed(0)}mg',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Builder(
-                          builder: (context) {
-                            final isWater =
-                                meal.foodId == 'quick_water' ||
-                                meal.foodId.toLowerCase().contains('water') ||
-                                meal.foodName == l10n.water;
-                            return Text(
-                              '${meal.quantityG.toStringAsFixed(0)}${isWater ? 'ml' : 'g'}',
-                              style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.7),
-                                fontSize: 13,
-                              ),
-                            );
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline_rounded,
-                            color: Colors.redAccent,
-                            size: 20,
-                          ),
-                          onPressed: () async {
-                            final repo = ref.read(mealRepositoryProvider);
-                            await repo.deleteMeal(meal);
-                            ref.invalidate(historyMealsProvider(dateStr));
-                            ref.invalidate(historySummaryProvider(dateStr));
-                            ref.invalidate(historyDatesProvider);
-                            ref.invalidate(dashboardSummaryProvider);
-                            ref.invalidate(todayMealsProvider);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-              .animate()
-              .fade(
-                delay: Duration(milliseconds: 100 + i * 50),
-                duration: 300.ms,
-              )
-              .slideX(begin: 0.03);
+                  )
+                  .animate()
+                  .fade(
+                    delay: Duration(milliseconds: 100 + i * 50),
+                    duration: 300.ms,
+                  )
+                  .slideX(begin: 0.03);
             }),
 
-        const SizedBox(height: 24),
-      ],
-    ),
+          const SizedBox(height: 24),
+        ],
+      ),
     );
   }
 }

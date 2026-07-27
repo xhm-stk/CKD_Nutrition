@@ -9,11 +9,7 @@ class DashboardNutrientsWidget extends StatelessWidget {
   final List<NutrientQuota> quotas;
   final DailyLog? log;
 
-  const DashboardNutrientsWidget({
-    super.key,
-    required this.quotas,
-    this.log,
-  });
+  const DashboardNutrientsWidget({super.key, required this.quotas, this.log});
 
   // แมปปิ้งไอคอน สี และ unit ให้ตรงกับสารอาหารแต่ละตัว
   Map<String, dynamic> _getNutrientStyle(
@@ -99,14 +95,16 @@ class DashboardNutrientsWidget extends StatelessWidget {
     final List<NutrientQuota> displayQuotas = [];
     for (final label in targetLabels) {
       final existing = quotas.cast<NutrientQuota?>().firstWhere(
-            (q) => q?.label == label,
-            orElse: () => null,
-          );
+        (q) => q?.label == label,
+        orElse: () => null,
+      );
       if (existing != null) {
         displayQuotas.add(existing);
       } else {
         double defaultLimit = 100.0;
-        if (label == 'sodium' || label == 'potassium' || label == 'phosphorus') {
+        if (label == 'sodium' ||
+            label == 'potassium' ||
+            label == 'phosphorus') {
           defaultLimit = 1000.0;
         } else if (label == 'protein' || label == 'sugar' || label == 'carb') {
           defaultLimit = 50.0;
@@ -114,7 +112,12 @@ class DashboardNutrientsWidget extends StatelessWidget {
         displayQuotas.add(
           NutrientQuota(
             label: label,
-            unit: (label == 'sodium' || label == 'potassium' || label == 'phosphorus') ? 'mg' : 'g',
+            unit:
+                (label == 'sodium' ||
+                        label == 'potassium' ||
+                        label == 'phosphorus')
+                    ? 'mg'
+                    : 'g',
             consumed: 0.0,
             limit: defaultLimit,
           ),
@@ -180,7 +183,10 @@ class DashboardNutrientsWidget extends StatelessWidget {
                   percent >= 1.0 ? AppTheme.errorBase : accentColor;
 
               // Format limit
-              final isDecimal = q.label == 'protein' || q.label == 'sugar' || q.label == 'carb';
+              final isDecimal =
+                  q.label == 'protein' ||
+                  q.label == 'sugar' ||
+                  q.label == 'carb';
               final limitStr =
                   isDecimal
                       ? q.limit.toStringAsFixed(0)
@@ -298,9 +304,10 @@ class DashboardNutrientsWidget extends StatelessWidget {
                   unit: AppLocalizations.of(context)!.millilitersUnit,
                   icon: Icons.local_drink_rounded,
                   accentColor: const Color(0xFF38BDF8),
-                  bgColor: isDark
-                      ? const Color(0xFF38BDF8).withValues(alpha: 0.12)
-                      : const Color(0xFF38BDF8).withValues(alpha: 0.08),
+                  bgColor:
+                      isDark
+                          ? const Color(0xFF38BDF8).withValues(alpha: 0.12)
+                          : const Color(0xFF38BDF8).withValues(alpha: 0.08),
                 ),
               ),
               const SizedBox(width: 12),
@@ -312,9 +319,10 @@ class DashboardNutrientsWidget extends StatelessWidget {
                   unit: AppLocalizations.of(context)!.millilitersUnit,
                   icon: Icons.opacity_rounded,
                   accentColor: const Color(0xFFF59E0B),
-                  bgColor: isDark
-                      ? const Color(0xFFF59E0B).withValues(alpha: 0.12)
-                      : const Color(0xFFF59E0B).withValues(alpha: 0.08),
+                  bgColor:
+                      isDark
+                          ? const Color(0xFFF59E0B).withValues(alpha: 0.12)
+                          : const Color(0xFFF59E0B).withValues(alpha: 0.08),
                 ),
               ),
             ],
@@ -380,10 +388,9 @@ class DashboardNutrientsWidget extends StatelessWidget {
                       unit,
                       style: TextStyle(
                         fontSize: 11,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.5),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -394,10 +401,9 @@ class DashboardNutrientsWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.75),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.75),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -409,8 +415,6 @@ class DashboardNutrientsWidget extends StatelessWidget {
       ),
     );
   }
-
-
 
   String _getLocalLabel(BuildContext context, String label) {
     final l10n = AppLocalizations.of(context)!;

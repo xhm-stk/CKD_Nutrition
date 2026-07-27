@@ -11,7 +11,8 @@ class CustomTimeDatePicker {
   }) async {
     return await showDialog<TimeOfDay>(
       context: context,
-      builder: (context) => _CustomStepperTimePickerDialog(initialTime: initialTime),
+      builder:
+          (context) => _CustomStepperTimePickerDialog(initialTime: initialTime),
     );
   }
 
@@ -32,19 +33,20 @@ class CustomTimeDatePicker {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: isDark
-                ? const ColorScheme.dark(
-                    primary: AppTheme.brandPrimary,
-                    onPrimary: Colors.white,
-                    surface: AppTheme.bgSurface,
-                    onSurface: Colors.white,
-                  )
-                : const ColorScheme.light(
-                    primary: AppTheme.brandPrimary,
-                    onPrimary: Colors.white,
-                    surface: Colors.white,
-                    onSurface: Color(0xFF0F172A),
-                  ),
+            colorScheme:
+                isDark
+                    ? const ColorScheme.dark(
+                      primary: AppTheme.brandPrimary,
+                      onPrimary: Colors.white,
+                      surface: AppTheme.bgSurface,
+                      onSurface: Colors.white,
+                    )
+                    : const ColorScheme.light(
+                      primary: AppTheme.brandPrimary,
+                      onPrimary: Colors.white,
+                      surface: Colors.white,
+                      onSurface: Color(0xFF0F172A),
+                    ),
             dialogTheme: DialogTheme(
               backgroundColor: isDark ? AppTheme.bgSurface : Colors.white,
               shape: RoundedRectangleBorder(
@@ -60,7 +62,10 @@ class CustomTimeDatePicker {
                 borderRadius: BorderRadius.circular(24),
               ),
               dayStyle: const TextStyle(fontWeight: FontWeight.w600),
-              todayBorder: const BorderSide(color: AppTheme.brandPrimary, width: 1.5),
+              todayBorder: const BorderSide(
+                color: AppTheme.brandPrimary,
+                width: 1.5,
+              ),
               todayBackgroundColor: WidgetStateProperty.all(
                 AppTheme.brandPrimary.withValues(alpha: 0.1),
               ),
@@ -125,9 +130,7 @@ class __CustomStepperTimePickerDialogState
 
     return Dialog(
       backgroundColor: isDark ? AppTheme.bgSurface : Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 340),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -205,9 +208,10 @@ class __CustomStepperTimePickerDialogState
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(
-                      TimeOfDay(hour: _hour, minute: _minute),
-                    ),
+                    onPressed:
+                        () => Navigator.of(
+                          context,
+                        ).pop(TimeOfDay(hour: _hour, minute: _minute)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.brandPrimary,
                       foregroundColor: Colors.white,

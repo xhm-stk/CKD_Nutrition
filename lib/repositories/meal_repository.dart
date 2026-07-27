@@ -179,6 +179,7 @@ class MealRepository {
       return Success(null);
     }
   }
+
   Future<Result<void>> logUrine(double amountMl) async {
     final now = DateTime.now();
     final loggedAtUtcStr = now.toUtc().toIso8601String();

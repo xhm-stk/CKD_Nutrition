@@ -22,22 +22,26 @@ class FluidBalanceWidget extends StatelessWidget {
         balance >= 0
             ? '+${balance.toStringAsFixed(0)}'
             : balance.toStringAsFixed(0);
-            
-    final Color balanceColor = balance > 500
-        ? const Color(0xFFF59E0B)
-        : (balance >= 0 ? const Color(0xFF0284C7) : const Color(0xFF10B981));
 
-    final String statusText = l10n.localeName == 'th'
-        ? (balance > 0
-            ? 'มีน้ำสะสมค้างในร่างกาย +${balance.toInt()} มล.'
-            : (balance < 0
-                ? 'ขับน้ำออกมากกว่าน้ำดื่ม ${balance.abs().toInt()} มล.'
-                : 'น้ำดื่มและปัสสาวะสมดุลกันเป็นอย่างดี'))
-        : (balance > 0
-            ? 'Net fluid retention: +${balance.toInt()} ml'
-            : (balance < 0
-                ? 'Fluid loss exceeds intake: ${balance.abs().toInt()} ml'
-                : 'Fluid intake and output are perfectly balanced'));
+    final Color balanceColor =
+        balance > 500
+            ? const Color(0xFFF59E0B)
+            : (balance >= 0
+                ? const Color(0xFF0284C7)
+                : const Color(0xFF10B981));
+
+    final String statusText =
+        l10n.localeName == 'th'
+            ? (balance > 0
+                ? 'มีน้ำสะสมค้างในร่างกาย +${balance.toInt()} มล.'
+                : (balance < 0
+                    ? 'ขับน้ำออกมากกว่าน้ำดื่ม ${balance.abs().toInt()} มล.'
+                    : 'น้ำดื่มและปัสสาวะสมดุลกันเป็นอย่างดี'))
+            : (balance > 0
+                ? 'Net fluid retention: +${balance.toInt()} ml'
+                : (balance < 0
+                    ? 'Fluid loss exceeds intake: ${balance.abs().toInt()} ml'
+                    : 'Fluid intake and output are perfectly balanced'));
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -83,10 +87,9 @@ class FluidBalanceWidget extends StatelessWidget {
                       l10n.fluidBalanceSubtitle,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.55),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.55),
                       ),
                     ),
                   ],
@@ -105,7 +108,8 @@ class FluidBalanceWidget extends StatelessWidget {
                   context,
                   title: l10n.waterIntake,
                   value: '${intake.toInt()} ${l10n.millilitersUnit}',
-                  subText: 'โควต้า ${targetWater.toInt()} ${l10n.millilitersUnit}',
+                  subText:
+                      'โควต้า ${targetWater.toInt()} ${l10n.millilitersUnit}',
                   icon: Icons.local_drink_rounded,
                   color: const Color(0xFF0284C7),
                   bgColor: const Color(0xFFE0F2FE),
@@ -119,7 +123,10 @@ class FluidBalanceWidget extends StatelessWidget {
                   context,
                   title: l10n.urineOutput,
                   value: '${output.toInt()} ${l10n.millilitersUnit}',
-                  subText: l10n.localeName == 'th' ? 'ขับปัสสาวะสะสม' : 'Output total',
+                  subText:
+                      l10n.localeName == 'th'
+                          ? 'ขับปัสสาวะสะสม'
+                          : 'Output total',
                   icon: Icons.opacity_rounded,
                   color: const Color(0xFFD97706),
                   bgColor: const Color(0xFFFEF3C7),
@@ -161,7 +168,9 @@ class FluidBalanceWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        l10n.localeName == 'th' ? 'ยอดดุลน้ำสะสมสุทธิ' : 'Net Fluid Balance',
+                        l10n.localeName == 'th'
+                            ? 'ยอดดุลน้ำสะสมสุทธิ'
+                            : 'Net Fluid Balance',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -173,10 +182,9 @@ class FluidBalanceWidget extends StatelessWidget {
                         statusText,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.65),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.65),
                         ),
                       ),
                     ],
@@ -202,10 +210,9 @@ class FluidBalanceWidget extends StatelessWidget {
             children: [
               Icon(
                 Icons.info_outline_rounded,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.45),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.45),
                 size: 15,
               ),
               const SizedBox(width: 8),
@@ -214,10 +221,9 @@ class FluidBalanceWidget extends StatelessWidget {
                   l10n.fluidBalanceDoctorTip,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.45),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.45),
                     height: 1.3,
                   ),
                 ),
@@ -273,10 +279,9 @@ class FluidBalanceWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -298,10 +303,9 @@ class FluidBalanceWidget extends StatelessWidget {
             subText,
             style: TextStyle(
               fontSize: 11,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

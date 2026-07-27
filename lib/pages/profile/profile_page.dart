@@ -267,7 +267,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
                 onPressed: () async {
                   Navigator.pop(context);
-                  
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('กำลังลบบัญชีผู้ใช้ของคุณ...'),
@@ -275,7 +275,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                   );
 
-                  final result = await ref.read(authRepositoryProvider).deleteAccount();
+                  final result =
+                      await ref.read(authRepositoryProvider).deleteAccount();
 
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -284,7 +285,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     case Success():
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('ลบบัญชีผู้ใช้สำเร็จ ระบบกำลังนำคุณออกจากระบบ'),
+                          content: Text(
+                            'ลบบัญชีผู้ใช้สำเร็จ ระบบกำลังนำคุณออกจากระบบ',
+                          ),
                           backgroundColor: AppTheme.brandPrimary,
                         ),
                       );
@@ -702,7 +705,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                 final n = double.tryParse(clean);
                                 if (n != null && n >= 0 && n <= 200) {
                                   final newStage =
-                                      HealthProfileService.calculateStageFromEgfr(n);
+                                      HealthProfileService.calculateStageFromEgfr(
+                                        n,
+                                      );
                                   if (_selectedStage != newStage) {
                                     setState(() {
                                       _selectedStage = newStage;
