@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  ACTIONS_NODE20_DEPRECATION_WARNING: false
+  ACTIONS_NODE20_DEPRECATION_WARNING: 'false'
 
 jobs:
   # ========================================================
