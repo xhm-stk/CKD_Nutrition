@@ -1,19 +1,27 @@
-# 🛡️ CKD Nutrition Application
-> **The Secure, Offline-First Diet & Water Intake Management Ecosystem for Chronic Kidney Disease (CKD) Patients**
+# 🛡️ CKD Nutrition Application (กินดีไตดี)
+> **The Secure, Offline-First Medical Nutrition & Fluid Balance Management Ecosystem for Chronic Kidney Disease (CKD) Patients**
 
 [![Flutter](https://img.shields.io/badge/Flutter-v3.22.0+-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-v3.4.0+-0175C2?logo=dart&logoColor=white)](https://dart.dev)
-[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
+[![Riverpod](https://img.shields.io/badge/Riverpod-v2.5.1-00599C?logo=flutter&logoColor=white)](https://riverpod.dev)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL_Cloud-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
 [![Isar](https://img.shields.io/badge/Isar-NoSQL_Cache-FF6F00?logo=databricks&logoColor=white)](https://isar.dev)
+[![CI/CD](https://img.shields.io/badge/GitHub_Actions-15--Stage_Enterprise-2088FF?logo=githubactions&logoColor=white)](https://github.com/xhm-stk/CKD_Nutrition/actions)
 [![License](https://img.shields.io/badge/License-MIT-4CAF50)](https://opensource.org/licenses/MIT)
-
-แอปพลิเคชันนวัตกรรมควบคุมโภชนาการและติดตามสมดุลสารน้ำส่วนบุคคลสำหรับผู้ป่วยโรคไตเรื้อรัง (CKD) พัฒนาขึ้นด้วยสถาปัตยกรรม **Clean Layered Architecture** ผสานขีดความสามารถการจัดเก็บข้อมูลแบบ **Offline-First** และระบบรักษาความปลอดภัยระดับองค์กร เพื่อช่วยให้แพทย์ นักกำหนดอาหาร และผู้ป่วยสามารถควบคุมดูแลโปรตีน โซเดียม โพแทสเซียม น้ำตาล คาร์โบไฮเดรต และน้ำดื่ม ได้อย่างมีประสิทธิภาพสูงสุดบนโทรศัพท์มือถือทุกระบบ
 
 ---
 
-## 🧭 System Architecture Diagram (ภาพรวมระบบย่อยสากล)
+## 📖 บทนำและภาพรวมโปรเจกต์ (Project Overview)
 
-สถาปัตยกรรมแบ่งชั้นแยกความรับผิดชอบอย่างชัดเจน (Separation of Concerns) ทำให้แอปพลิเคชันตอบสนองได้อย่างรวดเร็วและสามารถดูแลรักษาโค้ดในระยะยาวได้ง่าย
+**กินดีไตดี (CKD Nutrition Application)** คือแอปพลิเคชันทางการแพทย์บนมือถือและคอมพิวเตอร์ (Android, iOS, Windows) ที่พัฒนาขึ้นด้วยเฟรมเวิร์ก **Flutter (Dart)** เพื่อช่วยเหลือผู้ป่วยโรคไตเรื้อรัง (Chronic Kidney Disease: CKD) ตั้งแต่ระยะ 1 ถึง 5 รวมถึงผู้ป่วยที่ต้องฟอกเลือดด้วยเครื่องไตเทียม (Hemodialysis) และล้างไตทางหน้าท้อง (Peritoneal Dialysis) ให้สามารถติดตาม บันทึก และคำนวณสารอาหารหลัก 7 ชนิดและสภาวะสมดุลน้ำดื่มได้อย่างถูกต้องตามหลักเวชปฏิบัติ **KDIGO Guidelines**
+
+แอปพลิเคชันถูกออกแบบด้วยสถาปัตยกรรม **Clean Layered Architecture** ผสานขีดความสามารถการจัดเก็บข้อมูลแบบ **Offline-First (Isar NoSQL)** และระบบซิงค์คิวอัตโนมัติ (**FIFO Sync Worker**) ไปยังคลาวด์ **Supabase PostgreSQL** ช่วยให้คนไข้และผู้ดูแลใช้งานได้อย่างราบรื่นแม้ในพื้นที่ไม่มีสัญญาณอินเทอร์เน็ต
+
+---
+
+## 🧭 สถาปัตยกรรมระบบ (System Architecture & Technology Stack)
+
+### 1. ภาพรวมสถาปัตยกรรม 4 ชั้น (Clean Layered Architecture)
 
 ```mermaid
 graph TD
@@ -22,232 +30,210 @@ graph TD
     classDef cache fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#e65100;
     classDef cloud fill:#ede7f6,stroke:#673ab7,stroke-width:2px,color:#311b92;
 
-    %% Presentation Layer
-    subgraph UI_Layer ["1. Presentation Layer (หน้าจอแอปพลิเคชัน)"]
-        A[Dashboard UI]:::ui
-        B[Diet Search & Logger UI]:::ui
-        C[Profile & Quota Settings UI]:::ui
-        D[Reminders Settings UI]:::ui
+    subgraph UI_Layer ["1. Presentation Layer (UI & Widgets)"]
+        A[DashboardPage]:::ui
+        B[FoodSearchPage]:::ui
+        C[HistoryPage]:::ui
+        D[ProfilePage & Reminders]:::ui
     end
 
-    %% State Management Layer
-    subgraph Controller_Layer ["2. Application Logic & Providers (Riverpod State)"]
-        E[DashboardNotifier]:::logic
-        F[ReminderNotifier]:::logic
-        G[AuthNotifier]:::logic
+    subgraph Controller_Layer ["2. State Management Layer (Riverpod v2)"]
+        E[activeDailyLogProvider]:::logic
+        F[todayMealsProvider]:::logic
+        G[nutrientQuotasProvider]:::logic
+        H[authStateProvider]:::logic
     end
 
-    %% Repositories & Services Layer
-    subgraph Domain_Services ["3. Business Services & Repositories (กฎและบริการ)"]
-        H[QuotaEngine]:::logic
-        I[MealRepository]:::logic
-        J[OfflineSyncWorker]:::logic
+    subgraph Domain_Services ["3. Business Logic Layer (UseCases & Services)"]
+        I[QuotaEngine]:::logic
+        J[DashboardUseCase]:::logic
+        K[HealthProfileService]:::logic
+        L[OfflineSyncWorker]:::logic
     end
 
-    %% Storage Layer
-    subgraph Storage_Layer ["4. Data Sources (แหล่งบันทึกข้อมูล)"]
-        K[(Isar Local NoSQL DB)]:::cache
-        L[(SharedPreferences Cache)]:::cache
-        M((Supabase Cloud Backend)):::cloud
+    subgraph Storage_Layer ["4. Data Access Layer (Repositories & Data Sources)"]
+        M[MealRepository]:::cache
+        N[FoodRepository]:::cache
+        O[(Isar Local NoSQL DB)]:::cache
+        P((Supabase PostgreSQL Cloud)):::cloud
     end
 
-    %% Data Flow
-    UI_Layer <-->|Read/Write State| Controller_Layer
-    Controller_Layer <-->|Evaluate Rules| Domain_Services
-    Domain_Services <-->|Local Cache First| K
-    Domain_Services <-->|Auth / Sync Queue| M
-    J <-->|Watch Network Connection| M
+    UI_Layer <-->|Watch State / Events| Controller_Layer
+    Controller_Layer <-->|Invoke UseCases| Domain_Services
+    Domain_Services <-->|Read / Write Local First| M
+    M <-->|Fast Cache Query| O
+    M <-->|RPC / Sync Queue| P
+    L <-->|FIFO Worker Sync| P
+```
+
+### 2. สรุปเทคโนโลยีที่ใช้ (Tech Stack Summary)
+
+* **Frontend Framework:** Flutter 3.22+ (Dart 3.4+) — Single codebase สำหรับ Android, iOS, Windows
+* **State Management:** Flutter Riverpod v2.5+ (`StateNotifierProvider`, `StreamProvider`, `Provider`)
+* **Local Database (Offline Cache):** Isar NoSQL Database (High-performance fast NoSQL engine)
+* **Backend & Cloud Database:** Supabase (PostgreSQL 15+, Auth, Storage, Realtime, RPC Functions)
+* **Local Data Persistence:** SharedPreferences (สำหรับเก็บค่าสวิตช์ตั้งค่าและสภาวะ Theme)
+* **Local Security:** `local_auth` (Biometrics: Face ID / Touch ID / Fingerprint) & AES-256 Local Storage Encryption
+* **Local Notifications:** `flutter_local_notifications` (ระบบตั้งเวลาเตือนกินยา จิบน้ำ บันทึกอาหาร)
+* **Navigation:** `go_router` (ระบบเปลี่ยนหน้าพร้อม Auth & Profile Setup Guards)
+
+---
+
+## ⚡ สถาปัตยกรรมทำงานออฟไลน์ (Offline-First Synchronization Engine)
+
+แอปพลิเคชันใช้อุปกรณ์มือถือเป็น **Single Source of Truth** ชั่วคราวขณะใช้งาน โดยมีลำดับขั้นตอนดังนี้:
+
+```text
+[กดปุ่มบันทึกมื้ออาหาร / น้ำดื่ม / ปัสสาวะ]
+                 │
+                 ▼
+     [เขียนข้อมูลลง Isar Local DB ทันที] ───► [อัปเดตหน้าจอ UI ทันที (Zero Latency)]
+                 │
+       [ตรวจจับสัญญาณอินเทอร์เน็ต]
+        ├── (มีอินเทอร์เน็ต) ➔ เรียก Supabase RPC (`log_meal_v2`) ➔ [เสร็จสมบูรณ์]
+        └── (ไม่มีอินเทอร์เน็ต / ออฟไลน์)
+                 │
+                 ▼
+     [แปลง Payload เป็น OfflineAction บันทึกลงคิว Isar DB]
+                 │
+                 ▼
+     [เปิด Connectivity Listener รอสัญญาณเน็ตกลับมา]
+                 │
+                 ▼
+     (เมื่อเชื่อมต่อเน็ตสำเร็จ) ➔ OfflineSyncWorker กวาดคิวตามลำดับเวลา (FIFO) ส่งขึ้น Supabase RPC
+                 │
+     [ผลลัพธ์ซิงค์สำเร็จ?]
+     ├── ใช่ ➔ ลบรายการคิวนั้นออกจาก Isar Local DB
+     └── ไม่สำเร็จ ➔ เพิ่ม Retry Count +1 และทดลองใหม่ในรอบถัดไป
 ```
 
 ---
 
-## 🌟 Core Features Blueprint (รายละเอียด 12 ฟังก์ชันหลักของระบบ)
+## 🩺 เกณฑ์คำนวณทางการแพทย์ (Medical Quota Rules & Logic)
 
-| ฟังก์ชันที่ | ชื่อคุณสมบัติหลัก (Feature Name) | รายละเอียดเชิงเทคนิคและการประมวลผล (Technical Details) |
-| :---: | :--- | :--- |
-| **1** | **Onboarding Welcome Screen** | หน้าแนะนำแอปเริ่มต้น บันทึกสถานะข้ามหน้าแนะนำลงหน่วยความจำถาวร `SharedPreferences` เพื่อไม่แสดงซ้ำในการเข้าใช้งานครั้งถัดไป |
-| **2** | **Bilingual Secure Authentication** | ระบบลงทะเบียน/ล็อกอิน และเปลี่ยนรหัสผ่านผ่านระบบ Supabase Auth พร้อมจัดเก็บ JWT Access Token ในระบบรักษาความปลอดภัยฮาร์ดแวร์ระดับเครื่อง |
-| **3** | **Medical Quota Calculation Engine** | ตรรกะประเมินโควต้าสารอาหารประจำวัน (โปรตีน โซเดียม โพแทสเซียม คาร์บ น้ำตาล และน้ำดื่ม) ผันแปรตามน้ำหนักตัวอ้างอิงและสถานะฟอกไต |
-| **4** | **Master Food Search & Diet Logger** | ระบบพิมพ์ค้นหาข้อมูลอาหารแยก 8 หมวดหมู่โภชนาการ ดึงจากฐานข้อมูล Isar DB ในเครื่อง และบันทึกลง Daily Logs ภายในเวลาไม่ถึง 10 มิลลิวินาที |
-| **5** | **Custom Food with Image Upload** | ฟังก์ชันเพิ่มอาหารทำเอง ระบุค่าโภชนาการ และอัปโหลดไฟล์ภาพถ่ายลงระบบ Supabase Storage พร้อมกลไกทำแคชภาพถ่ายภายในเครื่อง |
-| **6** | **Quick Cup Water & Urine Logger** | ปุ่มลัดบันทึกปริมาณน้ำดื่มรายแก้วด่วน และระบบป้อนตัวเลขปริมาณน้ำปัสสาวะที่ตวงได้จริง เพื่อประเมินอัตราขับน้ำสะสมประจำวัน |
-| **7** | **History Calendar Log Manager** | ปฏิทินย้อนประวัติการรับประทานรายวันย้อนหลังรายปี สามารถกดเลือกวันเพื่อดูรายละเอียดโภชนาการ และสั่งลบ (Delete) ประวัติทิ้งได้ |
-| **8** | **Monthly Compliance Data Analytics** | ระบบวิเคราะห์อัตราความเข้มงวดในการควบคุมอาหารคนไข้ (Compliance Rate) แสดงผลผ่านกราฟแท่งเปรียบเทียบแนวโน้มโภชนาการแบบสวยงาม |
-| **9** | **Push Notification Reminders** | ระบบตั้งค่าแจ้งเตือนดื่มน้ำ การกินยา หรือรอบการล้างไตผ่านทางหน้าท้อง ยิงการปลุกแบบ Push Notification ผ่าน SDK ของระบบปฏิบัติการ |
-| **10** | **Offline-First Synchronization Sync** | กลไกความซิงค์ข้อมูลเบื้องหลังอัตโนมัติ โดยหากแอปออฟไลน์จะบันทึกคิวงานลงเครื่อง เมื่อสัญญาณเน็ตกลับมาจะกวาดคิวอัปโหลดซิงค์ทันที |
-| **11** | **Time-Based 3-Food Recommendations** | ระบบสุ่มแนะนำ 3 เมนูอาหารโรคไตอัจฉริยะแบบแยกตามระยะโรค และช่วงชั่วโมงมื้ออาหาร (เช้า, กลางวัน, เย็น, ว่าง) พร้อมปุ่มบันทึกด่วน |
-| **12** | **Fluid Balance Evaluation System** | หน้าจอประเมินสมดุลสารน้ำสะสมแบบสีแจ้งเตือน (สีฟ้าปกติ / สีแดงอันตราย) เพื่อความปลอดภัยสูงสุดของผู้ป่วยไม่ให้เกิดภาวะน้ำท่วมปอด |
+ตรรกะประเมินโควต้าสารอาหาร 7 ชนิดหลักอ้างอิงตามแนวทางเวชปฏิบัติ **KDIGO Guidelines** และสมาคมโรคไตแห่งประเทศไทย:
 
----
+### 1. การคำนวณน้ำหนักตัวตามเกณฑ์ (Ideal Body Weight - IBW)
+เพื่อป้องกันข้อผิดพลาดในผู้ป่วยที่มีภาวะบวมน้ำ (Edema) ระบบใช้น้ำหนักมาตรฐานคำนวณโควต้าโปรตีน:
+* **ชาย:** $\text{IBW (kg)} = \text{ส่วนสูง (cm)} - 100$
+* **หญิง:** $\text{IBW (kg)} = \text{ส่วนสูง (cm)} - 105$
+* *หมายเหตุ:* หากน้ำหนักจริงต่างจาก IBW เกิน $\pm 20\%$ ระบบจะใช้น้ำหนักปรับแต่ง (Adjusted Body Weight: aBW):
+$$\text{aBW} = \text{IBW} + 0.25 \times (\text{Actual Weight} - \text{IBW})$$
 
-## 🧠 Medical Quota Rules & Logic (ตรรกะประเมินทางการแพทย์อย่างละเอียด)
-
-แอปพลิเคชันใช้ตรรกะการประมวลผลคำนวณโควต้าอาหารและน้ำดื่มที่อ้างอิงจาก **สมาคมโรคไตแห่งประเทศไทย** เป็นตัวประเมินผล:
-
-### 1. การหาน้ำหนักตัวอ้างอิง (Ideal Body Weight - IBW)
-ระบบไม่ใช้น้ำหนักตัวจริงในการคำนวณโควต้าโปรตีนเพื่อป้องกันข้อผิดพลาดในผู้ป่วยที่มีภาวะบวมน้ำ (Edema) แต่จะใช้สูตรดังนี้:
-* **เพศชาย:** 
-  $$\text{IBW (kg)} = \text{ส่วนสูง (cm)} - 100$$
-* **เพศหญิง:** 
-  $$\text{IBW (kg)} = \text{ส่วนสูง (cm)} - 105$$
-
-### 2. เกณฑ์เป้าหมายสารอาหารต่อวัน (Daily Nutrients Limits)
-ระบบจะทำการจับคู่ระยะของโรคไต (eGFR Stage 1 - 5) และสถานะการฟอกไต เพื่อคำนวณโควต้า:
+### 2. เกณฑ์โควต้าสารอาหารประจำวัน (Daily Nutrients Quota Limits)
 
 $$\text{โควต้าโปรตีน (กรัม/วัน)} = \text{IBW (kg)} \times \text{ตัวคูณโปรตีน}$$
 
 * **ตัวคูณโปรตีน (Protein Coefficient):**
-  * **ก่อนฟอกไต (Stage 1 - 5):** ใช้ตัวคูณ **0.6 g/kg/day** (เพื่อลดของเสียและประคองไม่ให้ไตเสื่อมไปถึงระยะสุดท้าย)
-  * **ฟอกไตแล้ว (ฟอกเลือดด้วยเครื่อง HD / ล้างช่องท้อง PD):** ใช้ตัวคูณ **1.2 g/kg/day** (เพื่อชดเชยสารอาหารโปรตีนที่สูญเสียไปขณะฟอกไต)
-* **เกณฑ์เกลือแร่สะสมประจำวัน (Minerals Baseline):**
-  * **โซเดียม (Sodium):** $< 2000\,\text{mg/day}$ ทุกระยะโรคไต
-  * **โพแทสเซียม (Potassium):** 
-    * ระยะ 1 - 2: ไม่จำกัด (ขึ้นกับผลเลือด)
-    * ระยะ 3a - 5: $< 2000\,\text{mg/day}$ (เพื่อป้องกันกล้ามเนื้อหัวใจเต้นผิดจังหวะ)
-  * **น้ำตาล (Sugar):** $< 24\,\text{g/day}$ ทุกระยะ
-  * **คาร์โบไฮเดรต (Carbohydrate):** $\text{IBW} \times 4.5\,\text{g/day}$
+  * **ก่อนฟอกไต (Stage 1 - 5 Non-dialysis):** **0.6 - 0.8 g/kg/day** (Low Protein Diet เพื่อลดการเกิดของเสีย BUN คั่ง)
+  * **ฟอกไตแล้ว (Hemodialysis HD / Peritoneal Dialysis PD):** **1.2 - 1.3 g/kg/day** (เพิ่มโปรตีนชดเชยการสูญเสียในสายฟอก)
+* **เกณฑ์เกลือแร่และสารอาหารอื่น:**
+  * **โซเดียม (Sodium):** $< 2,000\,\text{mg/day}$ ทุกระยะโรคไต (ลดภาวะบวมน้ำและความดันสูง)
+  * **โพแทสเซียม (Potassium):** $< 1,500 - 2,000\,\text{mg/day}$ ใน Stage 3b-5 (ป้องกันหัวใจเต้นผิดจังหวะ Hyperkalemia)
+  * **ฟอสฟอรัส (Phosphorus):** $< 800 - 1,000\,\text{mg/day}$ ใน Stage 3b-5 (ป้องกันโรคกระดูกเปราะและคราบแคลเซียมเกาะเส้นเลือด)
+  * **สมดุลน้ำดื่มไดนามิก (Dynamic Fluid Balance):**ในผู้ป่วย Stage 4-5 ที่ขับปัสสาวะได้ลดลง:
+    $$\text{โควต้าน้ำดื่ม (mL/วัน)} = \text{ปริมาณปัสสาวะที่ขับออกจริง (mL)} + 500\,\text{mL}$$
+    *(500 mL คือปริมาณน้ำที่สูญเสียทางธรรมชาติ Insensible Loss ผ่านลมหายใจและเหงื่อ)*
 
 ---
 
-## ⚡ Offline-First Synchronization Protocol (กลไกซิงค์ออฟไลน์คิวงาน)
+## 🗄️ โครงสร้างฐานข้อมูล (Database Schemas)
 
-การสื่อสารและประสานระหว่าง Isar DB กับ Supabase Cloud ใช้กลไกควบคุมแบบ **FIFO (First-In, First-Out Queue)** ร่วมกับตัวควบคุมความพยายามใหม่ (Retry Policy):
+### 1. Isar Local Collections (Local NoSQL DB)
 
-```text
-[กดปุ่มบันทึกในแอป] ➔ [เขียนประวัติทับ Isar DB ทันทีเพื่อความเร็ว]
-                         │
-                         ▼
-             [ตรวจสัญญาณเน็ตในเครื่อง?]
-             ├── (มีอินเทอร์เน็ต) ➔ ยิง API อัปเดตข้อมูลขึ้น Supabase ➔ [เสร็จสิ้น]
-             └── (ไม่มีเน็ต/ออฟไลน์) 
-                         │
-                         ▼
-             [บันทึก Payload JSON ลงตาราง Isar OfflineAction ( FIFO )]
-                         │
-                         ▼
-             [เปิด Network Connectivity Listener เฝ้ารอเน็ตกลับมา]
-                         │
-                         ▼
-             (เน็ตกลับมาต่อสำเร็จ) ➔ ทยอยดึงคิวเก่าสุดส่งขึ้น Supabase ทีละรายการ
-                         │
-             [ซิงค์สำเร็จ?]
-             ├── ใช่ ➔ ลบรายการแถวคิวนั้นออกจาก Isar DB ➔ ประมวลคิวตัวถัดไป
-             └── ไม่สำเร็จ ➔ บวก Retry Count +1 (ขีดจำกัด 5 ครั้ง) ➔ ข้ามไปทำรายการถัดไปก่อน
-```
+* **`FoodItem` (คลังอาหารไทย 156 รายการ):**
+  `foodId` (Unique Index), `nameTh` (String Index), `category`, `caloriesKcal`, `proteinG`, `sodiumMg`, `potassiumMg`, `phosphorusMg`, `waterMl`, `isCustom`
+* **`OfflineAction` (คิวงานออฟไลน์):**
+  `id` (AutoInc), `actionType` (`LOG_MEAL`, `LOG_WATER`, `LOG_URINE`), `payloadJson`, `createdAt` (Index)
+
+### 2. Supabase PostgreSQL Remote Tables
+
+* **`user_health_profiles` (โปรไฟล์สุขภาพ):** `user_id` (PK UUID), `ckd_stage`, `height_cm`, `weight_kg`, `age`, `egfr`, `is_on_dialysis`
+* **`daily_logs` (สถิติสรุปรายวัน):** `log_id` (PK UUID), `user_id` (FK), `log_date` (DATE), `total_calories`, `total_protein_g`, `total_sodium_mg`, `total_potassium_mg`, `total_phosphorus_mg`, `total_water_ml`, `total_urine_ml`, `custom_protein_limit_g`, `custom_water_limit_ml`, `UNIQUE(user_id, log_date)`
+* **`meals` (มื้ออาหารย่อย):** `meal_id` (PK UUID), `log_id` (FK), `user_id` (FK), `meal_type`, `food_name`, `portion_size`, `calories`, `protein_g`, `sodium_mg`, `potassium_mg`, `phosphorus_mg`, `water_ml`, `logged_at`
 
 ---
 
-## 🔑 Deep Link Auth Recovery Loop (ระบบกู้คืนและรีเซ็ตรหัสผ่าน)
+## 🛡️ ระบบความปลอดภัยและ RLS Policies
 
-เมื่อกดรีเซ็ตรหัสผ่านผ่านกล่องจดหมายอีเมล ระบบจะยืนยัน Token และเปลี่ยนผ่านสิทธิ์ไปหน้าจอตั้งรหัสใหม่โดยอัตโนมัติ:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as คนไข้ (User)
-    participant Safari as บราวเซอร์ (Web Browser)
-    participant OS as ระบบปฏิบัติการ (iOS/Android)
-    participant App as แอปมือถือ (Flutter Run)
-    participant Supa as Supabase Auth Server
-
-    User->>Safari: 1. แตะปุ่ม "Reset Password" ในกล่องข้อความอีเมล
-    Safari->>Supa: 2. บราวเซอร์ส่งคำขอยืนยัน Token ที่ได้รับไปตรวจเช็ค
-    Supa-->>Safari: 3. ตรวจสอบผ่าน สั่ง Redirect กลับมายังแอปปลายทาง<br/>(io.supabase.ckdnutrition://reset-callback/...)
-    Safari->>OS: 4. ส่งต่อที่อยู่ลิงก์พิเศษของแอปไปยัง OS
-    OS->>App: 5. OS ตรวจพบ Scheme ตรงกับแอป จึงกระตุ้นเปิดแอปขึ้นทำงานทันที
-    App->>App: 6. Supabase SDK ในแอปดึง Token มาเข้าเซสชันรีเซ็ตชั่วคราว
-    App->>App: 7. GoRouter ตรวจจับสถานะ เปลี่ยนเส้นทางหน้าจอไปยัง /reset-password
-    User->>App: 8. กรอกรหัสผ่านชุดใหม่และแตะปุ่มบันทึก
-    App->>Supa: 9. ยิงคำสั่งอัปเดตรหัสผ่านใหม่ขึ้นสู่เซิร์ฟเวอร์
-    Supa-->>App: 10. ยืนยันเปลี่ยนแปลงสำเร็จ ล็อกอินเข้าแอปหน้า Dashboard อัตโนมัติ
-```
+1. **Row Level Security (RLS) บน PostgreSQL:**  
+   ทุกตารางถูกเปิดใช้งาน RLS โดยจำกัดสิทธิ์ให้คำสั่ง SQL `SELECT`, `INSERT`, `UPDATE`, `DELETE` ทำงานได้เฉพาะเมื่อ `auth.uid() = user_id` ป้องกันการเข้าถึงข้อมูลสุขภาพข้ามบัญชี 100%
+2. **Biometrics Authentication:**  
+   ยืนยันตัวตนผ่านสแกนลายนิ้วมือหรือ Face ID (`local_auth`) ก่อนอนุญาตให้เปิดหน้าจอแสดงผลข้อมูลสุขภาพส่วนบุคคล
+3. **Local Encryption:**  
+   เข้ารหัส AES-256 สำหรับข้อมูลการตั้งค่าอ่อนไหวที่จัดเก็บบนอุปกรณ์
 
 ---
 
-## 🗄️ Database Schemas Map (โครงสร้างตารางข้อมูลที่เปิดใช้งานจริง)
+## 🚀 ระบบบิวต์และตรวจสอบคุณภาพอัตโนมัติ (15-Stage CI/CD Pipeline)
 
-แอปพลิเคชันรองรับ RLS Policies (Row Level Security) ทุกตาราง โดยข้อมูลผู้ใช้ทั้งหมดจะถูกผูกเข้ากับ `auth.uid() = user_id` ของเจ้าของบัญชีเท่านั้น:
+โปรเจกต์นี้มีระบบ CI/CD บน **GitHub Actions** (`.github/workflows/flutter_ci.yml`) ครอบคลุม 9 Jobs / 15 ด่านตรวจสอบคุณภาพ:
 
-### 1. ตารางข้อมูลประวัติคนไข้ (`user_health_profiles`)
-*เก็บข้อมูลเป้าหมายสุขภาพตามเกณฑ์ที่คนไข้เลือก*
-* `user_id` (uuid, PRIMARY KEY) ➔ ไอดีอ้างอิงจาก Supabase Auth
-* `ckd_stage` (text) ➔ ระยะของโรคไต เช่น `stage_3b`, `stage_5`
-* `gender` (text) ➔ เพศ (`male` / `female`)
-* `weight_kg` (numeric) ➔ น้ำหนักตัวจริงของคนไข้
-* `height_cm` (numeric) ➔ ส่วนสูงของคนไข้
-* `avatar_id` (integer) ➔ ไอดีรูปโปรไฟล์ที่เลือกใช้งาน
-* `age` (integer) ➔ อายุจริงของผู้ป่วย
-* `egfr` (numeric) ➔ ค่าการทำงานของไตล่าสุด
-* `is_on_dialysis` (boolean) ➔ สถานะการฟอกไต
-
-### 2. ตารางบันทึกสารอาหารสะสมรายวัน (`daily_logs`)
-*เก็บยอดรวมสะสมแบบอัปเดตทับเพื่อความรวดเร็วในการโหลด*
-* `id` (uuid, PRIMARY KEY) ➔ ไอดีของประวัติวันนั้น ๆ
-* `user_id` (uuid) ➔ ไอดีเจ้าของประวัติ
-* `log_date` (date) ➔ วันที่ของสถิติ เช่น `2026-07-22`
-* `total_protein_g` (numeric) ➔ ยอดรวมโปรตีนที่ทานไปของวัน
-* `total_potassium_mg` (numeric) ➔ ยอดรวมโพแทสเซียมสะสม
-* `total_sodium_mg` (numeric) ➔ ยอดรวมโซเดียมสะสม
-* `total_sugar_g` (numeric) ➔ ยอดรวมน้ำตาลสะสม
-* `total_carb_g` (numeric) ➔ ยอดรวมคาร์โบไฮเดรตสะสม
-* `total_water_ml` (numeric) ➔ ยอดรวมปริมาณน้ำดื่มสะสม
-* `total_urine_ml` (numeric) ➔ ยอดรวมปริมาณปัสสาวะที่ขับถ่ายสะสม
-
-### 3. ตารางข้อมูลมื้อย่อยรายมื้อ (`meals`)
-*เก็บประวัติแบบแยกรายมื้อเพื่อใช้ในการดูรายละเอียดและสั่งลบย้อนหลัง*
-* `id` (uuid, PRIMARY KEY)
-* `log_id` (uuid) ➔ คีย์เชื่อมโยงไปยังหัวตาราง `daily_logs`
-* `food_id` (text) ➔ รหัสเมนูอาหารอ้างอิง
-* `food_name` (text) ➔ ชื่อเมนูอาหารที่ทาน
-* `quantity_g` (numeric) ➔ ปริมาณน้ำหนักกรัมของอาหาร
-* `meal_type` (text) ➔ ช่วงมื้ออาหาร (`breakfast`, `lunch`, `dinner`, `snack`)
-* `protein_g` (numeric) ➔ ปริมาณโปรตีนที่ได้รับจากจานนี้
-* `potassium_mg` (numeric) ➔ ปริมาณโพแทสเซียมที่ได้รับ
-* `sodium_mg` (numeric) ➔ ปริมาณโซเดียมที่ได้รับ
-* `sugar_g` (numeric) ➔ ปริมาณน้ำตาลที่ได้รับ
-* `carb_g` (numeric) ➔ ปริมาณคาร์โบไฮเดรตที่ได้รับ
-* `water_ml` (numeric) ➔ ปริมาณน้ำแฝง/น้ำเปล่าที่ได้รับ
+1. 🔍 **1. Code Quality & Formatting:** ตรวจสอบไวยากรณ์ด้วย `dart format` และ `flutter analyze`
+2. 🧹 **2. Native Android Lint Check:** ตรวจสอบไฟล์เนทีฟแอนดรอยด์ด้วย `./gradlew lintRelease`
+3. 🛡️ **3. Secret & Credential Scanning:** สแกนหา Security Leaks และ API Keys หลุดรอด
+4. 🔒 **4. Security & Dependency Scan:** ตรวจสอบแพ็กเกจด้วย `flutter pub outdated`
+5. 📋 **5. License Compliance Audit:** สอบทานสัญญาอนุญาตโอเพนซอร์ส
+6. 🧪 **6-9. Unit Tests & DB Migration:** รันยูนิตเทสและตรวจสอบโควต้าสารอาหาร 7 ชนิด
+7. 🤖 **10-13. Build Android Release:** คอมไพล์ไฟล์ APK และ App Bundle (AAB) พร้อมตรวจสอบขนาดไฟล์
+8. 📦 **11. Build iOS App Bundle:** คอมไพล์ไฟล์แอปพลิเคชันบนเครื่องเซิร์ฟเวอร์ macOS
+9. 🚀 **14-15. Pipeline Summary:** สรุปผลการรันไปป์ไลน์ผ่าน 100%
 
 ---
 
-## 🛠️ Installation & Setup (คำแนะนำสำหรับการรันโครงการต่อ)
+## 💻 การติดตั้งและเริ่มต้นใช้งาน (Installation & Setup Guide)
 
-### 1. ติดตั้งซอฟต์แวร์ที่เกี่ยวข้อง
-* ติดตั้ง **Flutter SDK** รุ่น `v3.22.0` ขึ้นไป
-* ดำเนินการเปิดจำลอง Android Emulator หรือเครื่อง iOS จริงที่มีการเชื่อมต่อโปรไฟล์การพัฒนาของ Apple (Developer Profile)
+### 1. ข้อกำหนดเบื้องต้น (Prerequisites)
+* **Flutter SDK:** Version 3.22.0 ขึ้นไป
+* **Dart SDK:** Version 3.4.0 ขึ้นไป
+* **IDE:** VS Code หรือ Android Studio พร้อมติดตั้ง Flutter Extension
 
-### 2. ดาวน์โหลดโปรเจกต์และสร้างตัวแปลฐานข้อมูล Isar (สำคัญ 🌟)
-เมื่อดึงโค้ดลงมาในเครื่องแล้ว ต้องทำการบิวต์สร้างคลาสฐานข้อมูล Local Cache ของ Isar ก่อนเสมอ ด้วยคำสั่งดังนี้:
+### 2. ขั้นตอนการติดตั้ง (Setup Steps)
+
 ```bash
-# 1. โหลดแพ็กเกจที่ใช้งานทั้งหมดในเครื่อง
+# 1. Clone repository ลงเครื่อง local
+git clone https://github.com/xhm-stk/CKD_Nutrition.git
+cd CKD_Nutrition
+
+# 2. โหลดแพ็กเกจที่เกี่ยวข้องทั้งหมด
 flutter pub get
 
-# 2. บิวต์สร้างคลาสและออบเจกต์ฐานข้อมูลในเครื่องอัตโนมัติ
+# 3. สร้างคลาสฐานข้อมูล Isar DB และ Code Generation (สำคัญมาก 🌟)
 flutter pub run build_runner build --delete-conflicting-outputs
-```
 
-### 3. สั่งทดสอบการรันแอปพลิเคชัน
-```bash
-# สั่งรันแอปบนอุปกรณ์จำลองที่กำลังเชื่อมต่ออยู่
+# 4. ทดลองสั่งรันแอปพลิเคชัน
 flutter run
 ```
 
----
+### 3. คำสั่งบิวต์สำหรับ Production Release
 
-## 📂 Project Architecture Map (แผนที่การเก็บรวบรวมไฟล์หลัก)
+```bash
+# บิวต์สำหรับ Android (APK)
+flutter build apk --release
 
-```text
-lib/
-├── core/             # คอนฟิกหลักและตัวจัดการฟังก์ชันตอบกลับระบบ (Result Type & Constants)
-├── l10n/             # ระบบคำแปลรองรับ 2 ภาษาหลัก ( Bilingul Localization TH / EN )
-├── models/           # ไฟล์กำหนดคลาสฐานข้อมูล Isar DB และคลาส JSON ของ Supabase
-├── pages/            # ส่วนควบคุม UI หน้าจอทั้งหมด ( Dashboard, Profile, Reminders )
-├── providers/        # ตัวกลางจัดหาและจัดการสถานะ ( Riverpod Providers & Controllers )
-├── repositories/     # ตัวกรองแยกเส้นทางข้อมูล ( local cache vs. supabase data repos )
-├── router/           # ระบบนำทางและคุมความปลอดภัยสิทธิ์การเข้าถึงหน้าจอ ( GoRouter Config )
-├── services/         # ฟังก์ชันการทำงานทางการแพทย์และระบบซิงค์ ( Quota Engine & Sync Worker )
-└── widgets/          # ชิ้นส่วนปุ่มหรือแถบข้อมูลที่ใช้ซ้ำในหน้าจอทั่วไป ( UI Core Custom Components )
+# บิวต์สำหรับ Windows Desktop
+flutter build windows --release
 ```
 
 ---
+
+## 📂 โครงสร้างโฟลเดอร์โปรเจกต์ (Project Structure)
+
+```text
+lib/
+├── controllers/      # StateNotifier Controllers ควบคุมการบันทึกอาหารและการสมัครสมาชิก
+├── core/             # คลาสส่วนกลาง (Result Type, Date Utilities)
+├── l10n/             # ระบบแปลภาษา TH / EN (Internationalization)
+├── models/           # Isar Collections (Local) และ Supabase Freezed Data Models (Cloud)
+├── pages/            # หน้าจอ presentation (Dashboard, Auth, Food Search, History, Profile)
+├── providers/        # Riverpod State Providers & Dependency Injection Streams
+├── repositories/     # Data Access Layer สลับการทำงานระหว่าง Local Isar DB และ Supabase Cloud
+├── router/           # ระบบนำทาง GoRouter พร้อม Auth & Health Setup Redirect Guards
+├── services/         # Business Logic Engine (QuotaEngine, OfflineSyncWorker, BiometricService)
+├── theme/            # ระบบสไตล์และโทนสี Premium Design System
+└── widgets/          # Reusable UI Components (QuotaBar, FluidBalanceCard, SmartFoodImage)
+```
+
+---
+
 **© 2026 CKD Nutrition Team. Designed for Medical Excellence and Data Sovereignty.**
